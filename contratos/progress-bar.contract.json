@@ -1,0 +1,60 @@
+{
+  "name": "ProgressBar",
+  "originalName": "Barra de Progresso",
+  "oneLiner": "Progresso mensurável de uma operação (0 a 100%) — diferente do Spinner, que é só 'está acontecendo', sem noção de quanto falta.",
+  "category": "display",
+  "status": "draft",
+  "whenToUse": "A duração/proporção de uma operação é conhecida ou calculável (upload de arquivo, importação, etapas concluídas de um processo) e vale a pena comunicar quanto falta.",
+  "whenNotToUse": "Duração desconhecida ou não-linear (isso é Spinner — carregamento indeterminado); progresso de uma etapa dentro de um fluxo com passos nomeados (isso seria um Stepper, fora do harness); contador simples sem noção de 'até onde vai' (isso é Badge/count).",
+  "anatomy": [
+    "Trilho (fundo, raio-circular)",
+    "Preenchimento (largura proporcional ao value, cor por variant)",
+    "Rótulo textual do percentual (opcional, showValue)"
+  ],
+  "dependencies": [],
+  "props": [
+    { "name": "value", "type": "number", "required": true, "description": "0 a max (padrão 0-100). Fora desse intervalo é clampado (ver decisions), não é erro." },
+    { "name": "max", "type": "number", "default": 100, "required": false },
+    { "name": "variant", "type": "enum", "enum": ["primary", "success", "error", "warning", "critical", "neutral"], "default": "primary", "required": false, "description": "primary = progresso normal em andamento. success/error = feedback final (operação concluída ou falhou), pra reaproveitar a mesma barra em vez de trocar por um Alert. warning/critical/neutral = tons de severidade/prioridade (ver decisions) — pensados pro caso de uma LISTA de barras representando categorias de prioridade/status lado a lado (ex.: ProgressList), não pra uma única barra de operação em andamento." },
+    { "name": "showValue", "type": "boolean", "default": false, "required": false, "description": "Mostra o percentual como texto (ex.: '42%') ao lado da barra." },
+    { "name": "accessibleLabel", "type": "string", "required": true, "description": "Descreve O QUE está progredindo (ex.: 'Enviando arquivo') — vira aria-label, obrigatório porque uma barra sozinha (só a cor/largura) não diz o que ela representa pra quem usa leitor de tela." }
+  ],
+  "variants": ["primary", "success", "error", "warning", "critical", "neutral"],
+  "states": ["static"],
+  "tokensAllowed": {
+    "track": ["semantic.fundo-secundario"],
+    "fill": ["semantic.acao-primaria", "semantic.borda-sucesso", "semantic.borda-erro", "semantic.borda-aviso", "semantic.acao-destrutiva-pressionada", "semantic.borda-inativo"],
+    "text": ["semantic.texto-secundario"],
+    "radius": ["structural.raio-circular"],
+    "spacing": ["structural.espaco-xp", "structural.espaco-pp"],
+    "typography": ["type-style.texto-p"]
+  },
+  "a11y": {
+    "role": "progressbar nativo (role=\"progressbar\") com aria-valuenow/aria-valuemin=0/aria-valuemax={max} e aria-label={accessibleLabel}.",
+    "requiredAria": ["aria-valuenow, aria-valuemin, aria-valuemax sempre presentes", "aria-label sempre presente (accessibleLabel é obrigatório, não opcional)"],
+    "keyboard": ["nenhuma — ProgressBar não é focável, é só informativo (mesmo padrão do Spinner)"],
+    "contrastMin": "N/A diretamente pro preenchimento (é uma barra de cor, não texto) — o texto do percentual (showValue), quando presente, segue texto-secundario sobre fundo-superficie, já validado em outros contratos.",
+    "notes": "Sem sombra/animação de 'stripes' indeterminada — isso é justamente o que diferencia ProgressBar de Spinner; se o progresso não é mensurável, o componente certo é Spinner, não ProgressBar com valor fake."
+  },
+  "events": { "status": "não definido no contrato original" },
+  "composition": {
+    "canContain": [],
+    "canBeContainedBy": ["formulários", "cards", "listas de upload/importação"],
+    "doNotCombine": ["ProgressBar com value fixo simulando indeterminado (ex.: animação CSS solta) — isso é Spinner"]
+  },
+  "forbidden": [
+    "usar ProgressBar sem noção real de progresso mensurável (ver whenNotToUse)",
+    "omitir accessibleLabel — erro em tempo de execução",
+    "cor fora da whitelist de tokensAllowed",
+    "adicionar animação de progresso indeterminado (stripes, pulse) — isso descaracteriza o componente, use Spinner"
+  ],
+  "decisions": [
+    "value fora do intervalo [0, max] é CLAMPADO (não lança erro) — ex.: value=150 com max=100 vira 100% visualmente. Motivo: cálculos de progresso vindos de APIs externas (ex.: bytes enviados / bytes totais) podem momentaneamente passar de 100% por arredondamento; travar a UI com um erro de execução por causa disso seria pior que simplesmente exibir 100%.",
+    "variant tem só 3 opções (primary/success/error), não os 5 do Badge/Chip (sem info/warning) — decisão do agente, não perguntada pra reduzir interferência: uma barra de progresso normalmente só precisa comunicar 'em andamento' (primary), 'terminou bem' (success) ou 'falhou' (error); 'aviso'/'info' não têm um significado claro no contexto de uma operação em progresso. Se surgir um caso real, é decisão nova.",
+    "EXTENSÃO — 3 novos variants (warning/critical/neutral), a partir da análise de sistemas legados (ver analise-sistemas-legados.md, item 1.7 'Barra de progresso rotulada com contagem') e da molécula ProgressList que passou a consumir ProgressBar (ver contratos/progress-list.contract.json). Motivo: o caso real observado não é 'uma barra de operação em andamento' (o que a decisão original cobria bem com só 3 variants), é uma LISTA de barras representando categorias de prioridade/status lado a lado (ex.: 'No prazo'/'Atenção'/'Urgente'/'Atrasado') — mesma semântica de severidade já usada em badge.contract.json (que ganhou os mesmos 3 tons na mesma leva de mudanças: warning=borda-aviso, critical=acao-destrutiva-pressionada, mais 'neutral'=borda-inativo, novo tanto pro Badge quanto pro ProgressBar). Reaproveita exatamente os mesmos tokens já usados no Badge (nenhum token novo criado) — mantém as duas famílias de componente com a mesma paleta de severidade. Continuam fora do ProgressBar: 'info' (ainda sem um caso real de progresso ou lista de prioridade que precise dele) e qualquer variant fora dessa paleta de status/severidade (ex.: cores puramente categóricas sem relação com prioridade/urgência, vistas em outros blocos das telas legadas mas sem padrão consistente o bastante pra virar token — ver analise-sistemas-legados.md pro racional completo).",
+    "accessibleLabel é OBRIGATÓRIO (diferente de outros 'accessibleLabel' opcionais no harness) — uma barra de progresso sozinha (só cor + largura, às vezes sem showValue) não tem NENHUM outro jeito de comunicar o que está progredindo pra quem usa leitor de tela; diferente de Icon/Avatar, que têm fallback de name/children, ProgressBar não tem nenhuma fonte alternativa de contexto.",
+    "showValue mostra só o número (ex.: '42%'), não reaproveita accessibleLabel como texto visível — são propósitos diferentes: accessibleLabel é pro leitor de tela entender O QUE é a barra, showValue é pra qualquer pessoa ver QUANTO já foi. As duas informações já ficam disponíveis juntas pra quem usa leitor de tela via aria-valuenow + aria-label, sem precisar duplicar na tela visualmente.",
+    "Sem tamanhos (small/medium/large) neste contrato — uma altura fixa e discreta (mesmo espírito de simplicidade do Divider) até surgir um caso real que peça variação."
+  ],
+  "references": { "tokensFile": "tokens/tokens.json — Cores Semânticas (Ações/Primárias, Fundos, Bordas/Sinalização sucesso/erro), Estrutural (raio-circular, espaco-xp/pp), Tipografia Estilo (texto-p)" }
+}

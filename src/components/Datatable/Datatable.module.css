@@ -1,0 +1,442 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-m);
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--espaco-p);
+}
+
+.toolbarLeft {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.title {
+  margin: 0;
+  color: var(--texto-primario);
+  font-family: var(--texto-g-forte-family);
+  font-size: var(--texto-g-forte-size);
+  font-weight: var(--texto-g-forte-weight);
+  line-height: var(--texto-g-forte-line-height);
+}
+
+.toolbarRight {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-p);
+}
+
+.activeFilters {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--espaco-pp);
+}
+
+.activeFiltersLabel {
+  color: var(--texto-secundario);
+  font-family: var(--texto-p-family);
+  font-size: var(--texto-p-size);
+  line-height: var(--texto-p-line-height);
+}
+
+.popoverAnchor {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espaco-xp);
+}
+
+.popoverTriggerWrap {
+  display: inline-flex;
+}
+
+.popover {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-xp);
+  padding: var(--espaco-pp);
+  background: var(--fundo-superficie);
+  border: 1px solid var(--borda-base);
+  border-radius: var(--raio-pp);
+  z-index: 10;
+}
+
+.popoverWide {
+  min-width: 200px;
+}
+
+.bulkActions {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-p);
+}
+
+.bulkCount {
+  color: var(--texto-primario);
+  font-family: var(--texto-p-family);
+  font-size: var(--texto-p-size);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-m);
+  border: 1px solid var(--borda-base);
+  border-radius: var(--raio-pp);
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.scrollArea {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--texto-p-family);
+  font-size: var(--texto-p-size);
+  line-height: var(--texto-p-line-height);
+  color: var(--texto-primario);
+}
+
+.thead {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--fundo-secundario);
+}
+
+.th {
+  vertical-align: middle;
+  border-bottom: 1px solid var(--borda-base);
+  white-space: nowrap;
+}
+
+/* Padding horizontal (left/right) é o MESMO nas 3 densidades — só o vertical
+   (top/bottom) encolhe. Antes o compact também encolhia o horizontal, deixando
+   o conteúdo colado na borda da tabela (bug real reportado). Sintaxe de 2
+   valores: 1º = vertical, 2º = horizontal. */
+.comfortable .th,
+.comfortable .td {
+  padding: var(--espaco-p) var(--espaco-pp);
+}
+
+.compact .th,
+.compact .td {
+  padding: var(--espaco-xp) var(--espaco-pp);
+}
+
+/* condensed é a densidade mais estreita possível — padding vertical quase
+   inexistente (0), pra caber o máximo de registros na tela (pedido explícito
+   do usuário, revisado depois do 1px ainda parecer grande demais). Horizontal
+   continua igual às outras densidades. */
+.condensed .th,
+.condensed .td {
+  padding: 0 var(--espaco-pp);
+}
+
+.thContent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espaco-xp);
+}
+
+.titleArea {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  flex: 1;
+}
+
+.headerLabel {
+  font-family: var(--texto-micro-forte-family);
+  font-size: var(--texto-micro-forte-size);
+  font-weight: var(--texto-micro-forte-weight);
+  line-height: var(--texto-micro-forte-line-height);
+  color: var(--texto-secundario);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+/* headerControl é a caixa compartilhada entre o botão-título e o input de
+   filtro — mesmo padding/borda/altura nos dois, só a cor da borda muda
+   (transparente vs borda-base), pra trocar um pelo outro nunca deslocar a
+   altura da linha de cabeçalho (bug real reportado, ver datatable.contract.json). */
+.headerControl {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-xp);
+  width: 100%;
+  box-sizing: border-box;
+  height: 26px;
+  padding: 2px var(--espaco-xp);
+  border: 1px solid transparent;
+  border-radius: var(--raio-xp);
+  font-family: var(--texto-micro-forte-family);
+  font-size: var(--texto-micro-forte-size);
+  font-weight: var(--texto-micro-forte-weight);
+  line-height: var(--texto-micro-forte-line-height);
+  letter-spacing: 0.02em;
+  color: var(--texto-secundario);
+  text-transform: uppercase;
+}
+
+.headerNameButton {
+  background: none;
+  cursor: pointer;
+}
+
+.headerNameButton:hover,
+.headerNameButton:focus-visible {
+  color: var(--texto-primario);
+}
+
+.headerNameText {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: left;
+}
+
+/* espaço da lupa é sempre reservado (o ícone existe no DOM), só a
+   visibilidade muda no hover/focus — nunca desloca o layout ao aparecer */
+.headerNameButton svg {
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+
+.headerNameButton:hover svg,
+.headerNameButton:focus-visible svg {
+  opacity: 1;
+}
+
+.headerNameButton:focus-visible,
+.sortButton:focus-visible {
+  outline: var(--foco-espessura) solid var(--borda-foco);
+  outline-offset: 1px;
+}
+
+input.headerControl {
+  border-color: var(--borda-base);
+  background: var(--fundo-superficie);
+  color: var(--texto-primario);
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+input.headerControl::placeholder {
+  color: var(--texto-placeholder);
+}
+
+input.headerControl:focus-visible {
+  outline: var(--foco-espessura) solid var(--borda-foco);
+  outline-offset: 1px;
+}
+
+input.headerControl:disabled {
+  color: var(--texto-inativo);
+  cursor: not-allowed;
+}
+
+.sortButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+.sortButton:disabled {
+  cursor: not-allowed;
+}
+
+.editInput {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  padding: var(--espaco-xp) var(--espaco-pp);
+  border: 1px solid var(--borda-base);
+  border-radius: var(--raio-pp);
+  background: var(--fundo-superficie);
+  color: var(--texto-primario);
+  font-family: var(--texto-p-family);
+  font-size: var(--texto-p-size);
+  font-weight: var(--texto-p-weight);
+}
+
+.editInput:focus-visible {
+  outline: var(--foco-espessura) solid var(--borda-foco);
+  outline-offset: 1px;
+}
+
+.thSelect {
+  width: 1%;
+}
+
+.td {
+  vertical-align: middle;
+  border-bottom: 1px solid var(--borda-base);
+  white-space: nowrap;
+}
+
+.row:hover {
+  background: var(--fundo-secundario);
+}
+
+.rowSelected,
+.rowSelected:hover {
+  background: var(--acao-primaria-transparente);
+}
+
+.rowEditing,
+.rowEditing:hover {
+  background: var(--fundo-secundario);
+}
+
+.rowDisabled {
+  opacity: 0.6;
+}
+
+.rowDisabled .td {
+  color: var(--texto-inativo);
+}
+
+/* coluna fixa (column.sticky='right') — precisa de fundo opaco próprio
+   porque position:sticky pinta por cima do conteúdo que rola por baixo;
+   sincronizado por estado de linha (ver datatable.contract.json, decisions) */
+.stickyRight {
+  position: sticky;
+  right: 0;
+  z-index: 1;
+  background: var(--fundo-superficie);
+  border-left: 1px solid var(--borda-base);
+  box-shadow: -4px 0 6px -4px rgba(17, 24, 39, 0.15);
+}
+
+.thead .stickyRight {
+  z-index: 3;
+  background: var(--fundo-secundario);
+}
+
+.row:hover .stickyRight {
+  background: var(--fundo-secundario);
+}
+
+.rowSelected .stickyRight,
+.rowSelected:hover .stickyRight {
+  background: color-mix(in srgb, var(--acao-primaria-transparente) 100%, var(--fundo-superficie));
+}
+
+.rowEditing .stickyRight,
+.rowEditing:hover .stickyRight {
+  background: var(--fundo-secundario);
+}
+
+.emptyCell {
+  padding: var(--espaco-g);
+  text-align: center;
+}
+
+.emptyTitle {
+  display: block;
+  color: var(--texto-primario);
+  font-family: var(--texto-p-family);
+  font-size: var(--texto-p-size);
+  font-weight: 700;
+}
+
+.emptyDescription {
+  margin: var(--espaco-xp) 0 0;
+  color: var(--texto-secundario);
+  font-family: var(--texto-p-family);
+  font-size: var(--texto-p-size);
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--espaco-p);
+  padding: var(--espaco-p) var(--espaco-m);
+}
+
+.paginationSummary {
+  color: var(--texto-secundario);
+  font-family: var(--texto-p-family);
+  font-size: var(--texto-p-size);
+}
+
+.paginationControls {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-p);
+}
+
+.pageSizeLabel {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-xp);
+  color: var(--texto-secundario);
+  font-family: var(--texto-p-family);
+  font-size: var(--texto-p-size);
+}
+
+.pageSizeSelect {
+  padding: var(--espaco-xp) var(--espaco-pp);
+  border: 1px solid var(--borda-base);
+  border-radius: var(--raio-pp);
+  background: var(--fundo-superficie);
+  color: var(--texto-primario);
+  font-family: var(--texto-p-family);
+  font-size: var(--texto-p-size);
+}
+
+.pageSizeSelect:focus-visible {
+  outline: var(--foco-espessura) solid var(--borda-foco);
+  outline-offset: 1px;
+}
+
+.pageIndicator {
+  color: var(--texto-primario);
+  font-family: var(--texto-p-family);
+  font-size: var(--texto-p-size);
+  white-space: nowrap;
+}
+
+.confirmBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-m);
+}
+
+.confirmText {
+  margin: 0;
+  color: var(--texto-primario);
+  font-family: var(--texto-p-family);
+  font-size: var(--texto-p-size);
+}
+
+.confirmActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--espaco-pp);
+}

@@ -1,0 +1,15 @@
+/* AJUSTADO a pedido do usuário — precisa ser mais CLARO que o fundo da
+   página nos dois temas (mesmo par de regras do SideNav — BUG real:
+   fundo-superficie fixo batia com o fundo-superficie da página no modo
+   escuro, mesma cor, sem contraste nenhum). */
+.emptyCard {
+  width: 100%;
+  height: 100%;
+  background: var(--fundo-superficie);
+  border-radius: var(--raio-p);
+  box-sizing: border-box;
+}
+
+:root[data-theme="dark"] .emptyCard {
+  background: var(--fundo-secundario);
+}

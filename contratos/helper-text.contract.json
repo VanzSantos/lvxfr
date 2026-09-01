@@ -1,0 +1,42 @@
+{
+  "name": "HelperText",
+  "originalName": "MensagemApoio",
+  "oneLiner": "Texto auxiliar abaixo de um campo, em intenção neutra (ajuda) ou de erro.",
+  "category": "display",
+  "status": "draft",
+  "whenToUse": "Campo precisa de ajuda contextual ('mínimo 8 caracteres') ou mensagem de erro ('e-mail inválido').",
+  "whenNotToUse": "Para nomear o campo, use FieldLabel. Para feedback de formulário inteiro ou notificações, use os componentes de feedback próprios (fora deste harness) — não este átomo.",
+  "anatomy": ["Texto único"],
+  "dependencies": [],
+  "props": [
+    { "name": "text", "type": "string", "required": true, "description": "Sempre obrigatório — não existe estado 'sem texto'. Quem decide SE o HelperText é montado é o campo consumidor; o átomo nunca recebe/trata texto vazio." },
+    { "name": "intent", "type": "enum", "enum": ["default", "error"], "default": "default", "required": false },
+    { "name": "fieldId", "type": "string", "required": false, "description": "Id do CAMPO (não da mensagem). O átomo deriva seu próprio id como `${fieldId}-message` e o expõe via `id`; o consumidor aponta o aria-describedby do input pra esse id derivado." }
+  ],
+  "variants": ["default", "error"],
+  "states": ["static"],
+  "tokensAllowed": {
+    "text": ["semantic.texto-secundario", "semantic.texto-erro"],
+    "typography": ["type-style.texto-p"]
+  },
+  "a11y": {
+    "role": "none (associado via aria-describedby, não tem role própria)",
+    "requiredAria": ["o input associado deve ter aria-invalid quando intent = error"],
+    "keyboard": [],
+    "contrastMin": "WCAG AA nas duas intenções",
+    "notes": "Erro NUNCA pode ser comunicado só pela cor — o texto da mensagem descreve o problema e o campo associado carrega aria-invalid. Crítico para o público-alvo (60+)."
+  },
+  "events": { "status": "não definido no contrato original — componente estático, provavelmente não precisa" },
+  "composition": { "canContain": [], "canBeContainedBy": ["TextField"], "doNotCombine": [] },
+  "forbidden": [
+    "expor variante de sucesso (fora de escopo — token texto-sucesso continua existindo no sistema para outros contextos, só este átomo não usa)",
+    "renderizar com texto vazio/null — o átomo nunca lida com esse caso, é o consumidor que decide se monta",
+    "receber id pronto da mensagem — o id é sempre derivado de fieldId internamente"
+  ],
+  "decisions": [
+    "Sucesso ficou fora de escopo: raramente muda a ação do usuário por campo. Pode ser adicionado se surgir caso real.",
+    "text é estritamente obrigatório (revisado — uma versão anterior tratava como opcional e renderizava null; voltou atrás).",
+    "Id é sempre derivado de fieldId (`${fieldId}-message`), nunca recebido pronto — mesmo padrão de responsabilidade usado em FieldLabel/Tooltip."
+  ],
+  "references": { "tokensFile": "tokens/tokens.json — Cores Semânticas (Textos/texto-secundario, Textos/Sinalização/texto-erro), Tipografia Estilo (texto-p)" }
+}

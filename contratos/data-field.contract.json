@@ -1,0 +1,64 @@
+{
+  "name": "DataField",
+  "originalName": "CampoDeDados",
+  "oneLiner": "Par rótulo (linha fina, em cima) + valor (linha forte, embaixo, com ícone opcional), dentro de uma caixa com borda leve — pra exibir um dado só-leitura de forma rotulada.",
+  "category": "display",
+  "status": "draft",
+  "whenToUse": "Mostrar um dado individual já resolvido (não editável nesta tela) com seu rótulo, dentro de uma grade de campos — ex.: 'CPF: 000.000.000-00', 'Matrícula: 000000', num painel de detalhe de um registro (beneficiário, ticket, empresa, prestador). Padrão identificado como o mais repetido em telas de detalhe de sistemas internos (ver analise-sistemas-legados.md, item 1.1).",
+  "whenNotToUse": "Campo que o usuário PODE editar nesta tela (isso é TextField/Select, não DataField); duas linhas de texto sem rótulo/valor com hierarquia diferente, tipo nome+e-mail dentro de uma célula de tabela (isso é StackedText — ver decisions pra diferença exata); título+descrição de um bloco maior de conteúdo (Card, EmptyState).",
+  "anatomy": [
+    "Caixa (fundo, borda leve, raio-pp)",
+    "Rótulo (linha de cima, texto-secundario, menor)",
+    "Valor (linha de baixo, texto-primario, maior) — com ícone decorativo opcional prefixando o texto"
+  ],
+  "dependencies": ["Icon"],
+  "props": [
+    { "name": "label", "type": "string", "required": true, "description": "Rótulo curto do dado (ex.: 'CPF', 'Matrícula', 'E-mail')." },
+    { "name": "value", "type": "string", "required": true, "description": "Valor já formatado pra exibição (ex.: '000.000.000-00'). DataField não formata nada — quem consome decide a máscara/formato antes de passar. Valor vazio/ausente é responsabilidade de quem consome decidir o que mostrar (ex.: '—', 'Não informado') — o átomo sempre renderiza o que recebe, sem placeholder-mágico embutido (mesmo racional de HelperText nunca tratar texto vazio sozinho)." },
+    { "name": "icon", "type": "IconName", "required": false, "description": "Ícone decorativo opcional, prefixando a linha de valor (não o rótulo) — ex.: um ícone de usuário antes do nome, de cartão antes do CPF. Sempre decorative (aria-hidden), nunca a única forma de identificar o campo." }
+  ],
+  "variants": [],
+  "states": ["static"],
+  "tokensAllowed": {
+    "background": ["semantic.fundo-superficie"],
+    "border": ["semantic.borda-base"],
+    "text": ["semantic.texto-secundario", "semantic.texto-primario"],
+    "iconColor": ["semantic.icone-secundario"],
+    "iconSize": ["structural.icone-pequeno"],
+    "radius": ["structural.raio-pp"],
+    "spacing": ["structural.espaco-xp", "structural.espaco-pp", "structural.espaco-p"],
+    "typography": ["type-style.texto-p", "type-style.texto-m"]
+  },
+  "a11y": {
+    "role": "none — rótulo e valor são texto simples dentro de um container, sem role própria. Quando usado dentro de uma grade/formulário maior, a ordem natural do DOM (rótulo antes do valor) já comunica a relação, sem precisar de aria-labelledby artificial.",
+    "requiredAria": [],
+    "keyboard": [],
+    "contrastMin": "AAA (7:1) pro valor (texto-primario), AA (4.5:1) mínimo pro rótulo (texto-secundario) — mesma régua já usada em texto-secundario no resto do harness (ex.: StackedText).",
+    "notes": "Ícone é sempre decorative=true (aria-hidden) — o texto do valor já comunica o dado por escrito, o ícone é reforço visual, nunca a única pista (mesmo racional de Alert/Timeline/Badge)."
+  },
+  "events": { "status": "não definido no contrato original — componente estático, só-leitura" },
+  "composition": {
+    "canContain": ["Icon"],
+    "canBeContainedBy": ["grades de detalhe (2 colunas ou mais)", "cards", "painéis de perfil/registro"],
+    "doNotCombine": ["DataField dentro de DataField", "usar DataField pra um campo editável — isso é TextField/Select"]
+  },
+  "forbidden": [
+    "label ou value ausentes — os dois são sempre obrigatórios, DataField sem rótulo ou sem valor não tem o que comunicar",
+    "formatar/mascarar value internamente — DataField só exibe o que recebe, formatação é responsabilidade de quem consome",
+    "tornar o valor editável (input, contentEditable) — DataField é estritamente só-leitura nesta v1 (ver decisions)",
+    "cor fora da whitelist de tokensAllowed",
+    "reimplementar Icon inline em vez de reaproveitar o átomo"
+  ],
+  "decisions": [
+    "Nasceu da análise de sistemas legados (analise-sistemas-legados.md, item 1.1) — padrão mais repetido de todos os prints analisados (Visão 360, Credenciamento, Internações, proposta do corretor), sempre remontado na mão porque o harness não tinha um átomo dedicado pra 'campo somente-leitura rotulado'.",
+    "NÃO é o mesmo componente que StackedText, apesar da semelhança superficial ('duas linhas de texto'): StackedText é texto principal EM CIMA + secundário EMBAIXO, mesma hierarquia visual (os dois são 'texto simples', usado solto dentro de células de tabela, sem borda/caixa, sem ícone). DataField inverte a hierarquia (rótulo pequeno em cima, valor grande embaixo), sempre dentro de uma caixa com borda, e aceita ícone prefixando o valor — são dois padrões visuais e semânticos diferentes (identidade compacta em tabela vs. campo rotulado em painel de detalhe), por isso ganharam contratos separados em vez de um prop a mais em StackedText.",
+    "Ícone prefixa a linha de VALOR, não o rótulo — reflete o padrão observado nos prints reais (ex.: ícone de usuário ao lado do nome, não ao lado da palavra 'Nome completo').",
+    "value é sempre string (não ReactNode livre) nesta v1 — mantém o contrato simples e prevê exatamente o caso observado (texto formatado). Se surgir um caso real de valor rico (ex.: um Chip ou Badge dentro do valor), é decisão nova, não antecipada aqui.",
+    "Estritamente só-leitura nesta v1, sem um modo 'editável' — a análise já cogitava essa possibilidade, mas nenhum caso real observado nos prints mostrava esse campo específico virando editável in-place; construir esse modo agora seria especular. Quando um campo precisa ser editável, o padrão do harness já é trocar pra TextField/Select (ex.: já acontece hoje na edição de linha do Datatable).",
+    "Caixa com borda (não só texto solto) — reflete fielmente o padrão visual mais comum nos prints (rótulo+valor sempre dentro de uma caixa com borda leve), diferente de simplesmente empilhar dois textos sem contêiner.",
+    "Rótulo em type-style.texto-p (14px/400, texto-secundario) e valor em type-style.texto-m (16px/400, texto-primario) — cria a hierarquia de tamanho vista nos prints (rótulo visivelmente menor que o valor) reaproveitando os dois estilos de tipografia já existentes no harness, sem introduzir um terceiro.",
+    "BUG REAL corrigido em teste no navegador — a caixa tinha `gap: espaco-xp` (4px) explícito entre rótulo e valor, além do `padding: espaco-pp` (8px) da caixa. Mesmo o gap explícito sendo numericamente menor que o padding, o line-height de cada estilo tipográfico (texto-p 1.4, texto-m 1.5) adiciona espaçamento extra (leading) acima/abaixo de cada linha de texto, que se soma ao gap explícito — o resultado visual era um espaço entre rótulo e valor maior que o espaço entre o texto e a borda da caixa, mesmo com os tokens 'certos' aplicados. Corrigido removendo o gap explícito (`gap: 0`) e deixando o line-height de cada linha ser a única fonte de espaçamento entre elas — o padding da caixa (uniforme nos 4 lados) passa a dominar visualmente a régua de espaçamento, como esperado. Reforça uma lição geral do harness: gap explícito + line-height não são aditivamente intuitivos, então composições de texto empilhado devem ser conferidas visualmente no navegador, não só pelos valores nominais dos tokens.",
+    "BUG REAL corrigido em teste no navegador (2ª rodada, mesma causa raiz da anterior) — mesmo com padding numericamente igual nos 4 lados (`padding: espaco-pp`, 8px), o padding vertical (topo/baixo) lia visualmente maior que o horizontal (esquerda/direita). Causa: o line-height das linhas de texto adiciona leading vertical (acima da primeira linha, abaixo da última) que não tem equivalente horizontal — texto não tem 'leading lateral', só o padding puro. Corrigido trocando pra `padding: espaco-pp espaco-p` (8px vertical / 12px horizontal) — o padding horizontal levemente maior compensa a ausência de leading lateral, equilibrando a percepção visual dos 4 lados. Confirmado no navegador que a caixa passou a ler como 'padding uniforme' de verdade, não só nominalmente."
+  ],
+  "references": { "tokensFile": "tokens/tokens.json — Cores Semânticas (Fundos, Bordas, Textos, Ícones), Estrutural (raio-pp, espaco-xp/pp, icone-pequeno), Tipografia Estilo (texto-p, texto-m)" }
+}

@@ -1,0 +1,24 @@
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espaco-xp);
+  width: 100%;
+  padding: var(--espaco-xp) var(--espaco-pp);
+  margin-bottom: var(--espaco-m);
+  border: 1px solid var(--borda-base);
+  border-radius: var(--raio-pp);
+  background: var(--fundo-superficie);
+  color: var(--texto-primario);
+  font-family: var(--texto-p-family);
+  font-size: var(--texto-p-size);
+  cursor: pointer;
+}
+
+.toggle:hover {
+  background: var(--fundo-secundario);
+}
+
+.toggle:focus-visible {
+  outline: var(--foco-espessura) solid var(--borda-foco);
+  outline-offset: 2px;
+}

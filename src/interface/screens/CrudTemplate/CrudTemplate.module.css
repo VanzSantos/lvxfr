@@ -1,0 +1,61 @@
+.body {
+  padding-top: var(--espaco-m);
+}
+
+/* AJUSTADO a pedido do usuário — conteúdo real da página (o Datatable)
+   precisa ficar DENTRO de um card na área central da tela, mesma regra já
+   documentada em AppShell.tsx (children) e aplicada no `.emptyCard` do
+   BackofficeTemplate — mesmo par de tokens por tema (fundo-superficie no
+   claro/fundo-secundario no escuro, sempre mais CLARO que o fundo da
+   página), sem borda (Datatable já desenha a própria borda ao redor só da
+   tabela — a borda desta superfície externa duplicaria/brigaria com aquela
+   se também tivesse borda, por isso só background+raio aqui, do jeito que
+   o emptyCard já faz). Reaproveitar o átomo Card não dava — ele sempre
+   desenha `border: 1px solid borda-base` (sem opção de remover via prop),
+   o que quebraria a consistência visual com o resto do harness AppShell. */
+.contentCard {
+  width: 100%;
+  min-height: 100%;
+  box-sizing: border-box;
+  padding: var(--espaco-g);
+  background: var(--fundo-superficie);
+  border-radius: var(--raio-p);
+}
+
+:root[data-theme="dark"] .contentCard {
+  background: var(--fundo-secundario);
+}
+
+.rowActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--espaco-xp);
+  flex-wrap: nowrap;
+}
+
+.bulkActions {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-xp);
+  flex-wrap: nowrap;
+}
+
+.confirmBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-m);
+}
+
+.confirmActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--espaco-p);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-m);
+}

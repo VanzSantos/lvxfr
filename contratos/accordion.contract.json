@@ -1,0 +1,65 @@
+{
+  "name": "Accordion",
+  "originalName": "Sanfona",
+  "oneLiner": "Cabeçalho clicável que expande/colapsa um painel de conteúdo — um único item (Collapsible) ou vários itens agrupados (Accordion), mesmo componente.",
+  "category": "display",
+  "status": "draft",
+  "whenToUse": "Conteúdo secundário/opcional que não precisa ficar sempre visível (ex.: FAQ, detalhes avançados de um formulário, seções longas de uma página) — o usuário decide expandir só o que quer ver. Também serve pra um único bloco isolado (ex.: 'Ver detalhes técnicos'), não só grupos.",
+  "whenNotToUse": "Navegação entre painéis mutuamente exclusivos sempre visíveis por título (isso é Tabs); passos sequenciais de um fluxo (isso é Stepper/Wizard); conteúdo que o usuário sempre precisa ver de cara (esconder atrás de um clique adiciona fricção desnecessária).",
+  "anatomy": [
+    "Item — cabeçalho clicável (label + ícone caret que gira 180° conforme aberto/fechado) e painel de conteúdo abaixo, que expande/colapsa por transição de altura",
+    "Accordion — lista de 1 ou mais Items; com 2+ items, mode decide se só um fica aberto por vez ou se todos podem abrir ao mesmo tempo"
+  ],
+  "dependencies": ["Icon"],
+  "props": [
+    { "name": "items", "type": "array", "required": true, "description": "Array de { key: string, label: string, content: node, disabled?: boolean }. key precisa ser único. Um array com 1 item só é o caso 'item único' (não existe um componente Collapsible separado — ver decisions)." },
+    { "name": "openKeys", "type": "array", "required": true, "description": "Array de key dos items atualmente abertos. 100% controlado, mesmo padrão de Tabs value/onChange — Accordion nunca guarda estado próprio de quais items estão abertos." },
+    { "name": "onChange", "type": "function", "required": true, "description": "Assinatura (openKeys: string[]) => void. Disparado ao clicar num cabeçalho — o próprio Accordion já calcula o próximo array (respeitando mode) antes de chamar; quem consome só aplica o valor recebido de volta em openKeys." },
+    { "name": "mode", "type": "enum", "enum": ["single", "multiple"], "default": "multiple", "required": false, "description": "single = abrir um item fecha automaticamente qualquer outro que estivesse aberto (array de onChange nunca tem mais de 1 key). multiple = cada item abre/fecha independente, quantos quiser ao mesmo tempo. Só importa com 2+ items — com 1 item só, o comportamento é o mesmo nos dois modos." }
+  ],
+  "variants": [],
+  "states": ["default", "open", "disabled"],
+  "tokensAllowed": {
+    "background": ["semantic.fundo-superficie"],
+    "border": ["semantic.borda-base"],
+    "radius": ["structural.raio-pp"],
+    "text": ["semantic.texto-primario", "semantic.texto-secundario", "semantic.texto-inativo"],
+    "iconColor": ["semantic.icone-secundario", "semantic.texto-inativo"],
+    "iconSize": ["structural.icone-pequeno"],
+    "focusRing": ["structural.foco-espessura", "semantic.borda-foco"],
+    "spacing": ["structural.espaco-p", "structural.espaco-m"],
+    "typography": ["type-style.texto-m-forte", "type-style.texto-p", "type-style.texto-rotulo-botao"]
+  },
+  "a11y": {
+    "role": "cada cabeçalho é um <button> dentro de um heading nativo não é obrigatório neste harness (sem componente Heading próprio) — botão direto, com aria-expanded e aria-controls apontando pro id do painel; painel usa role=\"region\" com aria-labelledby apontando de volta pro id do cabeçalho (mesmo padrão de id previsível já usado em Tabs: item-{key}-header / item-{key}-panel).",
+    "requiredAria": ["aria-expanded no botão do cabeçalho (true só quando o item está em openKeys)", "aria-controls/aria-labelledby ligando cabeçalho↔painel via id previsível", "aria-disabled no cabeçalho quando item.disabled"],
+    "keyboard": ["Tab navega entre os cabeçalhos normalmente (sem roving tabindex — diferente de Tabs; cada cabeçalho é um botão independente, não uma tablist de seleção única) — padrão ARIA Accordion mais simples, sem navegação por seta nesta v1", "Enter/Espaço alterna aberto/fechado (comportamento nativo de <button>)", "item disabled não recebe foco (fora da ordem de tabulação), mesmo padrão de opção disabled em Select/ComboBox/Stepper"],
+    "contrastMin": "AAA (7:1) pro texto do label, mesma régua do resto do harness.",
+    "notes": "Painel de conteúdo permanece montado no DOM mesmo fechado (altura colapsada via CSS, não display:none/desmontagem) — preserva estado interno do conteúdo entre toggles, mesmo racional do TabPanel em tabs.contract.json."
+  },
+  "events": { "status": "não definido no contrato original" },
+  "composition": {
+    "canContain": ["Icon", "qualquer conteúdo livre dentro de items[].content"],
+    "canBeContainedBy": ["páginas", "cards", "qualquer container de layout"],
+    "doNotCombine": ["Accordion dentro do content de um item do mesmo Accordion sem uma razão real (aninhamento raso é aceitável, ex.: FAQ com sub-categorias, mas não é o caso comum)"]
+  },
+  "forbidden": [
+    "items vazio ([]) — nada pra mostrar",
+    "key repetida entre items — quebra a correspondência openKeys↔item e os ids de aria-controls/aria-labelledby",
+    "abrir (incluir em openKeys) um item com disabled=true",
+    "reimplementar Icon inline pro caret",
+    "cor fora da whitelist de tokensAllowed",
+    "desmontar (não renderizar) o conteúdo de um item fechado em vez de colapsar a altura via CSS"
+  ],
+  "decisions": [
+    "Um componente só (Accordion) cobre tanto 'item único' quanto 'vários agrupados', em vez de um átomo Collapsible separado + um Accordion que o envolve. Motivo: o comportamento real (cabeçalho clicável, aria-expanded, painel que expande/colapsa, animação de altura) é idêntico nos dois casos — só muda se há 1 ou N items no array, e se mode importa (só faz diferença com 2+). Duas APIs pro mesmo padrão visual criariam a mesma duplicação que o harness evita em outros lugares (ex.: Datatable não tem um sistema de column.type separado por tipo de célula).",
+    "Controlado via openKeys (array) + onChange, mesmo padrão de Tabs value/onChange — mas aqui é array em vez de valor único, porque multiple precisa representar 'vários abertos ao mesmo tempo'. O próprio Accordion calcula o próximo array (respeitando mode) e entrega pronto pro onChange — o consumidor nunca implementa a lógica de 'fechar os outros' por fora, mesmo racional de Datatable calcular sortMode/paginationMode internamente antes de notificar via callback.",
+    "mode='multiple' como default (não 'single') — abrir mais de um item ao mesmo tempo é o comportamento mais permissivo e não surpreende o usuário; single é opt-in pra quando o consumidor quer forçar exclusividade (ex.: FAQ onde só uma resposta deveria ficar visível por vez).",
+    "Sem navegação por seta entre cabeçalhos (diferente de Tabs) — Accordion não é uma seleção mutuamente exclusiva como tablist, é uma lista de botões independentes; roving tabindex adicionaria complexidade sem um requisito real do padrão ARIA Accordion (que, ao contrário do ARIA Tabs, não pede isso).",
+    "Animação de altura via CSS grid-template-rows (0fr fechado → 1fr aberto) na própria linha do grid do painel, em vez de max-height fixo ou JS medindo scrollHeight — funciona com conteúdo de altura variável/dinâmica sem gambiarra de altura hardcoded nem ResizeObserver.",
+    "Painel sempre montado no DOM (visualmente colapsado via CSS), nunca desmontado enquanto fechado — mesmo racional do TabPanel de Tabs: preserva scroll/estado de formulário dentro do conteúdo entre um toggle e outro.",
+    "Ícone caret-down (já existente no registro do Icon) gira 180° via CSS transform conforme o estado aberto/fechado, em vez de trocar entre caret-down/caret-up — evita duas entradas de ícone pra comunicar a mesma coisa, mesma técnica já usada implicitamente noutros togglers do harness (ex.: nenhum componente troca o glyph do Icon só pra indicar orientação quando rotacionar resolve).",
+    "BUG REAL corrigido em revisão pedida pelo usuário — o cabeçalho usava type-style.texto-p (14px) com font-weight:700 hardcoded (não um token real, um mix improvisado de tamanho normal + peso manual). Isso destoava do resto do harness, onde todo 'título clicável/de destaque' equivalente (título de Modal, de Drawer, de Alert, nome em Avatar, título de EmptyState) usa consistentemente type-style.texto-m-forte (16px/700, via variável, não peso hardcoded). Corrigido pra texto-m-forte no cabeçalho — o painel de conteúdo continua em texto-p (14px/400), que é o tamanho de corpo de texto correto e já estava certo."
+  ],
+  "references": { "tokensFile": "tokens/tokens.json — Cores Semânticas (fundo-superficie, borda-base, Textos, ícone-secundario), Estrutural (espaco-p/m, foco-espessura, icone-pequeno), Tipografia Estilo (texto-p, texto-rotulo-botao)" }
+}

@@ -1,0 +1,271 @@
+{
+  "name": "DateTimePicker",
+  "originalName": "SeletorDeDataEHorario",
+  "oneLiner": "Campo de texto único que abre UM popover com Calendar (data) + colunas de Hora/Minuto (horário) juntos — data e horário únicos, ou intervalo (início/fim, dois campos independentes).",
+  "category": "data-entry",
+  "status": "draft",
+  "whenToUse": "Formulário precisa capturar data E horário como um valor combinado só (ex.: 'início do evento em 18/08/2026 às 14:30'), não dois campos separados que o usuário preenche/entende como coisas distintas.",
+  "whenNotToUse": "Só data (isso é DatePicker); só horário (isso é TimePicker); data e horário fazem mais sentido como dois campos claramente separados na tela (nesse caso, use DatePicker + TimePicker lado a lado em vez deste componente).",
+  "anatomy": [
+    "Campo único — FieldLabel opcional + trigger com Icon 'calendar' à esquerda (opcional, ver showIcon) + <input type='text'> com máscara automática 'DD/MM/AAAA HH:MM' (só dígitos aceitos, separadores '/' e ':' e o espaço inseridos sozinhos) + Icon caret-down decorativo à direita (só quando showPicker) + HelperText opcional",
+    "Popover (via @floating-ui, FloatingPortal, só quando showPicker=true) ancorado no campo — Calendar (grade de dias) ao lado de duas colunas roláveis (Hora/Minuto, mesmo visual refeito do TimePicker: cabeçalho fixo por coluna, opções circulares, sombra), tudo dentro do MESMO popover; escolher a data não fecha o popover (ainda falta o horário); selecionar aqui também preenche o campo de texto",
+    "Modo range — dois campos independentes (Início/Fim), cada um com seu próprio campo+popover combinado, mesmo padrão de DatePicker/TimePicker"
+  ],
+  "dependencies": [
+    "Calendar",
+    "FieldLabel",
+    "HelperText",
+    "Icon"
+  ],
+  "props": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": false,
+      "description": "Rótulo do campo (ou dos dois campos no modo range)."
+    },
+    {
+      "name": "required",
+      "type": "boolean",
+      "required": false,
+      "default": false,
+      "description": "Repassado pro FieldLabel."
+    },
+    {
+      "name": "withInfo",
+      "type": "boolean",
+      "required": false,
+      "default": false,
+      "description": "Repassado pro FieldLabel."
+    },
+    {
+      "name": "infoText",
+      "type": "string",
+      "required": false,
+      "description": "Texto do tooltip de informação, junto com withInfo."
+    },
+    {
+      "name": "state",
+      "type": "enum",
+      "enum": [
+        "default",
+        "error",
+        "disabled"
+      ],
+      "default": "default",
+      "required": false,
+      "description": "Mesmo enum de DatePicker/TimePicker."
+    },
+    {
+      "name": "helperText",
+      "type": "string",
+      "required": false,
+      "description": "Texto de apoio/erro abaixo do campo."
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "required": false,
+      "description": "Nome pra integração com formulários nativos."
+    },
+    {
+      "name": "step",
+      "type": "number",
+      "required": false,
+      "default": 5,
+      "description": "Incremento (em minutos) da coluna de minutos, repassado pro mesmo mecanismo do TimePicker."
+    },
+    {
+      "name": "minDateTime",
+      "type": "string",
+      "required": false,
+      "description": "ISO 'AAAA-MM-DDTHH:MM' mínimo selecionável (inclusive)."
+    },
+    {
+      "name": "maxDateTime",
+      "type": "string",
+      "required": false,
+      "description": "ISO 'AAAA-MM-DDTHH:MM' máximo selecionável (inclusive)."
+    },
+    {
+      "name": "disabledDate",
+      "type": "function",
+      "required": false,
+      "description": "Assinatura (dateValue: string) => boolean, recebe só a parte de data (AAAA-MM-DD) — mesma função repassada direto pro Calendar interno."
+    },
+    {
+      "name": "placeholder",
+      "type": "string",
+      "required": false,
+      "default": "DD/MM/AAAA HH:MM",
+      "description": "Texto do campo quando vazio — mudou de 'Selecione data e horário' pra 'DD/MM/AAAA HH:MM' junto com a digitação mascarada."
+    },
+    {
+      "name": "range",
+      "type": "boolean",
+      "required": false,
+      "default": false,
+      "description": "false (padrão) = campo único, value é ISO 'AAAA-MM-DDTHH:MM' ou null. true = { start, end }. Mesmo padrão de discriminated union de DatePicker/TimePicker."
+    },
+    {
+      "name": "showPicker",
+      "type": "boolean",
+      "required": false,
+      "default": true,
+      "description": "true (padrão) = campo abre o popover (Calendar + colunas Hora/Minuto) ao focar/clicar, além de aceitar digitação. false = campo vira só-digitação: nunca abre popover, sem o ícone caret-down decorativo, sem aria-haspopup/aria-expanded. Mesma prop e racional do DatePicker/TimePicker."
+    },
+    {
+      "name": "showIcon",
+      "type": "boolean",
+      "required": false,
+      "default": true,
+      "description": "true (padrão) = mostra o Icon 'calendar' fixo à esquerda do campo. false = campo sem esse ícone. Mesma prop e racional do DatePicker/TimePicker."
+    },
+    {
+      "name": "value",
+      "type": "string",
+      "required": true,
+      "description": "Modo único: ISO 'AAAA-MM-DDTHH:MM' ou null. Modo range: { start, end } (cada um ISO ou null). 100% controlado."
+    },
+    {
+      "name": "onChange",
+      "type": "function",
+      "required": true,
+      "description": "Modo único: (value: string) => void. Modo range: (value: { start, end }) => void."
+    },
+    {
+      "name": "startLabel",
+      "type": "string",
+      "required": false,
+      "default": "Início",
+      "description": "Só no modo range."
+    },
+    {
+      "name": "endLabel",
+      "type": "string",
+      "required": false,
+      "default": "Fim",
+      "description": "Só no modo range."
+    }
+  ],
+  "variants": [
+    "single",
+    "range"
+  ],
+  "states": [
+    "default",
+    "error",
+    "disabled",
+    "open"
+  ],
+  "tokensAllowed": {
+    "background": [
+      "semantic.fundo-superficie",
+      "semantic.fundo-secundario",
+      "semantic.acao-primaria",
+      "semantic.fundo-campo"
+    ],
+    "border": [
+      "semantic.borda-base",
+      "semantic.borda-erro",
+      "semantic.borda-inativo",
+      "semantic.borda-foco"
+    ],
+    "text": [
+      "semantic.texto-primario",
+      "semantic.texto-placeholder",
+      "semantic.texto-inativo",
+      "semantic.acao-primaria-texto",
+      "semantic.texto-secundario"
+    ],
+    "iconColor": [
+      "semantic.icone-secundario",
+      "semantic.icone-inativo"
+    ],
+    "radius": [
+      "structural.raio-pp",
+      "structural.raio-p",
+      "structural.raio-circular"
+    ],
+    "focusRing": [
+      "structural.foco-espessura"
+    ],
+    "spacing": [
+      "structural.espaco-xp",
+      "structural.espaco-pp",
+      "structural.espaco-p",
+      "structural.espaco-m"
+    ],
+    "typography": [
+      "type-style.texto-m",
+      "type-style.texto-p",
+      "type-style.texto-micro",
+      "type-style.texto-micro-forte"
+    ],
+    "shadow": [
+      "structural.sombra-p"
+    ]
+  },
+  "a11y": {
+    "role": "campo é um <input type='text'> normal (não mais um <button>) com aria-haspopup=\"dialog\" e aria-expanded (mesmo padrão de DatePicker/TimePicker); o popover tem role=\"dialog\" com aria-label; a área do Calendar mantém a semântica do próprio calendar.contract.json, as colunas de Hora/Minuto mantêm a semântica do próprio time-picker.contract.json (aria-label 'Hora'/'Minuto', aria-pressed por opção).",
+    "requiredAria": [
+      "aria-haspopup=\"dialog\" e aria-expanded no campo",
+      "aria-describedby do campo apontando pro HelperText quando presente",
+      "role=\"dialog\" no popover com aria-label",
+      "inputMode=\"numeric\" no campo"
+    ],
+    "keyboard": [
+      "digitar no campo aplica a máscara automaticamente; focar o campo já abre o popover (useFocus, além de useClick)",
+      "Esc fecha sem alterar value (useDismiss, mesmo padrão de DatePicker/TimePicker)",
+      "dentro do popover, Tab navega entre os dias do Calendar e as opções de Hora/Minuto na ordem do DOM — sem roving tabindex nesta v1 (mesma simplificação já usada nos componentes reaproveitados)"
+    ],
+    "contrastMin": "AA pro texto do gatilho, mesma régua de DatePicker/TimePicker.",
+    "notes": "Popover não fecha ao escolher só a data ou só o horário (faltaria a outra metade do valor) — fecha por dismiss, mesmo racional já usado no TimePicker."
+  },
+  "events": {
+    "status": "não definido no contrato original"
+  },
+  "composition": {
+    "canContain": [
+      "Calendar",
+      "Icon",
+      "FieldLabel",
+      "HelperText"
+    ],
+    "canBeContainedBy": [
+      "formulários",
+      "páginas",
+      "cards"
+    ],
+    "doNotCombine": [
+      "DateTimePicker dentro de DateTimePicker",
+      "usar DateTimePicker quando data e horário deveriam ser dois campos visualmente separados (nesse caso, DatePicker + TimePicker lado a lado é a composição certa, não este componente)"
+    ]
+  },
+  "forbidden": [
+    "abrir o popover quando state='disabled'",
+    "no modo range, permitir fim antes de início (o campo Fim aplica minDateTime = value.start quando início já existe)",
+    "reimplementar o Calendar inline em vez de reaproveitar o componente",
+    "cor fora da whitelist de tokensAllowed",
+    "formatar a data/horário exibidos fora de 'DD/MM/AAAA HH:MM' (padrão pt-BR do harness)"
+  ],
+  "decisions": [
+    "CORRIGIDO — auditoria de contratos (2026-09-01): texto-secundario adicionado a text — usado no componente (provavelmente rótulo/legenda auxiliar) mas ausente da whitelist.",
+    "UM só popover com Calendar + colunas de Hora/Minuto juntos, ancorado num ÚNICO gatilho — decisão explícita pra diferenciar este componente de simplesmente usar DatePicker + TimePicker lado a lado (que já é possível hoje sem este contrato). DateTimePicker existe pro caso onde data+horário são conceitualmente UM valor só, não dois campos.",
+    "value/onChange mudam de formato conforme range, mesmo padrão de discriminated union já usado em DatePicker/TimePicker/Select.",
+    "value ausente/parcial é resolvido com defaults sensatos: escolher uma data sem hora ainda escolhida assume horário 00:00 (mesmo texto que apareceria formatado); escolher hora/minuto sem data ainda escolhida assume a data de hoje. Isso evita ter um terceiro estado 'meio selecionado' que não é nem null nem uma data-hora válida — o valor emitido por onChange é sempre um ISO completo (ou null antes de qualquer interação).",
+    "Reaproveita o componente Calendar diretamente (import), mas as colunas de Hora/Minuto são reimplementadas inline em vez de extrair um sub-componente compartilhado com TimePicker — TimePicker não expõe essa parte como peça reaproveitável isolada, e criar essa extração agora sem um SEGUNDO consumidor real seria dedup prematuro (mesma disciplina já aplicada em outras partes do harness: duplicar uma vez é aceitável, extrair abstração por especulação não é).",
+    "Popover não fecha sozinho — nem ao escolher a data, nem ao escolher hora/minuto (faltaria sempre a outra metade). Fecha só por dismiss (clique fora/Esc), mesmo racional já usado no TimePicker.",
+    "disabledDate recebe só a parte de data (AAAA-MM-DD), repassada direto pro Calendar interno — não existe uma 'disabledDateTime' que combine data+hora nesta v1; se surgir um caso real (ex.: bloquear um horário específico dentro de um dia disponível), é decisão nova.",
+    "Modo range replica exatamente a decisão já validada em DatePicker/TimePicker: dois campos/popovers independentes, Fim aplica minDateTime = value.start — sem inventar uma terceira estratégia de range só porque o valor agora combina data e hora.",
+    "AJUSTADO a pedido do usuário — campo passou de <button> (só seleção via Calendar+colunas) pra <input type='text'> com máscara automática 'DD/MM/AAAA HH:MM' (12 dígitos: 8 de data + 4 de hora), reaproveitando as mesmas funções de máscara/parse compartilhadas com DatePicker/TimePicker (src/components/shared/dateTimeMask.ts) em vez de duplicar a lógica. Validação só considera os 12 dígitos completos formando data E hora válidas dentro de minDateTime/maxDateTime/disabledDate — value só muda quando o texto inteiro é válido. Blur com texto incompleto/inválido reverte pro último value confirmado.",
+    "BUG REAL corrigido em teste no navegador (mesma causa raiz do DatePicker/TimePicker) — onChange/onBlur do input eram sobrescritos silenciosamente pelo spread de getReferenceProps() do floating-ui. Corrigido passando os handlers como argumento — getReferenceProps({ onChange, onBlur }).",
+    "AJUSTADO a pedido do usuário — nova prop 'showPicker' (default true), mesma implementação e racional do DatePicker/TimePicker: hooks useClick/useFocus/useDismiss desabilitados via { enabled: showPicker } quando false.",
+    "AJUSTADO a pedido do usuário — colunas de Hora/Minuto dentro do popover combinado receberam o mesmo retrabalho visual do TimePicker (cabeçalho fixo por coluna, opções circulares de 40px, box-shadow no popover) — reaproveita a decisão já tomada lá em vez de inventar uma segunda linguagem visual pro mesmo tipo de coluna.",
+    "AJUSTADO a pedido do usuário — fundo do campo trocado de semantic.fundo-superficie pra semantic.fundo-campo (token novo): 'o fundo dos inputs de forma geral, devem ser levemente mais escuros que a cor de fundo da página onde estão, para destacar melhor'. No modo claro fundo-campo é idêntico a fundo-superficie (sem mudança visual, branco com borda já bastava) — só no modo escuro os dois valores divergem (fundo-campo um degrau mais escuro que a página), porque era só ali que o campo ficava indistinguível da própria página por trás.",
+    "AJUSTADO a pedido do usuário — novo Icon 'calendar' fixo à esquerda do trigger (antes o DateTimePicker não tinha ícone nenhum à esquerda, só o caret-down à direita), com nova prop showIcon (default true) pra permitir escondê-lo. Reaproveita o mesmo ícone 'calendar' do DatePicker em vez de um ícone combinado data+hora (não existe um no registro fechado do Icon, e criar um agora seria antecipar sem um pedido explícito por ele) — mesmo pedido de uma vez pros três pickers de data/hora do harness (ver decisions do DatePicker/TimePicker)."
+  ],
+  "references": {
+    "tokensFile": "tokens/tokens.json — Cores Semânticas (Fundos, Bordas, Textos, Ações/Primária, Ícones), Estrutural (raio-pp/p/circular, foco-espessura, espaco-xp/pp/p/m, sombra-p), Tipografia Estilo (texto-m, texto-p, texto-micro, texto-micro-forte)"
+  }
+}

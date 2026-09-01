@@ -1,0 +1,19 @@
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-m);
+}
+
+.description {
+  margin: 0;
+  color: var(--texto-secundario);
+  font-family: var(--texto-p-family);
+  font-size: var(--texto-p-size);
+  line-height: var(--texto-p-line-height);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--espaco-p);
+}

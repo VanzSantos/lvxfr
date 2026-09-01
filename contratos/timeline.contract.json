@@ -1,0 +1,65 @@
+{
+  "name": "Timeline",
+  "originalName": "LinhaDoTempo",
+  "oneLiner": "Lista vertical de eventos ordenados cronologicamente, cada um com marcador (ícone/cor por tom), título, descrição opcional e data/hora — ex.: histórico de auditoria, log de atividades.",
+  "category": "display",
+  "status": "draft",
+  "whenToUse": "Mostrar uma sequência de eventos que já aconteceram, em ordem cronológica, cada um com peso visual próprio (não é progresso a caminho de um objetivo — isso é Stepper).",
+  "whenNotToUse": "Etapas de um fluxo ainda em andamento com noção de 'atual/concluída/pendente' (isso é Stepper); lista sem relação de ordem/tempo entre os itens (uma lista comum já resolve).",
+  "anatomy": [
+    "Lista ordenada (<ol>) vertical — por item: marcador (círculo PREENCHIDO com a cor do tone, ícone em branco por dentro — customizado via items[].icon, ou um ícone padrão por tone quando ausente) + conector vertical até o próximo item + conteúdo (título, descrição opcional, data/hora opcional, caixa de valor opcional, lista de anexos opcional)",
+    "Caixa de valor (opcional, items[].value) — bloco de texto em negrito, fundo colorido claro + texto colorido forte, mesmo par de tokens fundo-X/texto-X reaproveitado do Badge inverted/Alert; sempre no mesmo tone do item, nunca configurável à parte",
+    "Lista de anexos (opcional, items[].attachments) — um Link por linha, ícone de download à esquerda, abaixo da caixa de valor"
+  ],
+  "dependencies": ["Icon", "Link"],
+  "props": [
+    { "name": "items", "type": "array", "required": true, "description": "Array de { title: string, description?: string, timestamp?: string, icon?: IconName, tone?: 'neutral'|'success'|'warning'|'error'|'info', value?: string, attachments?: { label: string, href: string, external?: boolean }[] }. tone (default 'neutral') define a cor de preenchimento do marcador — ex.: 'error' pra um evento de falha no histórico. icon ausente usa um ícone padrão por tone (success=check, warning=warning-circle, error=x-circle, info=info); tone='neutral' sem icon mostra um pontinho branco decorativo. value (opcional) renderiza uma caixa de valor destacada abaixo da descrição (ex.: 'Registro alta: 02/08/2024'), colorida com o MESMO tone do item — não tem tone próprio, é sempre derivado do tone do evento. attachments (opcional) renderiza uma lista de links reais (componente Link) abaixo do value, um por linha, cada um com ícone de download à esquerda." },
+    { "name": "accessibleLabel", "type": "string", "required": false, "default": "Linha do tempo", "description": "Nome acessível da lista." }
+  ],
+  "variants": [],
+  "states": ["static"],
+  "tokensAllowed": {
+    "background": ["semantic.fundo-superficie", "semantic.icone-secundario", "semantic.fundo-sucesso-forte", "semantic.fundo-aviso-forte", "semantic.fundo-erro-forte", "semantic.icone-info", "semantic.fundo-secundario", "semantic.fundo-sucesso", "semantic.fundo-aviso", "semantic.fundo-erro", "semantic.fundo-info"],
+    "border": ["semantic.borda-base"],
+    "text": ["semantic.texto-primario", "semantic.texto-secundario", "semantic.texto-inativo", "semantic.texto-sucesso", "semantic.texto-aviso", "semantic.texto-erro", "semantic.texto-info", "semantic.texto-invertido"],
+    "iconColor": ["semantic.texto-invertido", "semantic.texto-primario"],
+    "iconSize": ["structural.icone-pequeno"],
+    "radius": ["structural.raio-circular", "structural.raio-xp"],
+    "spacing": ["structural.espaco-xp", "structural.espaco-pp", "structural.espaco-p", "structural.espaco-g"],
+    "typography": ["type-style.texto-p", "type-style.texto-micro"]
+  },
+  "a11y": {
+    "role": "nenhum role customizado — <ol> nativo já comunica 'lista ordenada' corretamente (mesma semântica de Stepper). Marcadores (círculo/ícone) são aria-hidden, decorativos — a informação real está no texto (título/descrição/timestamp).",
+    "requiredAria": ["marcadores decorativos (aria-hidden) — nunca a única forma de identificar o tom do evento, sempre reforçados por texto quando o tom importa (ex.: 'Falha na sincronização' já comunica erro pelo próprio texto, a cor é reforço visual)"],
+    "keyboard": ["sem interação própria — Timeline é conteúdo só informativo, mesmo padrão de Stepper sem onStepClick"],
+    "contrastMin": "AAA (7:1) pro título; texto-secundario (descrição/timestamp) segue a régua padrão de texto de apoio do harness.",
+    "notes": "Cor do marcador por tone nunca é a única pista — mesmo racional de Alert/Badge, a cor reforça o que o texto já diz, não substitui."
+  },
+  "events": { "status": "não definido no contrato original" },
+  "composition": {
+    "canContain": ["Icon", "Link"],
+    "canBeContainedBy": ["páginas", "cards", "painéis de detalhe (ex.: histórico de um pedido)"],
+    "doNotCombine": ["Timeline dentro de Timeline", "usar Timeline pra progresso de um fluxo ainda não concluído com estados atual/pendente — isso é Stepper"]
+  },
+  "forbidden": [
+    "items vazio ([]) — nada pra mostrar",
+    "cor do marcador como única forma de comunicar o tom do evento, sem reforço textual",
+    "reimplementar Icon inline",
+    "cor fora da whitelist de tokensAllowed",
+    "value com tone próprio, diferente do tone do item — a caixa de valor é sempre derivada do tone do evento, nunca uma segunda decisão de cor independente",
+    "attachments sem href real (isso é Link, não Button — se a ação não é abrir/baixar um arquivo de verdade, não é um anexo)"
+  ],
+  "decisions": [
+    "Puramente informativo, sem interatividade nem estados 'atual/pendente' — diferente de Stepper (que modela progresso vivo de um fluxo), Timeline modela HISTÓRICO já acontecido; um evento não 'está em andamento', ele já ocorreu ou não existe na lista.",
+    "tone por item (não um enum fixo de estado como completed/current/pending do Stepper) — cada evento do histórico pode ter uma conotação própria (sucesso, erro, aviso, informativo, neutro) independente da posição na lista, diferente de Stepper onde o estado é derivado da posição relativa a currentStep.",
+    "Marcadores sempre aria-hidden — a cor/ícone é reforço visual, nunca a única pista (mesmo racional de contraste-mínimo de Alert/Badge já aplicado no resto do harness).",
+    "Sem paginação/virtualização nesta v1 — histórico muito longo (centenas de eventos) não foi um caso de uso real ainda; se aparecer, é decisão nova (provavelmente reaproveitando Pagination por fora, não construído dentro do Timeline).",
+    "AJUSTADO a pedido do usuário — marcador passou de círculo com contorno colorido pra círculo PREENCHIDO com a cor do tone, ícone em branco (semantic.texto-invertido) por dentro. Quando items[].icon não é fornecido, um ícone padrão por tone entra no lugar (success=check, warning=warning-circle, error=x-circle, info=info) — só tone='neutral' sem icon mantém o pontinho branco decorativo original, já que não existe um glyph 'neutro' óbvio. Reaproveita ícones já registrados no Icon, nenhum novo adicionado.",
+    "AJUSTADO a pedido do usuário — marcadores success/warning/error clareados um degrau: de icone-sucesso/icone-aviso/icone-erro (tom 700) pra fundo-sucesso-forte/fundo-aviso-forte/fundo-erro-forte (tom 600), mesma mudança e mesmos tokens já aplicados em Badge/Chip (ver contratos/badge.contract.json, decisions). warning é a exceção: o glyph interno usa semantic.texto-primario (preto) em vez de texto-invertido, porque fundo-aviso-forte + branco cai pra 3.10:1 (abaixo do mínimo AA). info não mudou — o pedido do usuário foi só verde/amarelo/vermelho.",
+    "EXTENSÃO — items[].value e items[].attachments adicionados pra suportar o padrão de 'caixa de valor' destacada + links de anexo, visto em 3 sistemas legados diferentes (Visão 360 → Histórico do caso, Internações → Histórico, Detalhe de solicitação SolicitaMed — ver analise-sistemas-legados.md, item 1.3). value é string livre (não node/children) — deliberadamente NÃO é um slot de conteúdo genérico, é só o texto do valor destacado, mantendo a Timeline fechada a composição livre, mesmo racional de todo o resto do harness (contratos declaram formato, não 'children: ReactNode' escancarado).",
+    "Caixa de valor reaproveita o par fundo-X (claro) + texto-X (forte) já usado no Badge inverted (contratos/badge.contract.json) — nenhum token novo criado. Sempre no MESMO tone do item (sem prop de tone separada pro value) porque nos 3 sistemas analisados a cor do valor sempre acompanhava a cor do marcador do evento, nunca divergia.",
+    "attachments usa o componente Link (não Button variant='link') porque é navegação/download real de um arquivo com href — mesma distinção já documentada no contrato do próprio Link (Button variant='link' é ação estilizada, Link é âncora de verdade). Ícone fixo download-simple à esquerda de cada attachment (não customizável por item) — os 3 prints legados mostravam sempre o mesmo padrão visual de 'baixar/ver anexo', não uma variedade de ícones por tipo de arquivo.",
+    "AJUSTADO a pedido do usuário — lista de attachments passou de empilhada (uma por linha, sempre) para flex-wrap: quando há espaço horizontal disponível, os links ficam lado a lado na mesma linha; só quebram pra linha de baixo quando não cabem mais. Evita desperdício de espaço vertical quando um item tem vários anexos com labels curtos."
+  ],
+  "references": { "tokensFile": "tokens/tokens.json — Cores Semânticas (Fundos, Bordas, Textos e Ícones de Sinalização), Estrutural (raio-circular, espaco-xp/pp/p, icone-pequeno), Tipografia Estilo (texto-p, texto-micro)" }
+}

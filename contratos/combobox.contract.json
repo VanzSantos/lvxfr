@@ -1,0 +1,218 @@
+{
+  "name": "ComboBox",
+  "originalName": "SelecaoComBusca",
+  "oneLiner": "Como o Select, mas o próprio campo aceita digitação pra filtrar as opções em tempo real (padrão 'Select2') — pra listas longas onde navegar sem busca é inviável.",
+  "category": "data-entry",
+  "status": "draft",
+  "whenToUse": "Escolher 1 ou mais opções de uma lista LONGA (dezenas ou mais), onde encontrar a opção certa navegando visualmente (como no Select) seria lento demais.",
+  "whenNotToUse": "Lista curta (até ~15-20 opções) onde navegar sem busca já é rápido — nesse caso use Select, que é mais simples e barato de manter; texto verdadeiramente livre, sem lista de opções pré-definidas (use TextField).",
+  "anatomy": [
+    "FieldLabel (em cima)",
+    "Campo de busca (fundo, borda, mostra o valor selecionado/resumo quando fechado; vira busca ao focar/abrir)",
+    "Ícone de limpar (x, opcional — só quando há valor ou texto digitado pra limpar)",
+    "Ícone de seta indicando aberto/fechado",
+    "Popup (listbox) — opções filtradas em tempo real, ícone de check na(s) selecionada(s), ou mensagem de 'nenhum resultado'",
+    "HelperText (embaixo, opcional)"
+  ],
+  "dependencies": [
+    "FieldLabel",
+    "HelperText",
+    "Icon",
+    "Tooltip"
+  ],
+  "props": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "required",
+      "type": "boolean",
+      "default": false,
+      "required": false
+    },
+    {
+      "name": "withInfo",
+      "type": "boolean",
+      "default": false,
+      "required": false
+    },
+    {
+      "name": "infoText",
+      "type": "string",
+      "required": false,
+      "requiredWhen": "withInfo = true"
+    },
+    {
+      "name": "options",
+      "type": "array",
+      "required": true,
+      "description": "Array de { value: string, label: string, disabled?: boolean } — mesmo formato do Select."
+    },
+    {
+      "name": "placeholder",
+      "type": "string",
+      "required": false,
+      "description": "Mostrado quando não há valor selecionado nem texto digitado."
+    },
+    {
+      "name": "multiple",
+      "type": "boolean",
+      "default": false,
+      "required": false,
+      "description": "Mesmo significado do Select — muda o formato de value/onChange (string vs string[])."
+    },
+    {
+      "name": "value",
+      "type": "string",
+      "required": true,
+      "description": "Mesma observação do Select: string quando multiple=false, string[] quando multiple=true. União discriminada de verdade no TypeScript da implementação."
+    },
+    {
+      "name": "state",
+      "type": "enum",
+      "enum": [
+        "default",
+        "error",
+        "disabled"
+      ],
+      "default": "default",
+      "required": false
+    },
+    {
+      "name": "helperText",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "onChange",
+      "type": "function",
+      "required": false
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "required": false,
+      "description": "<input type=\"hidden\"> espelhado, sempre (mesmo com multiple=false) — diferente do Select: aqui o <input> visível carrega texto de exibição (label/resumo/busca), nunca o value real, então o hidden é a única fonte correta pro FormData nativo."
+    }
+  ],
+  "variants": [],
+  "states": [
+    "default",
+    "error",
+    "disabled"
+  ],
+  "tokensAllowed": {
+    "background": [
+      "semantic.fundo-superficie",
+      "semantic.fundo-secundario",
+      "semantic.fundo-campo"
+    ],
+    "border": [
+      "semantic.borda-base",
+      "semantic.borda-foco",
+      "semantic.borda-erro",
+      "semantic.borda-inativo"
+    ],
+    "text": [
+      "semantic.texto-primario",
+      "semantic.texto-placeholder",
+      "semantic.texto-inativo",
+      "semantic.texto-secundario"
+    ],
+    "optionHighlight": [
+      "semantic.fundo-secundario",
+      "semantic.acao-primaria-transparente"
+    ],
+    "radius": [
+      "structural.raio-pp",
+      "structural.raio-xp"
+    ],
+    "focusRing": [
+      "structural.foco-espessura"
+    ],
+    "spacing": [
+      "structural.espaco-xp",
+      "structural.espaco-pp"
+    ],
+    "iconSize": [
+      "structural.icone-medio",
+      "structural.icone-pequeno"
+    ],
+    "iconColor": [
+      "semantic.icone-secundario",
+      "semantic.icone-inativo",
+      "semantic.acao-primaria"
+    ],
+    "typography": [
+      "type-style.texto-m"
+    ]
+  },
+  "a11y": {
+    "role": "combobox no <input> (aria-autocomplete='list', aria-haspopup='listbox', aria-expanded, aria-controls, aria-activedescendant) + listbox no popup (aria-multiselectable quando multiple=true) + option em cada item — padrão WAI-ARIA APG 'Editable Combobox with List Autocomplete', diferente do Select ('Select-Only Combobox', que não é editável).",
+    "requiredAria": [
+      "aria-required no input quando required=true",
+      "aria-invalid no input quando state=error",
+      "aria-describedby no input apontando pro id derivado do HelperText, quando helperText existe",
+      "aria-selected em cada option refletindo se está selecionada",
+      "aria-disabled em cada option com disabled=true"
+    ],
+    "keyboard": [
+      "digitar qualquer caractere: filtra as opções em tempo real (substring, sem diferenciar maiúsculas/minúsculas) e abre o popup se estiver fechado",
+      "Seta baixo/cima: abre o popup se fechado; move a opção ativa dentro da lista JÁ FILTRADA (sem wrap)",
+      "Home/End: pula pra primeira/última opção habilitada da lista filtrada",
+      "Enter: seleciona a opção ativa da lista filtrada — fecha e mostra o label escolhido se multiple=false; mantém aberto e limpa a busca (pra continuar filtrando) se multiple=true",
+      "Esc: fecha o popup e reverte o campo pro texto do valor já confirmado (label selecionado, resumo, ou vazio) — nunca aplica o que estava digitado e não foi confirmado",
+      "clique fora ou perda de foco sem confirmar: mesmo comportamento do Esc — reverte, não aplica a busca pendente",
+      "opções com disabled=true são puladas pela navegação por teclado",
+      "clique no ícone de limpar: esvazia o value (e a busca), sem fechar o popup — foco permanece no campo"
+    ],
+    "contrastMin": "AAA (7:1) como meta pro público 60+, mesma régua do Select/TextField.",
+    "notes": "Diferente do Select, o foco de teclado aqui é sempre um <input> de texto real (não um <button>) — é o que permite digitar. A navegação da lista ainda é 'virtual' (aria-activedescendant), pelo mesmo motivo do Select: mover o foco de verdade pra dentro do popup interromperia a digitação. useTypeahead do Select não se aplica aqui — a própria digitação já filtra, então um buffer de typeahead separado seria redundante e conflitante."
+  },
+  "events": {
+    "status": "não definido no contrato original"
+  },
+  "composition": {
+    "canContain": [
+      "FieldLabel",
+      "HelperText",
+      "Icon"
+    ],
+    "canBeContainedBy": [
+      "formulários"
+    ],
+    "doNotCombine": []
+  },
+  "forbidden": [
+    "abrir o popup só com clique — foco (Tab) e digitação também precisam abrir",
+    "aplicar uma busca não confirmada como se fosse seleção — Esc/blur sempre revertem, nunca commitam texto digitado sozinho",
+    "navegação por teclado considerando opções com disabled=true, mesmo dentro da lista filtrada",
+    "chips removíveis dentro do campo — mesma razão do Select (ver decisions), resumo múltiplo é só texto",
+    "comunicar obrigatoriedade só pelo asterisco do FieldLabel, sem aria-required no input",
+    "comunicar erro só pela borda vermelha, sem aria-invalid + HelperText explicando",
+    "cor fora da whitelist de tokensAllowed",
+    "reimplementar FieldLabel, HelperText, Icon ou Tooltip inline — mesma regra do Select/TextField/Textarea"
+  ],
+  "decisions": [
+    "CORRIGIDO — auditoria de contratos (2026-09-01): raio-xp adicionado a radius, mesmo gap do select.contract.json (botão-gatilho e ícone de limpar usam raio-xp, só o popup usava raio-pp, já declarado).",
+    "multiple=true desde a v1, mesma decisão já tomada pro Select — reaproveita o mesmo formato de value/onChange (string vs string[]) e a mesma lógica de resumo truncado com '+N' (ver decisions do select.contract.json) quando fechado.",
+    "Estado interno de 'busca' (query) é separado do value controlado: o <input> mostra o texto digitado enquanto o popup está aberto, mas volta a mostrar o label selecionado (single) ou o resumo truncado (multiple) assim que fecha — sem confirmação explícita (Enter ou clique numa opção), a busca digitada nunca vira o value.",
+    "Ao abrir (foco no campo), limpa pra busca vazia (mostra todas as opções) em vez de manter o label atual como texto pra editar — modelo mental mais simples ('abrir = nova busca'), consistente com implementações de referência (ex.: seletor de labels do GitHub). A opção já selecionada continua visível com um ícone de check dentro da lista.",
+    "RESOLVIDO — sem useClick do @floating-ui/react (diferente do Select): é um <input>, clicar nele já foca nativamente. 'Limpar a busca ao abrir' vive só no onFocus, nunca genericamente atrelado a 'open virou true' — bug real encontrado testando no navegador: um efeito baseado em `open` também disparava quando a PRÓPRIA digitação abria o popup (query não vazia → onChange seta open=true), apagando o caractere recém-digitado antes de aparecer na tela.",
+    "Sem useTypeahead do floating-ui aqui (diferente do Select): a própria digitação já filtra a lista em tempo real, um buffer de typeahead paralelo seria redundante e brigaria pela mesma tecla.",
+    "Filtro é substring simples (label.includes(query)), case-insensitive E sem diferenciar acento — sem fuzzy matching ou busca por trecho fora de ordem. Sem diferenciar acento é obrigatório, não opcional: bug real encontrado testando no navegador, digitar 'mex' não batia com 'México' porque toLowerCase() sozinho não normaliza diacríticos — crítico pra conteúdo em português (São Paulo, Índia, França). Normalização via String.normalize('NFD') + remoção da faixa unicode de diacríticos. Se um caso real pedir busca mais inteligente (fuzzy, fora de ordem), é decisão nova.",
+    "Ao digitar, o primeiro resultado filtrado vira automaticamente a opção ativa (Enter direto já seleciona o topo do resultado) — replica o padrão mais comum de combobox com busca (ex.: paletas de comando).",
+    "Lista vazia depois de filtrar mostra uma mensagem ('Nenhum resultado encontrado') em vez de um popup em branco — sem isso pareceria que o componente quebrou.",
+    "Ícone de limpar (x) aparece quando há value ou busca digitada — clique esvazia o value (e a busca múltipla toda, se multiple=true) sem fechar o popup, foco permanece no campo pra buscar de novo. Não existe no Select porque lá não faz sentido 'limpar a busca' (não tem busca).",
+    "Sem chips removíveis dentro do campo — mesmo motivo do Select: mesmo agora sendo um <input> (que tecnicamente comportaria chips ao lado do texto), a decisão de manter o resumo como texto simples foi mantida por consistência entre os dois componentes, não reaberta sem necessidade real.",
+    "Popup sem sombra, só borda — mesma convenção do Select/Card/resto do harness. Renderizado via FloatingPortal (@floating-ui/react), mesma lib e padrão do Select/Tooltip.",
+    "Foco real de teclado nunca sai do <input> (navegação 'virtual', mesma técnica do Select, mesmos cuidados de foco já resolvidos lá — onMouseDown+preventDefault nas opções, id real em cada option pra aria-activedescendant funcionar).",
+    "Erro + foco: erro vence visualmente — mesma regra já fixada em text-field.contract.json/select.contract.json, aplicada por consistência entre contratos de data-entry.",
+    "AJUSTADO a pedido do usuário — fundo do campo trocado de semantic.fundo-superficie pra semantic.fundo-campo (token novo): 'o fundo dos inputs de forma geral, devem ser levemente mais escuros que a cor de fundo da página onde estão, para destacar melhor'. No modo claro fundo-campo é idêntico a fundo-superficie (sem mudança visual, branco com borda já bastava) — só no modo escuro os dois valores divergem (fundo-campo um degrau mais escuro que a página), porque era só ali que o campo ficava indistinguível da própria página por trás."
+  ],
+  "references": {
+    "tokensFile": "tokens/tokens.json — Cores Semânticas (Fundos, Bordas, Textos, Ações/Primárias), Estrutural (raio-pp, foco-espessura, espaco-xp/pp, icone-pequeno/medio), Tipografia Estilo (texto-m)"
+  }
+}

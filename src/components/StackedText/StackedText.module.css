@@ -1,0 +1,21 @@
+.stack {
+  display: inline-flex;
+  flex-direction: column;
+  gap: var(--espaco-xp);
+}
+
+.primary {
+  font-family: var(--texto-p-family);
+  font-size: var(--texto-p-size);
+  font-weight: var(--texto-p-weight);
+  line-height: var(--texto-p-line-height);
+  color: var(--texto-primario);
+}
+
+.secondary {
+  font-family: var(--texto-micro-family);
+  font-size: var(--texto-micro-size);
+  font-weight: var(--texto-micro-weight);
+  line-height: var(--texto-micro-line-height);
+  color: var(--texto-secundario);
+}

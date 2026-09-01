@@ -1,0 +1,102 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--fundo-superficie);
+  font-family: var(--texto-m-family);
+  box-sizing: border-box;
+}
+
+.pageEmbedded {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  background: var(--fundo-superficie);
+  font-family: var(--texto-m-family);
+  box-sizing: border-box;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  gap: var(--espaco-m);
+  padding: var(--espaco-g);
+}
+
+.title {
+  margin: 0;
+  color: var(--texto-primario);
+  font-family: var(--texto-m-family);
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-p);
+}
+
+.filterTrigger {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espaco-xp);
+  height: 44px;
+  padding: 0 var(--espaco-m);
+  border-radius: var(--raio-pp);
+  border: 1px solid var(--borda-base);
+  background: var(--fundo-superficie);
+  color: var(--texto-primario);
+  font-family: var(--texto-m-family);
+  font-size: var(--texto-m-size);
+  cursor: pointer;
+}
+
+.filterTrigger:hover {
+  background: var(--fundo-superficie);
+}
+
+.filterTrigger:focus-visible {
+  outline: var(--foco-espessura) solid var(--borda-foco);
+  outline-offset: 2px;
+}
+
+.filterBadge {
+  display: inline-flex;
+}
+
+.filterPanel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-p);
+  width: 260px;
+}
+
+.filterActions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espaco-p);
+  margin-top: var(--espaco-xp);
+}
+
+.activeFilters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--espaco-xp);
+  flex-shrink: 0;
+  padding: 0 var(--espaco-g) var(--espaco-p);
+}
+
+.boardArea {
+  flex: 1;
+  min-height: 0;
+  padding: 0 var(--espaco-g) var(--espaco-g);
+  box-sizing: border-box;
+}

@@ -1,0 +1,107 @@
+.criticalWrapper {
+  border-radius: var(--raio-pp);
+  box-shadow: 0 0 0 1px var(--borda-erro);
+}
+
+.content {
+  margin-top: calc(var(--espaco-pp) * -1);
+  margin-bottom: calc(var(--espaco-pp) * -1);
+}
+
+/* BUG REAL corrigido a pedido do usuário — .header era flex com
+   align-items:center; como o iconCircle (36px) é mais alto que o texto do
+   label (~20px), o label ficava CENTRALIZADO dentro de uma linha de 36px,
+   sobrando ~8px de espaço vazio embaixo do próprio texto do label antes do
+   valueRow começar — só quando icon estava presente (sem icon, a linha do
+   header tinha a altura do próprio label, sem sobra nenhuma). Resultado:
+   gap label→valor inconsistente (~9px com ícone vs. 0px sem). Corrigido
+   tirando o iconCircle do fluxo flex (position:absolute) — a altura do
+   .header passa a ser SEMPRE só a do texto do label, com ou sem ícone, e o
+   ícone fica sobreposto no canto superior direito por cima, sem influenciar
+   o box de layout. */
+.header {
+  position: relative;
+}
+
+/* Só quando icon está presente — reserva espaço pro círculo absolutamente
+   posicionado, evitando que o texto do label fique embaixo dele. Sem icon,
+   .header não precisa desse padding (deixaria espaço vazio à toa). */
+.headerWithIcon {
+  padding-right: 44px;
+}
+
+.iconCircle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--raio-circular);
+}
+
+.label {
+  color: var(--texto-secundario);
+  font-family: var(--texto-p-family);
+  font-size: var(--texto-p-size);
+  font-weight: 400;
+}
+
+/* AJUSTADO a pedido do usuário — menos espaço entre o rótulo (topo) e o
+   valor grande. espaco-xp (4px) já era o menor token da escala estrutural
+   — "diminua" só é possível indo além da escala (0, sem token, não uma
+   escolha de tamanho — é a ausência de espaçamento extra, deixando só o
+   line-height natural das duas linhas como respiro). */
+.valueRow {
+  display: flex;
+  align-items: baseline;
+  gap: var(--espaco-pp);
+  margin-top: 0;
+  flex-wrap: wrap;
+}
+
+.value {
+  color: var(--texto-primario);
+  font-family: var(--texto-g-forte-family);
+  font-size: var(--texto-g-forte-size);
+  font-weight: var(--texto-g-forte-weight);
+  line-height: var(--texto-g-forte-line-height);
+}
+
+/* AJUSTADO a pedido do usuário — rodapé com o indicador de tendência
+   (trendValue, sem seta) + helperText na MESMA linha, separado do valor
+   grande por uma linha divisória (mesmo padrão das referências visuais
+   anexadas) + seta decorativa à direita, sempre no tom neutro (não é parte
+   do indicador de tendência). */
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espaco-pp);
+  margin-top: var(--espaco-p);
+  padding-top: var(--espaco-pp);
+  border-top: 1px solid var(--borda-base);
+}
+
+.footerText {
+  display: flex;
+  align-items: baseline;
+  gap: var(--espaco-xp);
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+.trend {
+  font-family: var(--texto-micro-family);
+  font-size: var(--texto-micro-size);
+  font-weight: 700;
+}
+
+.helperText {
+  color: var(--texto-secundario);
+  font-family: var(--texto-micro-family);
+  font-size: var(--texto-micro-size);
+}

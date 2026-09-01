@@ -1,0 +1,64 @@
+{
+  "name": "Link",
+  "originalName": "Link",
+  "oneLiner": "Âncora semântica (<a href>) para navegação real — diferente do Button variant='link', que é uma ação estilizada como link, não uma URL de verdade.",
+  "category": "action",
+  "status": "draft",
+  "whenToUse": "Navegar de verdade pra uma URL ou rota (interna ou externa) — precisa funcionar com botão direito 'abrir em nova aba', Cmd/Ctrl+clique, pré-visualização de status bar, indexação por crawler e sem JavaScript.",
+  "whenNotToUse": "Disparar uma ação que não é navegação (enviar formulário, abrir modal, alternar estado) — isso é Button, mesmo que precise parecer um link (variant='link' do Button existe justamente pra essa fronteira).",
+  "anatomy": [
+    "Ícone esquerdo (opcional)",
+    "Texto do link",
+    "Ícone direito (opcional) — substituído pelo ícone de 'abre em nova aba' quando external=true",
+    "Texto visualmente oculto '(abre em nova aba)', só pra leitor de tela, quando external=true"
+  ],
+  "dependencies": ["Icon"],
+  "props": [
+    { "name": "href", "type": "string", "required": true, "description": "URL ou rota de destino real — sem isso não é um link, é decoração." },
+    { "name": "label", "type": "string", "required": true },
+    { "name": "external", "type": "boolean", "default": false, "required": false, "description": "true adiciona target='_blank' + rel='noopener noreferrer' automaticamente (nunca exposto como prop separada — esquecer noopener é falha de segurança real, não é opcional), mostra o ícone de nova aba (substitui rightIcon manual) e um texto oculto '(abre em nova aba)' pro leitor de tela." },
+    { "name": "underline", "type": "boolean", "default": false, "required": false, "description": "false (padrão) = sem sublinhado em repouso, só no hover. true = sublinhado sempre visível, não só no hover. Mesmo par de cores nos dois casos — só muda quando o traço aparece, não é uma variante de cor." },
+    { "name": "leftIcon", "type": "string", "required": false },
+    { "name": "rightIcon", "type": "string", "required": false, "description": "Ignorado quando external=true — mesma regra de precedência já usada em TextField (type=password sobrepõe rightIcon manual)." },
+    { "name": "state", "type": "enum", "enum": ["default", "disabled"], "default": "default", "required": false, "description": "disabled remove o atributo href (ver decisions) — sem hover/pressed forçado por prop, são só :hover/:active nativos." },
+    { "name": "onPress", "type": "function", "required": false, "description": "Efeito colateral opcional (ex.: analytics) disparado JUNTO da navegação real — nunca a substitui, diferente do onPress do Button, que É o mecanismo inteiro." },
+    { "name": "current", "type": "boolean", "default": false, "required": false, "description": "true = aria-current=\"page\" + destaque visual (cor acao-link-texto-sobreposto em repouso, não só no hover) — pra marcar 'você está aqui' em contextos de navegação (ex.: NavBar). O link continua clicável/focável normalmente, só ganha o marcador semântico e visual (ver decisions)." }
+  ],
+  "variants": [],
+  "states": ["default", "disabled"],
+  "tokensAllowed": {
+    "text": ["semantic.acao-link-texto", "semantic.acao-link-texto-sobreposto", "semantic.texto-inativo"],
+    "iconColor": ["semantic.acao-link-texto", "semantic.acao-link-texto-sobreposto", "semantic.texto-inativo"],
+    "iconSize": ["structural.icone-pequeno"],
+    "focusRing": ["structural.foco-espessura"],
+    "spacing": ["structural.espaco-xp"]
+  },
+  "a11y": {
+    "role": "link nativo (<a href>) — implícito, sem role ARIA extra. Quando disabled, sem href: deixa de ser focável/interativo nativamente (mesmo efeito de 'sair da tabulação' que o Button disabled já tem, só que via ausência de href em vez de atributo disabled, que <a> não tem).",
+    "requiredAria": ["aria-disabled quando state=disabled (reforço declarativo — a ausência de href já é o que importa de verdade)", "aria-current=\"page\" quando current=true"],
+    "keyboard": ["Enter ativa o link focado — comportamento nativo do <a>, não reimplementado"],
+    "contrastMin": "AAA (7:1) como meta pro público 60+ — acao-link-texto mede 7.13:1 contra branco, acao-link-texto-sobreposto (hover) 11.99:1. texto-inativo (disabled) fica em 2.54:1, abaixo da régua — aceito por convenção: estado disabled comunica 'indisponível' via contraste reduzido de propósito, mesmo padrão já usado no Button/TextField disabled.",
+    "notes": "Sem sublinhado em repouso por padrão (só no hover), mas underline=true deixa sempre visível — útil quando o link precisa se distinguir do texto ao redor sem depender de interação (ex.: lista de links, texto corrido denso onde só a cor não seria suficiente pra quem tem baixa visão). Foco nunca só cor, anel visível padrão do harness."
+  },
+  "events": { "status": "não definido no contrato original" },
+  "composition": { "canContain": ["Icon"], "canBeContainedBy": ["parágrafos de texto", "barras de navegação", "rodapés", "formulários"], "doNotCombine": ["aninhar Link dentro de Link ou dentro de Button — <a> dentro de elemento interativo é HTML inválido"] },
+  "forbidden": [
+    "usar Link pra disparar uma ação que não é navegação — isso é Button variant='link'",
+    "target='_blank' sem rel='noopener noreferrer' — falha de segurança real (window.opener), por isso não existe uma prop 'target' separada, só 'external'",
+    "leftIcon/rightIcon reimplementado fora do átomo Icon",
+    "ícone de 'abre em nova aba' sem o texto oculto equivalente pro leitor de tela — o ícone sozinho (decorative=true) não anuncia nada",
+    "cor fora da whitelist de tokensAllowed",
+    "forçar um type-style fixo — ver decisions sobre herdar tipografia do contexto"
+  ],
+  "decisions": [
+    "Sem tipografia própria (nenhum type-style em tokensAllowed): diferente de todo o resto do harness, Link usa font: inherit — ele tipicamente vive dentro de um parágrafo, item de navegação ou rodapé com tamanho/família já definidos pelo contexto, e forçar um type-style fixo faria ele destoar do texto ao redor. Só a cor (acao-link-texto) é fixa.",
+    "external=true controla tudo relacionado a abrir em nova aba de uma vez (target, rel, ícone, texto oculto) — não existe uma prop 'target' separada porque target='_blank' sem rel='noopener noreferrer' é uma falha de segurança real (a página aberta ganha acesso a window.opener), não uma escolha estética; expor as duas props separadas criaria a possibilidade de esquecer o rel.",
+    "external sobrepõe rightIcon manual, mesma regra de precedência já usada no TextField (type=password sobrepõe rightIcon) — não dá pra combinar um rightIcon customizado com o indicador de link externo no mesmo lado.",
+    "disabled remove o atributo href em vez de usar aria-disabled sozinho: <a> não tem atributo disabled nativo, e sem href o elemento já não é focável nem clicável nativamente — mesmo efeito prático do Button disabled (sai da tabulação), só que pela ausência do atributo que o torna interativo, não por um atributo de bloqueio.",
+    "Ícone de 'abre em nova aba' fica decorative=true (só visual) — o anúncio real pro leitor de tela é um texto visualmente oculto '(abre em nova aba)' concatenado ao label, não um accessibleLabel no ícone (evita duplicar o anúncio).",
+    "onPress é efeito colateral opcional, nunca o mecanismo de navegação em si (diferente do Button) — a navegação real acontece via href nativo, então Link continua funcionando sem JavaScript.",
+    "underline é boolean, não um variant novo (ex.: 'default'/'underline') — só duas combinações existem hoje e ambas usam exatamente os mesmos tokens de cor, só o text-decoration muda. Mesmo padrão já usado no outlined do Button (boolean) em vez de dobrar o enum de variantes.",
+    "REVISADO — prop current adicionada: lacuna real encontrada implementando navbar.contract.json (item ativo de uma barra de navegação precisa de aria-current=page + destaque visual, e Link não tinha como expressar isso). current=true reaproveita acao-link-texto-sobreposto (a mesma cor que já era usada no :hover) como cor de REPOUSO — não introduz token novo, só aplica um tom que já existia no contrato pra um estado que também já existia (hover), agora também disponível como estado 'ativo' persistente. Diferente da decisão do último item do Breadcrumb (que vira texto estático, não-clicável): aqui o item current continua sendo um <a href> real e clicável, porque em NavBar clicar no item já ativo é uma ação válida (ex.: recarregar/voltar ao topo da área atual)."
+  ],
+  "references": { "tokensFile": "tokens/tokens.json — Cores Semânticas (Ações/Link), Estrutural (foco-espessura, espaco-xp, icone-pequeno)" }
+}

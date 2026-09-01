@@ -1,0 +1,57 @@
+{
+  "name": "ImageThumbnail",
+  "originalName": "MiniaturaDeImagem",
+  "oneLiner": "Imagem em miniatura, com a opção de clicar pra abrir uma versão ampliada num Modal.",
+  "category": "display",
+  "status": "draft",
+  "whenToUse": "Mostrar uma imagem pequena associada a um registro (ex.: foto do produto numa célula de Datatable) onde ver a versão grande é útil mas não merece navegar pra outra página.",
+  "whenNotToUse": "Avatar de usuário/pessoa (use o átomo Avatar, que já tem fallback iniciais/ícone genérico); galeria com várias imagens navegáveis em sequência (fora de escopo — este contrato mostra 1 imagem por vez, sem next/anterior); imagem puramente decorativa de layout (isso não precisa de um componente, é só uma tag <img> do próprio consumidor).",
+  "anatomy": [
+    "Miniatura — <img> com raio-pp, tamanho fixo por size, object-fit cover",
+    "Gatilho — quando clickable=true, a miniatura inteira vira um <button> (ícone de expandir sutil sobreposto no hover, ver decisions)",
+    "Modal (reaproveitado) — abre com a imagem em tamanho grande, quando clickable=true"
+  ],
+  "dependencies": ["Modal", "Icon"],
+  "props": [
+    { "name": "src", "type": "string", "required": true },
+    { "name": "alt", "type": "string", "required": true, "description": "Texto alternativo real da imagem — nunca genérico tipo 'imagem' (mesma régua de a11y de conteúdo não-decorativo usada no resto do harness)." },
+    { "name": "size", "type": "enum", "enum": ["small", "medium", "large"], "default": "medium", "required": false, "description": "small=32px, medium=48px, large=64px de lado — mesma escala de Avatar, reaproveitada por consistência." },
+    { "name": "clickable", "type": "boolean", "default": false, "required": false, "description": "true = miniatura vira gatilho que abre a imagem ampliada num Modal. false = só exibição, sem interação." },
+    { "name": "expandedAlt", "type": "string", "required": false, "description": "Texto alternativo da imagem ampliada dentro do Modal, se precisar ser diferente do alt da miniatura (raramente necessário). Default: reaproveita alt." }
+  ],
+  "variants": ["small", "medium", "large"],
+  "states": ["default", "clickable-hover", "expanded"],
+  "tokensAllowed": {
+    "background": ["semantic.fundo-secundario"],
+    "border": ["semantic.borda-base"],
+    "radius": ["structural.raio-pp"],
+    "iconColor": ["semantic.texto-invertido"],
+    "iconSize": ["structural.icone-pequeno"],
+    "spacing": ["structural.icone-extra-grande", "structural.espaco-xg", "structural.espaco-xgg"]
+  },
+  "a11y": {
+    "role": "img (nativo, via <img alt>) quando clickable=false; quando clickable=true, button envolvendo a imagem com aria-label derivado do alt (ex.: 'Ampliar {alt}')",
+    "requiredAria": ["alt real na <img> sempre", "aria-label no botão-gatilho quando clickable=true, derivado de alt (não duplica o mesmo texto de forma redundante pro leitor de tela, ver decisions)"],
+    "keyboard": ["Enter/Espaço no gatilho abre o Modal (botão nativo)", "Modal aberto herda toda a a11y de modal.contract.json (focus trap, Esc fecha)"],
+    "contrastMin": "não aplicável a conteúdo de imagem — alt textual é o requisito real, não contraste de cor",
+    "notes": "Miniatura decorativa quando já existe um texto adjacente descrevendo a mesma coisa (ex.: célula de tabela com nome do produto ao lado) ainda assim recebe alt real, não alt vazio — a imagem em si pode carregar informação que o texto não repete (cor, variação visual)."
+  },
+  "events": { "status": "não definido no contrato original" },
+  "composition": { "canContain": [], "canBeContainedBy": ["Datatable (célula de coluna)", "Card", "listas"], "doNotCombine": [] },
+  "forbidden": [
+    "alt vazio ou genérico ('imagem', 'foto') — sempre descritivo do conteúdo real",
+    "abrir o Modal ampliado sem clickable=true — não existe abertura automática/hover-only",
+    "reimplementar Modal ou Icon inline em vez de reaproveitar",
+    "cor fora da whitelist de tokensAllowed",
+    "usar este átomo pra avatar de pessoa — isso é o átomo Avatar, que já resolve fallback iniciais/ícone genérico"
+  ],
+  "decisions": [
+    "Nasceu como um dos 'tipos de célula' pedidos pra Datatable (datatable.contract.json) — célula de imagem com abertura opcional em modal. Ganhou contrato próprio em vez de lógica embutida na Datatable, mesma decisão já tomada pra QuantitySelector/StackedText.",
+    "Reaproveita a escala de tamanho do Avatar (small/medium/large em vez de introduzir uma nova) — os dois são 'imagem pequena e quadrada/circular', consistência entre os dois vale mais que uma escala dedicada sem necessidade real de divergir.",
+    "Sem fallback de erro de carregamento nesta v1 (diferente do Avatar, que tem cascata foto→iniciais→ícone) — um produto sem foto é responsabilidade do consumidor não passar src, não um estado que este átomo precisa resolver sozinho. Se surgir caso real de imagem quebrada com frequência, é decisão nova.",
+    "Sem navegação next/anterior entre várias imagens (galeria) — fora de escopo desta v1, um caso de uso real e concreto define isso depois.",
+    "Ícone de 'ampliar' sobreposto na miniatura só aparece no hover/focus quando clickable=true (mesmo racional do ícone de lupa em datatable.contract.json — espaço reservado, sem popular a UI com ruído visual quando o mouse não está em cima).",
+    "REVISADO — bug real reportado: a imagem ampliada dentro do Modal não ficava centralizada (grudava na esquerda quando mais estreita que o corpo do Modal). Corrigido com margin: 0 auto na imagem ampliada — display:block já existia, só faltava a margem automática pra centralizar um bloco mais estreito que o pai."
+  ],
+  "references": { "tokensFile": "tokens/tokens.json — Cores Semânticas (Fundos, Bordas, texto-invertido), Estrutural (raio-pp, icone-pequeno/grande/extra-grande)" }
+}

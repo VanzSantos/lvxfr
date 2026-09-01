@@ -1,0 +1,254 @@
+{
+  "name": "FileUpload",
+  "originalName": "EnvioDeArquivo",
+  "oneLiner": "Seleção de arquivo(s) local(is) — três variantes visuais (campo, botão, dropzone) sobre o mesmo comportamento: coleta File[], não faz upload de verdade.",
+  "category": "data-entry",
+  "status": "draft",
+  "whenToUse": "Usuário precisa anexar um ou mais arquivos do próprio computador a um formulário (ex.: documento, foto de perfil, planilha de importação).",
+  "whenNotToUse": "Já existe uma imagem/arquivo remoto só pra exibir (isso é ImageThumbnail); a lógica de upload de verdade (progresso, multipart, retry) — este componente só coleta os File[] e entrega via onChange, o resto é responsabilidade de quem consome.",
+  "anatomy": [
+    "<input type='file'> nativo, sempre presente mas visualmente oculto (display:none) — é ele quem de fato abre o seletor do sistema operacional",
+    "Gatilho visível, uma de três variantes: 'field' (FieldLabel + linha com os arquivos selecionados via Chip removível + botão 'Procurar'), 'button' (só um Button que abre o seletor), 'dropzone' (área tracejada clicável, também aceita arrastar-e-soltar)",
+    "Lista de arquivos selecionados — reaproveita o átomo Chip (removable=true) por arquivo, mesmo nas variantes button/dropzone (aparece abaixo do gatilho)"
+  ],
+  "dependencies": [
+    "Chip",
+    "Icon",
+    "FieldLabel",
+    "HelperText",
+    "Button"
+  ],
+  "props": [
+    {
+      "name": "variant",
+      "type": "enum",
+      "enum": [
+        "field",
+        "button",
+        "dropzone"
+      ],
+      "default": "dropzone",
+      "required": false,
+      "description": "Aparência do gatilho. O comportamento de seleção/validação é idêntico nas três."
+    },
+    {
+      "name": "value",
+      "type": "array",
+      "required": true,
+      "description": "Array de File já selecionados. 100% controlado — FileUpload nunca guarda os arquivos internamente além do necessário pra repassar pro onChange."
+    },
+    {
+      "name": "onChange",
+      "type": "function",
+      "required": true,
+      "description": "Assinatura (files: File[]) => void, chamado com a lista COMPLETA e já validada (sem os rejeitados) a cada seleção, drop ou remoção via Chip."
+    },
+    {
+      "name": "onReject",
+      "type": "function",
+      "required": false,
+      "description": "Assinatura (rejected: { file: File, reason: 'type' | 'size' }[]) => void. Chamado quando algum arquivo escolhido/arrastado não passa em accept ou maxSizeMB — esses arquivos NUNCA entram em value."
+    },
+    {
+      "name": "multiple",
+      "type": "boolean",
+      "required": false,
+      "default": false,
+      "description": "Permite selecionar/arrastar mais de um arquivo de uma vez. false = value nunca tem mais de 1 item (uma nova seleção substitui a anterior)."
+    },
+    {
+      "name": "accept",
+      "type": "string",
+      "required": false,
+      "description": "Mesma sintaxe do atributo HTML accept (ex.: '.pdf,.docx', 'image/*') — repassado direto pro input nativo e reaplicado na validação de drag-and-drop (o navegador só filtra o picker nativo, não o drop)."
+    },
+    {
+      "name": "maxSizeMB",
+      "type": "number",
+      "required": false,
+      "description": "Tamanho máximo por arquivo, em megabytes. Arquivo maior vira rejected (reason='size')."
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "required": false,
+      "description": "Só variant='field' — rótulo do campo."
+    },
+    {
+      "name": "required",
+      "type": "boolean",
+      "required": false,
+      "default": false,
+      "description": "Só variant='field' — repassado pro FieldLabel."
+    },
+    {
+      "name": "helperText",
+      "type": "string",
+      "required": false,
+      "description": "Texto de apoio/erro abaixo do componente, nas três variantes."
+    },
+    {
+      "name": "state",
+      "type": "enum",
+      "enum": [
+        "default",
+        "error",
+        "disabled"
+      ],
+      "default": "default",
+      "required": false,
+      "description": "disabled bloqueia clique/drop/remoção; error só muda a borda (variant='field'/'dropzone') ou o texto de apoio."
+    },
+    {
+      "name": "buttonLabel",
+      "type": "string",
+      "required": false,
+      "default": "Selecionar arquivo",
+      "description": "Texto do gatilho quando variant='button', ou do botão 'Procurar' quando variant='field'."
+    },
+    {
+      "name": "dropzoneLabel",
+      "type": "string",
+      "required": false,
+      "default": "Arraste um arquivo aqui ou clique para selecionar",
+      "description": "Só variant='dropzone'."
+    },
+    {
+      "name": "accessibleLabel",
+      "type": "string",
+      "required": false,
+      "default": "Enviar arquivo",
+      "description": "Nome acessível do input nativo quando não há label visível (variant≠'field')."
+    },
+    {
+      "name": "buttonVariant",
+      "type": "enum",
+      "enum": [
+        "primary",
+        "secondary",
+        "neutral",
+        "subtle",
+        "destructive",
+        "link"
+      ],
+      "default": "neutral",
+      "required": false,
+      "description": "Só variant='button'. Reaproveita o enum já definido em button.contract.json (sem redefinir aqui), repassado direto pro variant do Button interno. Default 'neutral' preserva o visual original — único que existia antes desta prop."
+    },
+    {
+      "name": "buttonOutlined",
+      "type": "boolean",
+      "default": true,
+      "required": false,
+      "description": "Só variant='button'. Repassado pro outlined do Button interno — ignorado quando buttonVariant='link' (link não usa outlined como estilo primário, ver button.contract.json). Default true preserva o visual original."
+    }
+  ],
+  "variants": [
+    "field",
+    "button",
+    "dropzone"
+  ],
+  "states": [
+    "default",
+    "dragOver",
+    "error",
+    "disabled"
+  ],
+  "tokensAllowed": {
+    "background": [
+      "semantic.fundo-superficie",
+      "semantic.fundo-secundario"
+    ],
+    "border": [
+      "semantic.borda-base",
+      "semantic.borda-erro",
+      "semantic.borda-inativo",
+      "semantic.acao-primaria",
+      "semantic.borda-foco"
+    ],
+    "text": [
+      "semantic.texto-primario",
+      "semantic.texto-secundario",
+      "semantic.texto-placeholder",
+      "semantic.texto-inativo"
+    ],
+    "iconColor": [
+      "semantic.icone-secundario",
+      "semantic.icone-inativo",
+      "semantic.acao-primaria"
+    ],
+    "radius": [
+      "structural.raio-pp"
+    ],
+    "focusRing": [
+      "structural.foco-espessura"
+    ],
+    "spacing": [
+      "structural.espaco-xp",
+      "structural.espaco-pp",
+      "structural.espaco-p",
+      "structural.espaco-m"
+    ],
+    "typography": [
+      "type-style.texto-p",
+      "type-style.texto-m"
+    ]
+  },
+  "a11y": {
+    "role": "o <input type='file'> nativo é o controle acessível de verdade (label via htmlFor quando variant='field', aria-label=accessibleLabel nas outras) — visualmente oculto (display:none), mas continua no DOM e recebe foco de teclado real via o gatilho visível encaminhando .click()/.focus() pra ele quando necessário.",
+    "requiredAria": [
+      "aria-label ou label associada no input nativo",
+      "aria-describedby apontando pro HelperText quando presente",
+      "aria-disabled no gatilho quando state='disabled'"
+    ],
+    "keyboard": [
+      "Tab foca o gatilho visível (button nas 3 variantes — mesmo em 'field'/'dropzone', o elemento clicável É um button, não uma div com onClick)",
+      "Enter/Espaço no gatilho abre o seletor nativo de arquivos do sistema operacional",
+      "cada Chip de arquivo selecionado é focável e removível via teclado, mesmo padrão já validado em chip.contract.json"
+    ],
+    "contrastMin": "AA pro texto do gatilho/label, mesma régua de TextField/Select.",
+    "notes": "Arrastar-e-soltar (variant='dropzone') é um reforço de conveniência, nunca a ÚNICA forma de selecionar — a dropzone inteira também é clicável e abre o mesmo seletor nativo, então quem não consegue arrastar (teclado, touch, leitor de tela) tem o caminho equivalente completo."
+  },
+  "events": {
+    "status": "não definido no contrato original"
+  },
+  "composition": {
+    "canContain": [
+      "Chip",
+      "Icon",
+      "FieldLabel",
+      "HelperText",
+      "Button"
+    ],
+    "canBeContainedBy": [
+      "formulários",
+      "páginas"
+    ],
+    "doNotCombine": [
+      "FileUpload dentro de FileUpload",
+      "usar este componente pra exibir um arquivo/imagem já enviada sem permitir trocar — isso é ImageThumbnail"
+    ]
+  },
+  "forbidden": [
+    "arquivo rejeitado (tipo ou tamanho) entrando em value",
+    "mais de 1 item em value quando multiple=false",
+    "abrir o seletor nativo ou aceitar drop quando state='disabled'",
+    "reimplementar a lista de arquivos selecionados em vez de reaproveitar o átomo Chip",
+    "fazer upload de verdade (chamada de rede) dentro do componente — está fora de escopo",
+    "cor fora da whitelist de tokensAllowed"
+  ],
+  "decisions": [
+    "CORRIGIDO — auditoria de contratos (2026-09-01): borda-foco adicionado a border — anel de foco do gatilho usa esse token, ausente da whitelist.",
+    "Um componente só com 3 variantes visuais (field/button/dropzone) em vez de 3 componentes separados — o comportamento real (abrir seletor nativo, validar accept/maxSizeMB, listar via Chip, remover) é idêntico nas três, só muda a aparência do gatilho. Mesmo racional já usado no Accordion (item único vs. grupo é o mesmo componente).",
+    "Lista de arquivos selecionados reaproveita o átomo Chip (removable=true), nas 3 variantes — evita reinventar uma 'lista removível' quando o harness já tem exatamente esse padrão pronto e testado.",
+    "Componente só entrega File[] via onChange — upload de verdade (multipart, progresso, retry, cancelamento) é responsabilidade de quem consome. Mesmo racional do onExport do Datatable: o harness entrega os dados prontos (aqui, os arquivos validados), a operação de rede em si fica de fora.",
+    "onReject é uma prop separada de onChange — arquivos inválidos NUNCA aparecem em value nem por um instante, então quem consome não precisa filtrar; o motivo da rejeição (tipo/tamanho) vem pronto pra montar uma mensagem de erro específica, em vez de o consumidor recalcular sozinho.",
+    "accept é revalidado manualmente no drop (o atributo HTML accept só filtra o picker nativo de clique, navegadores não aplicam automaticamente em arquivos arrastados) — sem essa revalidação, arrastar um arquivo de tipo errado passaria despercebido.",
+    "Sem preview de imagem nesta v1 (mesmo pra accept='image/*') — não foi pedido; se surgir caso real, decisão nova (provavelmente reaproveitando ImageThumbnail pro preview em vez de reinventar).",
+    "Drag-and-drop reforça mas não substitui o clique — a dropzone inteira é um <button> clicável por baixo (mesmo alvo do teclado/Enter), o listener de drop é um extra por cima, não o único caminho (ver a11y notes).",
+    "EXTENSÃO — novas props buttonVariant/buttonOutlined (só variant='button'), sob demanda real: SettingsTemplate precisava do gatilho de upload no estilo 'botão link' (ícone + texto, sem fundo/borda), diretamente abaixo do Avatar — o Button interno da variant='button' vinha com variant/outlined FIXOS em 'neutral'/true, sem forma de configurar. Reaproveita o enum ButtonVariant já existente (nenhum enum novo) — default 'neutral'/true preserva 100% o comportamento de todos os outros consumidores já existentes do componente."
+  ],
+  "references": {
+    "tokensFile": "tokens/tokens.json — Cores Semânticas (Fundos, Bordas, Textos, Ícones, Ação Primária), Estrutural (raio-pp, foco-espessura, espaco-xp/pp/p/m), Tipografia Estilo (texto-p, texto-m)"
+  }
+}

@@ -1,0 +1,94 @@
+/* Mesma estrutura/lógica do LoginScreen (ver ROADMAP.md) — split-screen
+   edge-to-edge, sem cartão flutuante, sem margem entre a página e a borda
+   real da tela. Formulário mais longo que os outros — `.formPanel` já rola
+   verticalmente por dentro quando o conteúdo não cabe. */
+.page {
+  height: 100vh;
+  display: flex;
+  overflow: hidden;
+  background: var(--fundo-superficie);
+  font-family: var(--texto-m-family);
+}
+
+.pageEmbedded {
+  height: 100%;
+  display: flex;
+  overflow: hidden;
+  background: var(--fundo-superficie);
+  font-family: var(--texto-m-family);
+}
+
+/* AJUSTADO a pedido do usuário — mesma foto do LoginScreen (casal de idosos
+   sorrindo juntos olhando pro laptop) em todas as 8 páginas de auth/status —
+   ver decisions do LoginScreen e ROADMAP.md. */
+.imagePanel {
+  flex: 1 1 60%;
+  min-width: 0;
+  background: url("https://images.unsplash.com/photo-1758686254493-7b3e49a8f325?w=1200&q=80&fm=jpg&fit=crop&auto=format") center/cover no-repeat;
+}
+
+.formPanel {
+  flex: 1 1 40%;
+  max-width: 40%;
+  min-width: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--fundo-superficie);
+  padding: var(--espaco-xgg);
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-m);
+  width: 100%;
+  max-width: 360px;
+  box-sizing: border-box;
+}
+
+.stepFields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-m);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-xp);
+}
+
+.backRow {
+  align-self: flex-start;
+  margin-bottom: var(--espaco-p);
+}
+
+.title {
+  margin: 0;
+  color: var(--texto-primario);
+  font-family: var(--texto-m-forte-family);
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+@media (min-width: 1440px) {
+  .formPanel {
+    flex-basis: 37%;
+    max-width: 37%;
+  }
+}
+
+@media (max-width: 768px) {
+  .imagePanel {
+    display: none;
+  }
+
+  .formPanel {
+    max-width: none;
+    padding: var(--espaco-g);
+  }
+}

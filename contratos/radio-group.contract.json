@@ -1,0 +1,62 @@
+{
+  "name": "RadioGroup",
+  "originalName": "Grupo de Radio",
+  "oneLiner": "Formaliza o agrupamento de Radios que hoje é responsabilidade de quem consome (via name compartilhado) — gerencia value/onChange central, name automático, rótulo do grupo e erro/helper compartilhado.",
+  "category": "data-entry",
+  "status": "draft",
+  "whenToUse": "Escolher exatamente 1 entre N opções (2 a ~6, mesma régua do Radio) quando o grupo como um todo precisa de um rótulo próprio, mensagem de erro compartilhada, ou quando montar os Radios individualmente com name/checked repetidos manualmente vira fricção real.",
+  "whenNotToUse": "Só 1 Radio isolado sem noção de grupo (usa Radio direto, sem RadioGroup); lista longa de opções (Select); mais de uma opção pode ficar marcada (Checkbox, não Radio).",
+  "anatomy": [
+    "<fieldset> envolvendo tudo — semântica nativa de agrupamento de campos",
+    "<legend> com o rótulo do grupo (reaproveita a tipografia do FieldLabel, mas não o componente — ver decisions)",
+    "Radio (um por option, name/checked/onChange geridos pelo RadioGroup, não por quem consome)",
+    "HelperText (embaixo, opcional, uma vez só pro grupo inteiro)"
+  ],
+  "dependencies": ["Radio", "HelperText"],
+  "props": [
+    { "name": "label", "type": "string", "required": true, "description": "Rótulo do grupo inteiro, vira o <legend>." },
+    { "name": "options", "type": "array", "required": true, "description": "Array de { value: string, label: string, disabled?: boolean }." },
+    { "name": "value", "type": "string", "required": true, "description": "Value do option marcado. Controlado, mesmo padrão do Radio isolado." },
+    { "name": "onChange", "type": "function", "required": true, "description": "Assinatura (value: string) => void." },
+    { "name": "name", "type": "string", "required": false, "description": "Gerado automaticamente via useId quando omitido — RadioGroup sempre garante um name único compartilhado entre os Radios internos, sem exigir que quem consome lembre de passar um." },
+    { "name": "required", "type": "boolean", "default": false, "required": false, "description": "Puramente decorativo (asterisco no legend) — mesma decisão já registrada no Checkbox sobre required ser decorativo, obrigatoriedade real é responsabilidade de validação de formulário de quem consome." },
+    { "name": "state", "type": "enum", "enum": ["default", "error"], "default": "default", "required": false, "description": "Aplicado a TODOS os Radios do grupo de uma vez — não existe state por option individual neste contrato (ver decisions)." },
+    { "name": "helperText", "type": "string", "required": false },
+    { "name": "orientation", "type": "enum", "enum": ["vertical", "horizontal"], "default": "vertical", "required": false, "description": "vertical (padrão) = Radios empilhados, um por linha. horizontal = Radios lado a lado numa linha, quebrando pra próxima linha (flex-wrap) quando não cabem — pensado pra grupos curtos (ex.: Sim/Não, Masculino/Feminino/Outro) onde a disposição horizontal é mais compacta e lê melhor que uma coluna." }
+  ],
+  "variants": ["vertical", "horizontal"],
+  "states": ["default", "error"],
+  "tokensAllowed": {
+    "legend": ["semantic.texto-primario", "semantic.texto-obrigatorio"],
+    "spacing": ["structural.espaco-xp", "structural.espaco-pp", "structural.espaco-m"],
+    "typography": ["type-style.texto-rotulo-campo"]
+  },
+  "a11y": {
+    "role": "fieldset/legend nativos — o navegador já associa o legend como nome acessível do grupo (role=group implícito de fieldset), sem precisar de aria-labelledby manual.",
+    "requiredAria": ["aria-describedby no <fieldset> apontando pro id do HelperText, quando helperText existe", "aria-invalid em cada Radio interno quando state=error (delegado ao próprio Radio, que já suporta isso)"],
+    "keyboard": ["setas do teclado movem a marcação entre os Radios do grupo — comportamento nativo do name compartilhado, não reimplementado (RadioGroup só automatiza o name, não inventa navegação)", "Tab entra/sai do grupo inteiro de uma vez (padrão nativo de radio: só o marcado, ou o primeiro, é parte da ordem de tabulação)"],
+    "contrastMin": "Herda os números já validados em radio.contract.json pros Radios internos; legend usa texto-primario, mesmo par de alto contraste do resto do harness.",
+    "notes": "disabled é por OPTION individual (options[i].disabled), não uma prop do grupo inteiro — RadioGroup não tem um estado 'todo mundo desabilitado' próprio; se precisar disso, é a lista de options que já vem toda com disabled=true, RadioGroup não precisa de um caminho especial pra isso."
+  },
+  "events": { "status": "não definido no contrato original" },
+  "composition": {
+    "canContain": ["Radio", "HelperText"],
+    "canBeContainedBy": ["formulários"],
+    "doNotCombine": ["Radio isolado com o mesmo name de dentro de um RadioGroup — quebra a exclusividade mútua real do grupo formal"]
+  },
+  "forbidden": [
+    "menos de 2 options — sem escolha real entre alternativas",
+    "state=error por option individual — é sempre o grupo inteiro, não um Radio isolado dentro dele",
+    "reimplementar a navegação por seta entre os Radios — já é nativa via name compartilhado, RadioGroup não adiciona handler de teclado próprio",
+    "cor fora da whitelist de tokensAllowed"
+  ],
+  "decisions": [
+    "RESOLVIDO — RadioGroup existe porque Radio/HelperText já registravam essa lacuna como dívida técnica (ver radio.contract.json, decisions: 'RadioGroup não existe... candidato natural quando surgir um caso real'). Este contrato preenche exatamente o que Radio previu: state=error compartilhado, HelperText uma vez só, e agora também name automático.",
+    "name é OPCIONAL aqui (gerado via useId se omitido) — diferente do Radio isolado, onde name é sempre obrigatório (porque um Radio sozinho não tem como saber se faz parte de um grupo formal ou não). RadioGroup, por definição, SEMPRE representa um grupo — não faz sentido pedir pra quem consome inventar um name toda vez.",
+    "Legend usa a tipografia de type-style.texto-rotulo-campo (a mesma do FieldLabel), mas NÃO reaproveita o componente FieldLabel em si — FieldLabel tem ícone opcional + Tooltip de ajuda, funcionalidade que um <legend> de fieldset não precisa neste primeiro momento; reaproveitar o componente inteiro traria complexidade (Tooltip dentro de <legend> tem suporte inconsistente entre navegadores). Se surgir um caso real de RadioGroup com tooltip de ajuda, é decisão nova.",
+    "state=error é do GRUPO inteiro, nunca de um Radio individual dentro dele — exatamente a previsão já registrada em radio.contract.json ('um Radio isolado raramente decide sozinho que está errado... RadioGroup provavelmente vai repassar o mesmo state pra todos os radios do grupo').",
+    "disabled é por option (não uma prop do grupo) — via options[i].disabled, repassado Radio a Radio. Não existe uma prop 'disabled' no nível do RadioGroup inteiro neste contrato; se precisar desabilitar o grupo inteiro, quem consome marca todas as options como disabled (mecanicamente simples, sem precisar de um caminho especial).",
+    "AJUSTADO a pedido do usuário — nova prop 'orientation' (vertical/horizontal, default vertical). horizontal usa flex-direction: row + flex-wrap: wrap (não uma grid fixa de N colunas) — o grupo simplesmente quebra pra próxima linha quando os labels não cabem na largura disponível, sem exigir que quem consome calcule quantas colunas cabem. Espaçamento horizontal entre opções usa espaco-m (mais generoso que o espaco-xp vertical original) porque, lado a lado, opções muito próximas ficam mais difíceis de escanear como itens distintos do que empilhadas."
+  ],
+  "references": { "tokensFile": "tokens/tokens.json — Cores Semânticas (Textos), Estrutural (espaco-xp/pp), Tipografia Estilo (texto-rotulo-campo)" }
+}

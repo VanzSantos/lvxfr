@@ -1,0 +1,18 @@
+.spinner {
+  display: inline-block;
+  box-sizing: border-box;
+  width: var(--spinner-size);
+  height: var(--spinner-size);
+  border-style: solid;
+  border-width: 2px;
+  border-color: var(--spinner-color);
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

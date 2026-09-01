@@ -1,0 +1,105 @@
+.row {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espaco-pp);
+  min-height: 44px;
+  /* border-box é essencial aqui: sem isso, o padding vertical de .bare soma
+     POR CIMA dos 44px (content-box), virando 60px em vez de 44px — bug real
+     encontrado numa Datatable com Switch "nu" na coluna de ações, onde a
+     linha não encolhia nem em densidade condensed. Com border-box, o padding
+     de .bare passa a contar DENTRO do orçamento de 44px, como o comentário
+     de .bare sempre pretendeu. */
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+.disabled {
+  cursor: not-allowed;
+}
+
+/* uso "nu" (sem label visível) — o trilho sozinho tem só 28px de altura,
+   então o padding aqui garante os 44x44px de alvo de toque mesmo sem
+   texto ao lado (contratos/switch.contract.json, a11y.notes) */
+.bare {
+  padding: var(--espaco-pp) 0;
+}
+
+/* visualmente escondido, mas focável e lido por leitor de tela — o trilho
+   visível (.track) é decorativo (aria-hidden), o estado real vive aqui */
+.input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.track {
+  --thumb-size: var(--icone-medio);
+  --track-height: calc(var(--thumb-size) + (var(--espaco-xp) * 2));
+  --track-width: calc(var(--track-height) * 2);
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  width: var(--track-width);
+  height: var(--track-height);
+  box-sizing: border-box;
+  padding: 2px;
+  border: 2px solid var(--borda-base);
+  border-radius: var(--raio-circular);
+  background: var(--fundo-secundario);
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+/* size="small" — pra contextos densos (ex.: coluna de ações de Datatable),
+   ver switch.contract.json decisions. Alvo de toque de 44px continua vindo
+   do .row/.bare, não do trilho em si. */
+.small .track {
+  --thumb-size: var(--icone-pequeno);
+}
+
+.checked {
+  background: var(--acao-primaria);
+  border-color: var(--acao-primaria);
+}
+
+.thumb {
+  width: var(--thumb-size);
+  height: var(--thumb-size);
+  border-radius: var(--raio-circular);
+  background: var(--fundo-superficie);
+  transition: transform 0.15s ease;
+}
+
+.checked .thumb {
+  transform: translateX(
+    calc(var(--track-width) - 4px - 4px - var(--thumb-size))
+  );
+}
+
+.input:focus-visible ~ .track {
+  border-color: var(--borda-foco);
+  box-shadow: 0 0 0 var(--foco-espessura) color-mix(in srgb, var(--borda-foco) 30%, transparent);
+}
+
+.disabled .track {
+  background: var(--acao-inativa);
+  border-color: var(--borda-inativo);
+}
+
+.labelText {
+  font-family: var(--texto-m-family);
+  font-size: var(--texto-m-size);
+  font-weight: var(--texto-m-weight);
+  line-height: var(--texto-m-line-height);
+  color: var(--texto-primario);
+}
+
+.disabled .labelText {
+  color: var(--texto-inativo);
+}

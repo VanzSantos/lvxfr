@@ -1,0 +1,193 @@
+{
+  "name": "StatCard",
+  "originalName": "CartaoDeIndicador",
+  "oneLiner": "Número grande + rótulo + indicador de tendência opcional (sem seta — o sinal +/- já indica direção), dentro de um Card — ex.: 'Receita: R$ 42.300, +12% vs. mês anterior'.",
+  "category": "display",
+  "status": "draft",
+  "whenToUse": "Destacar um número/métrica isolada (KPI) no topo de um dashboard ou painel de resumo, com ou sem comparação de tendência.",
+  "whenNotToUse": "Vários números relacionados que fazem mais sentido numa tabela (isso é Datatable); o valor não é uma métrica isolada mas parte de um formulário/dado editável (isso é TextField/outro campo).",
+  "anatomy": [
+    "Card (reaproveitado como superfície — padding='medium', elevation='none' por padrão, borda vermelha opcional via critical) contendo: rótulo pequeno no topo, círculo colorido com ícone (opcional, só quando icon é fornecido) no canto oposto ao rótulo — cor do ícone sempre igual à cor do indicador de tendência —, valor grande em destaque sozinho numa linha",
+    "Rodapé — separado do valor por uma linha divisória (borda-base) — com trendValue (colorido por tone, SEM seta) e helperText na MESMA linha, um ao lado do outro (trendValue primeiro/à esquerda), e uma seta decorativa (arrow-right, sempre neutra — não faz parte do indicador de tendência) alinhada à direita. Rodapé só aparece quando há trendValue OU helperText pra mostrar."
+  ],
+  "dependencies": [
+    "Card",
+    "Icon"
+  ],
+  "props": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "Rótulo curto da métrica (ex.: 'Receita mensal')."
+    },
+    {
+      "name": "value",
+      "type": "string",
+      "required": true,
+      "description": "Valor em destaque, já formatado por quem consome (ex.: 'R$ 42.300', '1.204', '87%') — StatCard não formata número, só exibe."
+    },
+    {
+      "name": "icon",
+      "type": "string",
+      "required": false,
+      "description": "IconName decorativo opcional — quando presente, renderiza dentro de um círculo colorido (36px), posicionado no canto superior direito do card via position:absolute (não participa do layout flex do cabeçalho — ver decisions, era a causa de um bug real de gap inconsistente). A cor do PRÓPRIO ícone é sempre igual à cor do indicador de tendência (mesma var de TONE_COLOR_VAR) — não configurável separadamente. O fundo do círculo é só um tint (tint da mesma família de tom), o ícone em si é sempre a cor exata do trend."
+    },
+    {
+      "name": "trendDirection",
+      "type": "enum",
+      "enum": [
+        "up",
+        "down",
+        "neutral"
+      ],
+      "required": false,
+      "description": "Direção da tendência (up/down/neutral) — decide só a COR do indicador (tone), não desenha mais seta nenhuma (removida a pedido do usuário: 'o + ou - já indica se aumentou ou diminuiu'). Ausente = sem indicador de tendência."
+    },
+    {
+      "name": "trendValue",
+      "type": "string",
+      "required": false,
+      "description": "Texto do indicador (ex.: '+12%', '-3 pedidos') — obrigatório junto de trendDirection. Já vem com o sinal +/- de quem consome (StatCard não adiciona nem infere sinal); renderiza na mesma linha do helperText, à esquerda dele, colorido pelo tone."
+    },
+    {
+      "name": "trendTone",
+      "type": "enum",
+      "enum": [
+        "success",
+        "error",
+        "neutral"
+      ],
+      "required": false,
+      "description": "Cor do indicador de tendência. Ausente = derivado de trendDirection (up→success, down→error, neutral→neutral) — só use explicitamente quando 'subir' é uma notícia RUIM pra essa métrica (ex.: 'Custos: +8%' deveria ser vermelho apesar da seta pra cima, ver decisions)."
+    },
+    {
+      "name": "helperText",
+      "type": "string",
+      "required": false,
+      "description": "Texto pequeno de apoio (ex.: 'vs. mês anterior') — mesma linha do trendValue (quando presente), logo depois dele. Sozinho (sem trendValue), ainda aparece no rodapé com a seta decorativa."
+    },
+    {
+      "name": "elevation",
+      "type": "enum",
+      "enum": [
+        "none",
+        "low",
+        "medium",
+        "high"
+      ],
+      "default": "none",
+      "required": false,
+      "description": "Repassado direto pro Card interno."
+    },
+    {
+      "name": "critical",
+      "type": "boolean",
+      "default": false,
+      "required": false,
+      "description": "true = borda do card fica vermelha clara (borda-erro, mesmo token usado em campos com state='error'), via box-shadow 1px por FORA da borda do Card. Opt-in, NÃO derivado automaticamente de trendTone='error' — nem todo card com tendência ruim precisa desse destaque extra de borda, é uma decisão de quem consome caso a caso (ver decisions)."
+    }
+  ],
+  "variants": [],
+  "states": [
+    "static"
+  ],
+  "tokensAllowed": {
+    "background": [
+      "semantic.fundo-superficie",
+      "semantic.fundo-secundario",
+      "semantic.acao-primaria-transparente",
+      "semantic.acao-destrutiva-transparente"
+    ],
+    "border": [
+      "semantic.borda-base",
+      "semantic.borda-erro"
+    ],
+    "text": [
+      "semantic.texto-primario",
+      "semantic.texto-secundario",
+      "semantic.texto-sucesso",
+      "semantic.texto-erro",
+      "semantic.texto-inativo"
+    ],
+    "iconColor": [
+      "semantic.icone-secundario",
+      "semantic.texto-sucesso",
+      "semantic.texto-erro",
+      "semantic.texto-secundario"
+    ],
+    "iconSize": [
+      "structural.icone-pequeno",
+      "structural.icone-medio"
+    ],
+    "radius": [
+      "structural.raio-pp",
+      "structural.raio-circular"
+    ],
+    "spacing": [
+      "structural.espaco-xp",
+      "structural.espaco-pp",
+      "structural.espaco-p"
+    ],
+    "typography": [
+      "type-style.texto-p",
+      "type-style.texto-micro",
+      "type-style.texto-g-forte"
+    ]
+  },
+  "a11y": {
+    "role": "nenhum role customizado — a hierarquia visual (rótulo pequeno, valor grande) já comunica a relação através da ordem do DOM, sem precisar de heading semântico forçado (StatCard não sabe em que nível de heading da página ele está).",
+    "requiredAria": [
+      "seta decorativa do rodapé (arrow-right) é aria-hidden — é só um affordance visual (mesmo padrão das referências anexadas pelo usuário), não faz parte do indicador de tendência e não tem cor de tone"
+    ],
+    "keyboard": [
+      "sem interação própria — mesmo racional de Card (nenhum onClick no container)"
+    ],
+    "contrastMin": "AAA (7:1) pro valor principal (texto-primario), régua padrão pro rótulo/helperText (texto-secundario).",
+    "notes": "Cor do indicador de tendência nunca é a única pista — o texto (trendValue, ex.: '+12%', já com o sinal) já comunica o número e a direção, a cor é reforço visual (mesmo racional de Alert/Badge/Timeline). Sem seta/ícone de direção: o sinal +/- do próprio texto já cumpre esse papel, seta seria redundante (pedido explícito do usuário)."
+  },
+  "events": {
+    "status": "não definido no contrato original"
+  },
+  "composition": {
+    "canContain": [
+      "Card",
+      "Icon"
+    ],
+    "canBeContainedBy": [
+      "templates de dashboard",
+      "cabeçalhos de página"
+    ],
+    "doNotCombine": [
+      "StatCard dentro de StatCard"
+    ]
+  },
+  "forbidden": [
+    "trendValue sem trendDirection (ou vice-versa) — os dois vêm juntos ou nenhum aparece",
+    "formatar/calcular o value internamente (ex.: adicionar separador de milhar) — value chega pronto de quem consome",
+    "cor fora da whitelist de tokensAllowed",
+    "reimplementar a superfície (borda/fundo/raio) em vez de reaproveitar o Card",
+    "cor do ícone diferente da cor do indicador de tendência — sempre a mesma var, sem exceção nem prop de override",
+    "critical derivado automaticamente de trendTone/trendDirection — é sempre uma decisão explícita de quem consome, nunca inferida",
+    "seta/ícone de direção (caret-up/caret-down) no indicador de tendência — o sinal +/- de trendValue já comunica a direção sozinho, uma seta ficaria redundante (pedido explícito do usuário)",
+    "cor de tone aplicada na seta decorativa do rodapé (arrow-right) — ela é sempre neutra (icone-secundario), não é parte do indicador de tendência"
+  ],
+  "decisions": [
+    "Reaproveita o átomo Card como superfície (padding='medium', elevation repassada) em vez de declarar fundo/borda/raio próprios — StatCard é literalmente 'conteúdo específico dentro de um Card', não uma superfície nova.",
+    "trendTone é derivado automaticamente de trendDirection (up→verde, down→vermelho) MAS pode ser sobrescrito explicitamente — decisão pensada pra métricas onde 'subir' é notícia ruim (ex.: 'Taxa de erro: +8%' ou 'Custos operacionais: +15%'). Sem esse escape, o componente forçaria sempre 'seta pra cima = verde', o que é semanticamente errado pra esse tipo de métrica.",
+    "value é sempre string, não number — StatCard nunca formata (separador de milhar, casas decimais, moeda); isso evitaria ter que expor uma API de formatação/locale só pra esse componente, quando quem consome já sabe formatar do jeito certo pro contexto (moeda, percentual, unidade).",
+    "Sem sparkline/mini-gráfico nesta v1 — os gráficos (barra/linha/pizza) ficaram explicitamente fora de escopo desta fila (pedido do usuário); um StatCard com mini-gráfico embutido é decisão nova quando esse escopo for retomado.",
+    "AJUSTADO a pedido do usuário — StatCard estava 'muito simples' quando usado no DashboardTemplate (item 5.3). Reforço visual adicionado: ícone dentro de um círculo colorido (36px), mesmo padrão do iconCircle do ActionCard, reaproveitando as tokens -transparente (acao-primaria-transparente/acao-destrutiva-transparente) e fundo-secundario pro caso neutro.",
+    "REVISADO a pedido do usuário — a primeira versão deste ajuste tinha 3 partes (ícone, barra de destaque de 4px na borda esquerda, prop iconTone com override independente do trend). O usuário pediu pra remover a barra ('não deve existir') e simplificar o ícone: 'o ícone sempre deve ter a mesma cor do indicador percentual do card' — eliminando qualquer possibilidade de divergência entre a cor do ícone e a cor do trend. Por isso: (1) barra de destaque removida por completo, junto do wrapper/CSS que a implementava; (2) prop iconTone removida — o ícone (glyph) agora usa DIRETAMENTE a mesma var de cor do indicador de tendência (TONE_COLOR_VAR), sem prop de override, garantindo a invariante 'sempre igual' pedida; o fundo do círculo (só um tint, não a cor do glyph) continua reaproveitando as tokens -transparente por tone.",
+    "AJUSTADO a pedido do usuário — nova prop critical (boolean, default false): 'quando um card for crítico, a borda do card pode ficar vermelha ou não' — interpretado como um controle EXPLÍCITO e opcional de quem consome, não uma inferência automática a partir de trendTone='error' (nem todo card com tendência ruim é crítico o bastante pra merecer destaque de borda). Implementado com um wrapper (só quando critical=true) usando box-shadow sobre o Card, sem modificar o contrato do Card (que não expõe cor de borda customizada por design).",
+    "BUG REAL corrigido em teste no navegador — a primeira implementação de critical usava box-shadow INSET 1px, exatamente sobreposto ao 1px de borda que o próprio Card já desenha (var(--borda-base)). Como o Card é filho do wrapper e pinta sua própria borda por cima do box-shadow inset do pai (ordem de pintura: elemento pai primeiro, filho depois, no mesmo pixel), o vermelho ficava completamente encoberto pela borda cinza do Card — sem erro nenhum, a prop funcionava (confirmado via getComputedStyle), só não aparecia visualmente. Corrigido trocando pra box-shadow NÃO-inset (spread pra fora, `0 0 0 Npx`), que desenha um anel PRA FORA da caixa do Card em vez de por cima da borda dele — os dois elementos não competem mais pelo mesmo pixel.",
+    "AJUSTADO a pedido do usuário — cor e espessura da borda crítica refinadas: acao-destrutiva (#ca3434, vermelho mais saturado/escuro) trocado por borda-erro (#eb5757, vermelho mais claro) — mesmo token semântico já usado nos estados state='error' de TextField/Select/DatePicker, então critical=true no StatCard agora usa exatamente a mesma cor de 'erro' que o resto do harness, em vez de reaproveitar o tom mais escuro de ação destrutiva. Spread do box-shadow reduzido de 1.5px pra 1px, mais fino/discreto.",
+    "AJUSTADO a pedido do usuário — 3 refinamentos: (1) padding vertical do Card reduzido visualmente (sem trocar o token padding='medium', que continua controlando o horizontal) via um wrapper .content interno com margin-top/bottom negativo de -espaco-pp (-8px) — resultado prático ~16px vertical vs. 24px horizontal, mesmo racional de 'padding vertical menor que o horizontal' já estabelecido no DataField, mas alcançado por margem negativa em vez de padding assimétrico porque aqui o padding vem de fora (do Card reaproveitado, que só aceita um valor único por token); (2) label do topo perdeu o font-weight:700 hardcoded (virou 400/normal) — não tinha justificativa de contraste/hierarquia forte o bastante pra estar em negrito, e brigava visualmente com o valor grande abaixo; (3) helperText trocou de texto-inativo (#9ca3af, tom mais claro, pensado originalmente pra indicar algo 'desabilitado') pra texto-secundario (#4b5563) — mais escuro, melhor contraste, mais legível como texto de apoio normal (não deveria comunicar 'inativo', é só um texto secundário comum).",
+    "AJUSTADO a pedido do usuário, inspirado em referências visuais anexadas — 3 mudanças: (1) removida a seta/ícone de direção (caret-up/caret-down/minus) do indicador de tendência — 'o + ou - já indica se aumentou ou diminuiu', a seta virou redundante; (2) trendValue saiu de colado no valor grande (mesma linha do value) e passou a dividir uma linha com helperText, no RODAPÉ do card, à esquerda dele — 'coloque o valor... colorido, na mesma linha do vs..., ficando na esquerda disso'; (3) reestruturação geral inspirada nas referências: rodapé separado do valor por uma linha divisória (borda-base) e uma seta decorativa (arrow-right, sempre neutra, nunca colorida pelo tone) alinhada à direita, fechando a linha — mesmo affordance visual 'ver mais' das referências, sem virar interativo (StatCard continua sem onClick, mesmo racional de Card).",
+    "AJUSTADO a pedido do usuário — menos espaço entre o rótulo (topo) e o valor grande. espaco-xp (4px) já era o menor token da escala estrutural do harness — diminuir ainda mais só era possível indo além da escala, não trocando por um token menor (não existe). margin-top do valueRow zerado (0, não um valor de pixel solto — é a ausência de espaçamento extra), deixando só o line-height natural das duas linhas de texto como respiro entre rótulo e valor.",
+    "BUG REAL corrigido a pedido do usuário — o gap entre o rótulo (topo) e o valor grande ficava MAIOR quando icon estava presente do que quando ausente (~9px vs. 0px). Causa: o cabeçalho (label + iconCircle) era um flex row com align-items:center — como o iconCircle (36px) é mais alto que o texto do label (~20px), o label ficava centralizado dentro de uma linha de 36px, sobrando espaço vazio embaixo do próprio texto antes do valor começar; sem ícone, a linha do cabeçalho tinha exatamente a altura do label, sem sobra. Corrigido tirando o iconCircle do fluxo flex (position:absolute, ancorado no canto superior direito do header, que virou position:relative) — a altura do cabeçalho passa a ser SEMPRE só a do texto do label, com ou sem ícone, garantindo o mesmo gap label→valor nos dois casos. .header ganha padding-right (só quando icon está presente, via classe condicional) pra reservar o espaço do círculo e não deixar o texto do label passar por baixo dele."
+  ],
+  "references": {
+    "tokensFile": "tokens/tokens.json — Cores Semânticas (Fundos, Bordas, Textos e Ícones de Sinalização), Estrutural (raio-pp, espaco-xp/pp/p, icone-pequeno/medio), Tipografia Estilo (texto-p, texto-micro, texto-g-forte)"
+  }
+}

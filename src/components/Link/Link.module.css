@@ -1,0 +1,55 @@
+.link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espaco-xp);
+  /* sem tipografia própria — herda font-family/size do contexto onde o
+     link vive (parágrafo, item de navegação, rodapé); só a cor é fixa */
+  font: inherit;
+  color: var(--acao-link-texto);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.link:hover {
+  color: var(--acao-link-texto-sobreposto);
+  text-decoration: underline;
+}
+
+/* sublinhado sempre visível, não só no hover — mesmo par de cores, só muda
+   quando o traço aparece */
+.underline {
+  text-decoration: underline;
+}
+
+/* current=true — reaproveita a mesma cor do :hover (acao-link-texto-sobreposto)
+   como cor de REPOUSO, pra marcar "você está aqui" (ex.: item ativo da NavBar).
+   Não é um token novo, só um estado novo usando um tom que já existia. */
+.current {
+  color: var(--acao-link-texto-sobreposto);
+  font-weight: 700;
+}
+
+.link:focus-visible {
+  outline: var(--foco-espessura) solid var(--borda-foco);
+  outline-offset: 2px;
+}
+
+.disabled {
+  color: var(--texto-inativo);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* pro leitor de tela, nunca visível — reforça "(abre em nova aba)" sem
+   duplicar o ícone decorativo ao lado */
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

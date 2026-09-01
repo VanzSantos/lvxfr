@@ -1,0 +1,62 @@
+{
+  "name": "Pagination",
+  "originalName": "Paginacao",
+  "oneLiner": "Navegação entre páginas de uma lista/coleção qualquer — resumo de itens, seletor opcional de itens por página, anterior/próxima.",
+  "category": "action",
+  "status": "draft",
+  "whenToUse": "Qualquer lista paginada que não seja uma tabela (galeria de imagens, resultados de busca, feed de itens) — a Datatable já tem paginação embutida própria (ver decisions), este componente cobre os outros casos.",
+  "whenNotToUse": "Dentro de uma Datatable — ela já tem paginação embutida (paginationEnabled), não deveria compor este componente por dentro (ver decisions); navegação sequencial de ETAPAS de um formulário/fluxo (isso é Stepper, que nomeia cada etapa, não pagina uma coleção de itens).",
+  "anatomy": [
+    "Resumo textual — 'X–Y de Z registros' (ou '0 registros' quando vazio)",
+    "Seletor de itens por página — só aparece quando onPageSizeChange é fornecida (opt-in, ver decisions)",
+    "Indicador 'página atual de total' + botões anterior/próxima (Icon caret-left/caret-right via Button variant='link' iconOnly)"
+  ],
+  "dependencies": ["Button", "Icon"],
+  "props": [
+    { "name": "page", "type": "number", "required": true, "description": "Página atual, 1-indexed. 100% controlado." },
+    { "name": "onPageChange", "type": "function", "required": true, "description": "Assinatura (page: number) => void, disparado ao clicar anterior/próxima. Nunca chamado fora do intervalo [1, totalPages] — os botões desabilitam sozinhos nas pontas." },
+    { "name": "totalItems", "type": "number", "required": true, "description": "Total de itens da coleção inteira (não só da página atual) — usado pra calcular totalPages e o resumo textual." },
+    { "name": "pageSize", "type": "number", "required": true, "description": "Quantidade de itens por página atual." },
+    { "name": "pageSizeOptions", "type": "array", "required": false, "default": "[5, 10, 25, 50, 100]", "description": "Opções do seletor de itens por página — só relevante quando onPageSizeChange é fornecida." },
+    { "name": "onPageSizeChange", "type": "function", "required": false, "description": "Assinatura (pageSize: number) => void. Presença/ausência decide se o seletor de itens por página aparece (ver decisions) — sem ela, pageSize fica fixo e o controle nem é renderizado." },
+    { "name": "disabled", "type": "boolean", "required": false, "default": false, "description": "Desabilita os botões e o seletor (ex.: durante carregamento de uma nova página)." },
+    { "name": "accessibleLabel", "type": "string", "required": false, "default": "Paginação", "description": "Nome acessível do nav." }
+  ],
+  "variants": [],
+  "states": ["default", "disabled"],
+  "tokensAllowed": {
+    "text": ["semantic.texto-secundario", "semantic.texto-primario"],
+    "border": ["semantic.borda-base", "semantic.borda-foco"],
+    "background": ["semantic.fundo-superficie"],
+    "radius": ["structural.raio-pp"],
+    "focusRing": ["structural.foco-espessura"],
+    "spacing": ["structural.espaco-xp", "structural.espaco-pp", "structural.espaco-p", "structural.espaco-m"],
+    "typography": ["type-style.texto-p", "type-style.texto-rotulo-campo"]
+  },
+  "a11y": {
+    "role": "nav (aria-label=accessibleLabel) envolvendo o resumo e os controles.",
+    "requiredAria": ["aria-label 'Página anterior'/'Próxima página' nos botões iconOnly (mesmo padrão já usado dentro da Datatable)", "aria-disabled/disabled nativo nos botões quando na primeira/última página ou disabled=true", "aria-live='polite' no resumo textual — leitor de tela anuncia a mudança de página sem precisar de foco explícito"],
+    "keyboard": ["Tab alcança o seletor de itens por página (quando presente) e os dois botões, na ordem natural do DOM — sem atalho de teclado dedicado nesta v1", "Enter/Espaço nos botões (comportamento nativo de Button)"],
+    "contrastMin": "AA pro texto do resumo/indicador, mesma régua do resto do harness.",
+    "notes": "Mesmo padrão visual e de aria-label já usado dentro da paginação embutida da Datatable — replicado aqui como componente à parte, não uma refatoração da Datatable pra consumir este componente (ver decisions)."
+  },
+  "events": { "status": "não definido no contrato original" },
+  "composition": {
+    "canContain": ["Button", "Icon"],
+    "canBeContainedBy": ["galerias", "listas de resultado de busca", "qualquer coleção paginada fora de uma Datatable"],
+    "doNotCombine": ["Pagination dentro de Datatable — usar paginationEnabled da própria Datatable em vez de compor os dois"]
+  },
+  "forbidden": [
+    "onPageChange disparando com página fora de [1, totalPages]",
+    "renderizar o seletor de itens por página quando onPageSizeChange não foi fornecida",
+    "cor fora da whitelist de tokensAllowed",
+    "reimplementar os botões de navegação em vez de reaproveitar o átomo Button"
+  ],
+  "decisions": [
+    "Extraído como componente novo, NÃO como refatoração da paginação já existente dentro da Datatable — a paginação da Datatable já está construída, testada e documentada (ver datatable.contract.json); reescrevê-la pra consumir este componente novo é dedup especulativo sem um bug ou necessidade real puxando essa mudança agora (mesma disciplina de 'no premature dedup' já aplicada a outras partes do harness). Os dois compartilham o mesmo desenho visual por replicação deliberada, não por código compartilhado.",
+    "Seletor de itens por página é opt-in via presença de onPageSizeChange (sem a prop, o controle nem renderiza) — mesmo padrão já usado em Datatable pra bulkActions/toolbarActions: a prop decide SE um pedaço da UI aparece, não um boolean redundante tipo showPageSizeSelector.",
+    "totalItems + pageSize (não totalPages direto) são as props de entrada — o componente calcula totalPages internamente (Math.ceil(totalItems/pageSize)), evitando o consumidor ter que fazer essa conta toda vez e correr o risco de divergir do resumo textual.",
+    "aria-live='polite' no resumo — trocar de página é uma mudança de conteúdo relevante que o usuário de leitor de tela precisa saber, sem precisar mover o foco pra lá manualmente (mesmo racional de outros textos dinâmicos do harness, ex.: contadores)."
+  ],
+  "references": { "tokensFile": "tokens/tokens.json — Cores Semânticas (Textos, Bordas), Estrutural (espaco-xp/pp/m), Tipografia Estilo (texto-p, texto-rotulo-campo)" }
+}

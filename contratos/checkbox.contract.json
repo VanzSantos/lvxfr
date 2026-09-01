@@ -1,0 +1,182 @@
+{
+  "name": "Checkbox",
+  "originalName": "CaixaSelecao",
+  "oneLiner": "Controle de formulário booleano — marcado, desmarcado ou indeterminado.",
+  "category": "data-entry",
+  "status": "draft",
+  "whenToUse": "Usuário precisa marcar/desmarcar uma opção independente (ex.: aceitar termos, 'lembrar-me'), ou uma de uma lista onde mais de uma pode estar marcada ao mesmo tempo.",
+  "whenNotToUse": "Escolher exatamente 1 entre N opções mutuamente exclusivas (use Radio); valor precisa de mais de 2 estados reais além do indeterminado; alternar uma configuração que aplica na hora, sem precisar de submit (considerar Switch, fora deste harness por enquanto).",
+  "anatomy": [
+    "<label> envolvendo a linha inteira (clicar em qualquer parte — caixa ou texto — alterna o estado, associação nativa via htmlFor/id)",
+    "Caixa quadrada (fundo, borda, raio)",
+    "Ícone de check (state checked) ou traço (indeterminate), só a caixa muda — nunca os dois ao mesmo tempo",
+    "Texto do rótulo",
+    "Indicador de obrigatório — asterisco (opcional, decorativo)",
+    "HelperText (embaixo, opcional)"
+  ],
+  "dependencies": [
+    "Icon",
+    "HelperText"
+  ],
+  "props": [
+    {
+      "name": "checked",
+      "type": "boolean",
+      "required": true,
+      "description": "Campo controlado, mesmo padrão de value em TextField."
+    },
+    {
+      "name": "indeterminate",
+      "type": "boolean",
+      "default": false,
+      "required": false,
+      "description": "Propriedade DOM, não atributo HTML — setada via ref (element.indeterminate), não dá pra fazer só com props do <input>. Visualmente substitui o check por um traço; não é um terceiro valor de 'checked' (o input continua reportando true/false no onChange)."
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "Sempre presente e associado via <label> nativo — visível por padrão. Com hideLabel=true, o texto continua no DOM (nome acessível pra leitor de tela) mas fica visualmente oculto (ver hideLabel e decisions)."
+    },
+    {
+      "name": "hideLabel",
+      "type": "boolean",
+      "default": false,
+      "required": false,
+      "description": "true = label fica visualmente oculto (técnica sr-only: clip/width 1px, não display:none nem aria-hidden), mas continua no DOM como nome acessível do <input>. Não é um jeito de 'remover' o rótulo — é pra contextos onde o rótulo já é redundante visualmente (ex.: coluna de seleção de uma tabela, onde a coluna inteira já comunica 'selecionar linha'), mas o nome acessível continua obrigatório. Ver decisions."
+    },
+    {
+      "name": "required",
+      "type": "boolean",
+      "default": false,
+      "required": false,
+      "description": "Puramente decorativo no asterisco — obrigatoriedade real é required/aria-required no input, mesma decisão do TextField."
+    },
+    {
+      "name": "state",
+      "type": "enum",
+      "enum": [
+        "default",
+        "error",
+        "disabled"
+      ],
+      "default": "default",
+      "required": false
+    },
+    {
+      "name": "helperText",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "onChange",
+      "type": "function",
+      "required": false,
+      "description": "Assinatura (checked: boolean) => void."
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "variants": [],
+  "states": [
+    "default",
+    "error",
+    "disabled"
+  ],
+  "tokensAllowed": {
+    "background": [
+      "semantic.fundo-superficie",
+      "semantic.acao-primaria",
+      "semantic.acao-inativa",
+      "semantic.fundo-campo"
+    ],
+    "border": [
+      "semantic.borda-base",
+      "semantic.borda-foco",
+      "semantic.borda-erro",
+      "semantic.borda-inativo"
+    ],
+    "checkColor": [
+      "semantic.acao-primaria-texto",
+      "semantic.icone-inativo"
+    ],
+    "text": [
+      "semantic.texto-primario",
+      "semantic.texto-inativo",
+      "semantic.texto-obrigatorio"
+    ],
+    "radius": [
+      "structural.raio-xp"
+    ],
+    "focusRing": [
+      "structural.foco-espessura"
+    ],
+    "spacing": [
+      "structural.espaco-pp"
+    ],
+    "iconSize": [
+      "structural.icone-pequeno"
+    ],
+    "typography": [
+      "type-style.texto-m"
+    ]
+  },
+  "a11y": {
+    "role": "checkbox nativo (<input type=\"checkbox\">) — sem role ARIA explícita, o navegador já expõe checked/indeterminate a partir do elemento nativo",
+    "requiredAria": [
+      "aria-required quando required=true",
+      "aria-invalid quando state=error",
+      "aria-describedby apontando pro id derivado do HelperText, quando helperText existe"
+    ],
+    "keyboard": [
+      "Espaço alterna o estado",
+      "Tab move o foco",
+      "disabled sai da ordem de tabulação"
+    ],
+    "contrastMin": "AAA (7:1) como meta pro público 60+, mesma régua do Button/TextField.",
+    "notes": "Alvo de toque mínimo 44×44px (igual Button/TextField) mesmo com a caixa visual menor (20px) — a área clicável real é o <label> inteiro, não só a caixa. Foco nunca só cor — anel visível combinando cor + espessura. Foco + erro: erro vence (mesma regra já registrada em text-field.contract.json, aplicada aqui por consistência, não reaberta)."
+  },
+  "events": {
+    "status": "não definido no contrato original"
+  },
+  "composition": {
+    "canContain": [
+      "Icon",
+      "HelperText"
+    ],
+    "canBeContainedBy": [
+      "formulários",
+      "listas de opções"
+    ],
+    "doNotCombine": []
+  },
+  "forbidden": [
+    "Checkbox sem label NO DOM (ex.: só um <input> nu com aria-label, ou reimplementação fora deste átomo) — todo Checkbox usa este componente com um label real associado via <label>/htmlFor, visível ou oculto via hideLabel (ver decisions), nunca substituído por aria-label solto",
+    "comunicar obrigatoriedade só pelo asterisco, sem required/aria-required no input",
+    "comunicar erro só pela cor da borda, sem HelperText (intent=error) explicando o problema",
+    "reimplementar o ícone de check/traço fora do átomo Icon (SVG inline, etc.)",
+    "colocar o gatilho de qualquer ícone extra fora do fluxo checkbox+label+helperText sem atualizar este contrato primeiro",
+    "onChange com assinatura diferente de (checked: boolean) => void",
+    "setar indeterminate como atributo HTML (não existe) em vez de propriedade DOM via ref"
+  ],
+  "decisions": [
+    "REVISADO — hideLabel adicionado depois que datatable.contract.json precisou de um checkbox sem texto visível ao lado (coluna de seleção de linha/'selecionar todos', célula estreita). A primeira versão deste contrato resolvia isso proibindo Checkbox sem label visível, o que levou o Datatable a usar um <input> nativo por fora do átomo — quebrando a regra maior do harness de nunca ter interatividade fora de um componente. hideLabel resolve as duas coisas: o rótulo continua no DOM (nome acessível real, não um aria-label solto que fica dessincronizado do texto visível), só troca de visível pra clip/1px (mesma técnica sr-only que este componente já usa no próprio <input>, ver .input em Checkbox.module.css) quando true. Datatable agora usa <Checkbox hideLabel label=\"Selecionar linha X\" .../> em vez de reimplementar a caixa.",
+    "Não depende de FieldLabel: a tipografia de FieldLabel (texto-rotulo-campo, peso 500) foi desenhada pra um rótulo ACIMA de um campo, não pro texto ao lado de um controle pequeno — usar aqui produziria peso visual errado. Além disso, o padrão de clique é diferente: em Checkbox, o <label> INTEIRO (caixa + texto) é clicável por decisão (maior alvo de toque, bom pro público 60+); em FieldLabel, o gatilho de ícone é deliberadamente mantido FORA do <label> pra não disparar o campo por engano — situação que não existe aqui. Checkbox implementa seu próprio <label> simples.",
+    "Alvo de toque 44×44px (herda a decisão já registrada em button.contract.json/text-field.contract.json para o público 60+), com a caixa visual em structural.icone-medio (20px) centralizada dentro — a área clicável real é a linha inteira via <label>, não só a caixa.",
+    "RESOLVIDO — HelperText fica alinhado com o texto do rótulo, não com a borda esquerda da linha (que ficaria embaixo da caixa). Recuo de calc(icone-medio + espaco-pp) — os mesmos dois tokens que já definem a largura da caixa e o gap entre caixa e texto, não um valor novo inventado.",
+    "raio-xp (4px) pra caixa — reaproveita token estrutural existente; não é raio-pp (8px, usado em Button/TextField) porque a caixa é bem menor, um raio proporcionalmente menor lê melhor num controle de 20px.",
+    "Borda da caixa fixa em 2px — não é token (mesmo tipo de constante não-tokenizada já usada no traço do Spinner).",
+    "Cor de check reaproveita semantic.acao-primaria (fundo) + semantic.acao-primaria-texto (glifo do check, branco) — os mesmos tokens que o Button variant=primary já usa, não uma família nova de 'seleção'.",
+    "RESOLVIDO — state=disabled + checked/indeterminate: o glifo (check/traço) troca de semantic.acao-primaria-texto (branco) para semantic.icone-inativo. Bug real relatado: branco sobre o fundo cinza-claro de acao-inativa ficava quase invisível. icone-inativo tem o mesmo valor de semantic.borda-inativo (a borda da caixa desabilitada), então o glifo passa a combinar com a borda em vez de tentar simular o contraste do estado habilitado.",
+    "Checkbox depende de HelperText porque uso isolado (ex.: 'aceitar termos') comumente precisa de mensagem de erro própria. Radio não tem essa dependência — ver decisions em radio.contract.json.",
+    "indeterminate é propriedade DOM (element.indeterminate), não atributo HTML — implementação precisa de useRef + useEffect pra sincronizar, não dá pra resolver só com props declarativas do <input>.",
+    "Erro + foco: erro vence visualmente, mesma regra já fixada em text-field.contract.json — aplicada aqui por consistência entre os contratos de data-entry, não é uma nova decisão reaberta.",
+    "AJUSTADO a pedido do usuário — fundo do campo trocado de semantic.fundo-superficie pra semantic.fundo-campo (token novo): 'o fundo dos inputs de forma geral, devem ser levemente mais escuros que a cor de fundo da página onde estão, para destacar melhor'. No modo claro fundo-campo é idêntico a fundo-superficie (sem mudança visual, branco com borda já bastava) — só no modo escuro os dois valores divergem (fundo-campo um degrau mais escuro que a página), porque era só ali que o campo ficava indistinguível da própria página por trás."
+  ],
+  "references": {
+    "tokensFile": "tokens/tokens.json — Cores Semânticas (Ações/Primárias, Bordas, Fundos, Textos), Estrutural (raio-xp, foco-espessura, espaco-pp, icone-pequeno/medio), Tipografia Estilo (texto-m)"
+  }
+}

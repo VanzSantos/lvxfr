@@ -1,0 +1,106 @@
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-xp);
+  width: 100%;
+}
+
+.container {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-xp);
+  height: 44px;
+  padding: 0 var(--espaco-pp);
+  background: var(--fundo-campo);
+  border: 1px solid var(--borda-base);
+  border-radius: var(--raio-pp);
+  box-sizing: border-box;
+}
+
+.container:focus-within {
+  border-color: var(--borda-foco);
+  box-shadow: 0 0 0 var(--foco-espessura) color-mix(in srgb, var(--borda-foco) 30%, transparent);
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: var(--texto-m-family);
+  font-size: var(--texto-m-size);
+  font-weight: var(--texto-m-weight);
+  line-height: var(--texto-m-line-height);
+  color: var(--texto-primario);
+}
+
+.input::placeholder {
+  color: var(--texto-placeholder);
+}
+
+/* state=error — vence sobre foco: borda e anel também assumem borda-erro */
+.error {
+  border-color: var(--borda-erro);
+}
+
+.error:focus-within {
+  border-color: var(--borda-erro);
+  box-shadow: 0 0 0 var(--foco-espessura) color-mix(in srgb, var(--borda-erro) 30%, transparent);
+}
+
+/* state=disabled — sai da navegação (via atributo disabled do input) */
+.disabled {
+  background: var(--fundo-secundario);
+  border-color: var(--borda-inativo);
+}
+
+.disabled .input {
+  color: var(--texto-inativo);
+  cursor: not-allowed;
+}
+
+/* state=readOnly — texto legível, permanece focável (diferente de disabled) */
+.readOnly .input {
+  color: var(--texto-primario);
+}
+
+.focus {
+  border-color: var(--borda-foco);
+}
+
+.ddi {
+  flex-shrink: 0;
+  padding-right: var(--espaco-xp);
+  border-right: 1px solid var(--borda-base);
+  color: var(--texto-secundario);
+  font-family: var(--texto-m-family);
+  font-size: var(--texto-m-size);
+  font-weight: var(--texto-m-weight);
+  line-height: var(--texto-m-line-height);
+}
+
+.disabled .ddi {
+  color: var(--texto-inativo);
+}
+
+.iconButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  border-radius: var(--raio-pp);
+}
+
+.iconButton:disabled {
+  cursor: not-allowed;
+}
+
+.iconButton:focus-visible {
+  outline: var(--foco-espessura) solid var(--borda-foco);
+  outline-offset: 1px;
+}

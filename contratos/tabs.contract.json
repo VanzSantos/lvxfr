@@ -1,0 +1,58 @@
+{
+  "name": "Tabs",
+  "originalName": "Abas",
+  "oneLiner": "Navegação entre painéis de conteúdo mutuamente exclusivos, no mesmo espaço da tela — padrão WAI-ARIA Tabs (ativação automática).",
+  "category": "action",
+  "status": "draft",
+  "whenToUse": "Organizar conteúdo relacionado em seções que o usuário alterna deliberadamente, todas relevantes ao mesmo contexto (ex.: 'Detalhes' / 'Histórico' / 'Configurações' de uma mesma entidade).",
+  "whenNotToUse": "Passos sequenciais de um fluxo (isso é um wizard/stepper, fora do harness); menos de 2 opções (não faz sentido ter só 1 aba); navegação entre páginas/rotas diferentes da aplicação (isso é NavBar, fora do harness ainda); grupo de chips selecionáveis onde mais de um pode ficar ativo (isso é Chip, Tabs é sempre mutuamente exclusivo).",
+  "anatomy": [
+    "Tabs — lista de botões (role=tablist), um por item, com indicador visual do ativo, e um indicador numérico opcional (átomo Badge) ao lado da label",
+    "TabPanel — conteúdo de cada aba, só o correspondente ao item ativo fica visível (os outros ficam hidden, não desmontados — ver decisions)"
+  ],
+  "dependencies": ["Badge"],
+  "props": [
+    { "name": "items", "type": "array", "required": true, "description": "Array de { value: string, label: string, disabled?: boolean, count?: number }. Fonte única da lista de abas — Tabs não aceita children arbitrário pra tablist, mesmo espírito de 'array de opções' já usado em Select. count (opcional) mostra um indicador numérico (átomo Badge, variant='neutral') ao lado da label — pra situações onde o usuário precisa saber quantos itens/registros existem naquela aba, sem abrir." },
+    { "name": "value", "type": "string", "required": true, "description": "Value do item ativo. 100% controlado, mesmo padrão de TextField/Select." },
+    { "name": "onChange", "type": "function", "required": true, "description": "Assinatura (value: string) => void. Disparado ao clicar numa aba OU ao navegar com seta (ativação automática — ver decisions)." }
+  ],
+  "variants": [],
+  "states": ["default", "selected", "disabled"],
+  "tokensAllowed": {
+    "border": ["semantic.borda-base", "semantic.acao-primaria"],
+    "text": ["semantic.texto-secundario", "semantic.texto-primario", "semantic.acao-primaria", "semantic.texto-inativo"],
+    "focusRing": ["structural.foco-espessura", "semantic.borda-foco"],
+    "spacing": ["structural.espaco-m", "structural.espaco-pp", "structural.espaco-xp"],
+    "typography": ["type-style.texto-rotulo-botao"]
+  },
+  "a11y": {
+    "role": "tablist no container; tab em cada botão (aria-selected, aria-controls apontando pro id do TabPanel correspondente, aria-disabled quando disabled); tabpanel no conteúdo (aria-labelledby apontando pro id do tab correspondente).",
+    "requiredAria": ["aria-selected em cada tab (true só no ativo)", "aria-controls/aria-labelledby ligando tab↔panel via id previsível (tab-{value} / panel-{value})", "tabindex roving: só o tab ativo tem tabIndex=0, os outros -1 — nunca todos tabbable ao mesmo tempo", "aria-label combinando label+count (ex.: 'Pedidos, 12') quando count está presente — sem isso, o Badge dentro do botão pode não ser lido de forma clara pelo leitor de tela (o número apareceria solto, sem o contexto de que é uma contagem)"],
+    "keyboard": ["seta esquerda/direita move o foco E seleciona o próximo/anterior tab habilitado (ativação automática, pula os disabled)", "Home vai pro primeiro tab habilitado, End pro último", "Tab (tecla) sai da tablist inteira pro conteúdo do painel ativo, não navega entre abas — só as setas fazem isso, seguindo o padrão WAI-ARIA Tabs"],
+    "contrastMin": "AA como meta pro texto do tab ativo/inativo (texto-primario/texto-secundario sobre fundo-superficie, já dentro da régua validada em outros contratos deste harness).",
+    "notes": "Ativação automática (seta já seleciona, sem precisar de Enter/Espaço de confirmação) — decisão do agente, ver decisions. TabPanel inativo fica com hidden (não desmontado do DOM) pra preservar estado interno de formulários/scroll dentro dele entre trocas de aba."
+  },
+  "events": { "status": "não definido no contrato original" },
+  "composition": {
+    "canContain": [],
+    "canBeContainedBy": ["páginas", "cards", "qualquer container de layout"],
+    "doNotCombine": ["Tabs dentro de Tabs (abas aninhadas) sem uma razão real — confunde a navegação por seta de qual tablist está ativa"]
+  },
+  "forbidden": [
+    "menos de 2 items — Tabs existe pra alternar entre pelo menos 2 opções",
+    "value que não corresponde a nenhum item.value — estado inconsistente",
+    "TabPanel sem o value correspondente a um item real de Tabs",
+    "desmontar (não renderizar) o TabPanel inativo em vez de escondê-lo com hidden — perde estado interno do painel ao trocar de aba",
+    "cor fora da whitelist de tokensAllowed"
+  ],
+  "decisions": [
+    "Ativação AUTOMÁTICA (seta já troca a aba ativa, sem precisar de Enter/Espaço) em vez de manual — decisão do agente, não perguntada ao usuário pra reduzir interferência: é o padrão mais comum (abas de navegador, a maioria dos design systems) e o conteúdo de cada painel neste harness é tipicamente leve (não há custo real de carregamento que justificasse a ativação manual, que existe principalmente pra evitar carregar conteúdo caro a cada tecla de seta). Revisitar se surgir um caso real de painel caro de renderizar.",
+    "items é um array de dados (value/label/disabled), não children JSX livre — Tabs não aceita um <Tab> customizado por fora. Mesmo padrão de 'fonte única, sem slot arbitrário' já usado em Select (options) e Card (sem slots fixos, mas aqui pelo motivo oposto: a estrutura do tablist É rígida o bastante pra não precisar de flexibilidade).",
+    "TabPanel é um componente separado (não um slot interno de Tabs) que o consumidor posiciona e conecta via o mesmo value — Tabs não sabe nada sobre o conteúdo dos painéis, só sobre a lista de abas. Motivo: manter Tabs 100% desacoplado de LAYOUT do conteúdo (poderia ser abaixo, ao lado, em outra ordem do DOM) — mesmo racional de HelperText/FieldLabel serem componentes próprios em vez de slots fixos dentro de TextField.",
+    "ids previsíveis (tab-{value} / panel-{value}) derivados diretamente do value da aba — evita gerar e sincronizar ids aleatórios entre dois componentes desacoplados (Tabs e TabPanel) que não compartilham estado React entre si além do value que já vem de fora.",
+    "Só horizontal neste contrato — Tabs vertical (comum em configurações estilo 'painel lateral') não tem caso de uso real ainda; se aparecer, é decisão nova, mesmo raciocínio já usado em outros contratos pra não construir variante sem pedido real (ex.: RadioGroup ainda não existe por esse motivo).",
+    "count (indicador numérico por aba) reaproveita o átomo Badge com variant='neutral' fixo — não é uma prop de cor customizável por aba. Pedido explícito do usuário: 'usuário precisa saber quantos itens/registros tem naquela aba'. variant fixo em 'neutral' (não segue o estado selecionado/não-selecionado da aba) porque o Badge já tem contraste suficiente nos dois fundos e variar a cor por seleção seria uma segunda forma de indicar 'selecionado', redundante com a borda/cor que a aba já usa.",
+    "aria-label combinando label+count é setado no <button> inteiro (sobrescrevendo o texto visível como nome acessível) só quando count existe — sem count, o texto do botão já é o nome acessível de sobra, não precisa de aria-label redundante."
+  ],
+  "references": { "tokensFile": "tokens/tokens.json — Cores Semânticas (Bordas, Textos, Ações/Primárias), Estrutural (espaco-m/pp, foco-espessura), Tipografia Estilo (texto-rotulo-botao)" }
+}

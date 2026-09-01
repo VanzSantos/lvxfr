@@ -1,0 +1,21 @@
+.tooltip {
+  background: var(--fundo-invertido);
+  color: var(--texto-invertido);
+  border-radius: var(--raio-pp);
+  padding: var(--espaco-xp) var(--espaco-pp);
+  font-family: var(--texto-p-family);
+  font-size: var(--texto-p-size);
+  font-weight: var(--texto-p-weight);
+  line-height: var(--texto-p-line-height);
+  max-width: 240px;
+  z-index: 1000;
+  /* sombra pra manter definição no modo escuro — fundo-invertido é uma
+     superfície fixa 'sempre escura' (não muda de tema), então no dark mode
+     ela fica próxima do tom da própria página; a sombra garante que o
+     tooltip continue lendo como algo flutuando por cima, não fundido nela */
+  box-shadow: var(--sombra-p);
+}
+
+.arrow {
+  fill: var(--fundo-invertido);
+}

@@ -1,0 +1,110 @@
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--fundo-secundario);
+  font-family: var(--texto-m-family);
+}
+
+.pageEmbedded {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--fundo-secundario);
+  font-family: var(--texto-m-family);
+  overflow: hidden;
+}
+
+/* AJUSTADO a pedido do usuário — sem NavBar, sem coluna de navegação
+   lateral (virou Tabs dentro do próprio Card, ver SettingsTemplate.tsx) —
+   o corpo agora só centraliza o Card de conteúdo na página. */
+.body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  justify-content: center;
+  padding: var(--espaco-g);
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+.content {
+  width: 100%;
+  max-width: 560px;
+}
+
+/* AJUSTADO a pedido do usuário — mais espaço entre as Tabs (menu de topo) e
+   o conteúdo de cada seção. TabPanel já tem padding-top próprio
+   (Tabs.module.css, .panel, espaco-m/16px) — como esse padding é
+   COMPARTILHADO por qualquer consumidor de Tabs no harness, o aumento fica
+   só aqui (mais espaco-m por cima, 32px no total), sem alterar o
+   componente Tabs pra todo mundo. */
+.panelContent {
+  padding-top: var(--espaco-m);
+}
+
+.title {
+  margin: 0 0 var(--espaco-m) 0;
+  color: var(--texto-primario);
+  font-family: var(--texto-m-family);
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-m);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-xp);
+}
+
+/* AJUSTADO a pedido do usuário — botão de upload (FileUpload) fica
+   EXATAMENTE embaixo da imagem do avatar — empilhados numa coluna só,
+   alinhados à esquerda (mesmo alinhamento do resto do formulário abaixo). */
+.avatarRow {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--espaco-xp);
+}
+
+/* AJUSTADO a pedido do usuário — Avatar aumentado além do maior tamanho do
+   próprio átomo (xlarge/64px, topo da escala de avatar.contract.json).
+   .avatarWrapper RESERVA o espaço final (96px) no layout — sem isso, o
+   FileUpload logo abaixo ficaria encostado na caixa original de 64px,
+   sobrepondo os 32px que o transform (puramente visual, não afeta o box de
+   layout) empurra pra fora. .avatarScale é quem escala visualmente o
+   Avatar (transform, de fora do átomo — Avatar continua declarando
+   size="xlarge" normalmente, contrato intocado), ancorado no canto
+   superior esquerdo do wrapper (transform-origin) pra preencher os 96px
+   exatamente. */
+.avatarWrapper {
+  display: inline-flex;
+  width: 96px;
+  height: 96px;
+}
+
+/* BUG REAL — .avatarWrapper é flex (row) com align-items:stretch padrão;
+   sem isso aqui, .avatarScale esticava no eixo cruzado pra preencher os
+   96px de altura do wrapper ANTES do transform rodar, virando uma caixa
+   64x96 (não 64x64) — daí escalada (1.5x) pra 96x144, 48px mais alta que o
+   wrapper. Esses 48px extras de área visual/clicável invadiam o botão
+   "Enviar sua foto" logo abaixo, roubando o clique. align-self:flex-start
+   mantém .avatarScale no tamanho de conteúdo real (64x64) antes do
+   transform, que passa a escalar pra 96x96 certinho, sem sobrar nada. */
+.avatarScale {
+  display: inline-flex;
+  align-self: flex-start;
+  transform: scale(1.5);
+  transform-origin: top left;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+}

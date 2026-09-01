@@ -1,0 +1,84 @@
+{
+  "name": "Toast",
+  "originalName": "Notificação Transiente",
+  "oneLiner": "Feedback rápido e não bloqueante que aparece sozinho, empilha com outros, e some sozinho — diferente do Alert, que é persistente e fica na página até ser removido por quem consome.",
+  "category": "overlay",
+  "status": "draft",
+  "whenToUse": "Confirmar o resultado de uma ação pontual do usuário sem exigir leitura imediata nem interação (ex.: 'Item salvo', 'Link copiado', 'Falha ao enviar — tente novamente'), disparado via useToast().toast(...) de qualquer lugar da árvore envolvida por ToastProvider.",
+  "whenNotToUse": "Mensagem que precisa ficar visível até a pessoa resolver/ler com calma, sem prazo (isso é Alert); confirmação que bloqueia o fluxo até uma decisão explícita (Modal/Dialog, fora do harness ainda); erro de UM campo de formulário (HelperText, já associado via aria-describedby).",
+  "anatomy": [
+    "Ícone (esquerda, reforça o intent redundantemente à cor — mesma filosofia do Alert)",
+    "Mensagem",
+    "Ação secundária opcional (texto/link, ex.: 'Desfazer')",
+    "Botão de fechar (direita, sempre presente — Toast é sempre dispensável manualmente, diferente do Alert onde dismissible é opcional)"
+  ],
+  "dependencies": ["Icon"],
+  "props": [
+    { "name": "intent", "type": "enum", "enum": ["info", "success", "warning", "error"], "default": "info", "required": true, "description": "Mesmos 4 intents do Alert. Visual sólido (fundo forte + texto branco), mas num tom mais claro que o Badge — ver decisions." },
+    { "name": "message", "type": "string", "required": true },
+    { "name": "actionLabel", "type": "string", "required": false, "requiredWhen": "onAction é fornecido — os dois são mutuamente dependentes (ver forbidden)" },
+    { "name": "onAction", "type": "function", "required": false, "requiredWhen": "actionLabel é fornecido", "description": "Assinatura () => void. Clicar na ação NÃO dispensa o toast automaticamente — quem consome decide (chamando dismiss(id) dentro do próprio onAction, se quiser fechar ao agir; ver decisions)." },
+    { "name": "duration", "type": "number", "default": 5000, "required": false, "description": "Milissegundos até auto-dispensa. 0 desativa a auto-dispensa (o toast só sai por fechamento manual ou por quem consome chamar dismiss(id))." },
+    { "name": "onDismiss", "type": "function", "required": true, "description": "Assinatura () => void. Chamado quando o timer expira OU o botão de fechar é clicado. Toast não se remove sozinho da árvore — mesmo padrão 100% controlado do Alert; quem gerencia a remoção real é o ToastProvider (ver references sobre a API do sistema completo)." }
+  ],
+  "variants": ["info", "success", "warning", "error"],
+  "states": ["static"],
+  "tokensAllowed": {
+    "background": ["semantic.fundo-erro-forte", "semantic.fundo-sucesso-forte", "semantic.fundo-info-forte", "semantic.fundo-aviso-forte"],
+    "border": ["semantic.fundo-erro-forte", "semantic.fundo-sucesso-forte", "semantic.fundo-info-forte", "semantic.fundo-aviso-forte", "semantic.borda-foco"],
+    "text": ["semantic.texto-invertido", "semantic.texto-escuro-fixo"],
+    "icon": ["semantic.texto-invertido", "semantic.texto-escuro-fixo"],
+    "radius": ["structural.raio-pp", "structural.raio-xp"],
+    "focusRing": ["structural.foco-espessura"],
+    "spacing": ["structural.espaco-pp", "structural.espaco-m"],
+    "iconSize": ["structural.icone-medio"],
+    "typography": ["type-style.texto-m", "type-style.texto-m-forte", "type-style.texto-rotulo-botao"]
+  },
+  "variantTokenMap": {
+    "note": "MUDANÇA DE MODELO (ver decisions) — não segue mais a fórmula simples de sufixo do Alert. error usa fundo-erro-forte (vermelho-600, token novo), success usa fundo-sucesso-forte (verde-600, token novo), info usa fundo-info-forte (azul-700, token novo), warning reaproveita semantic.texto-aviso (amarelo-700, já existia — não ganhou um 'forte' próprio porque amarelo-600 falha contraste, ver decisions). Texto e ícone são sempre semantic.texto-invertido (branco) nas 4 variantes, não mais um tom por intent.",
+    "info": "info-forte", "success": "sucesso-forte", "warning": "aviso", "error": "erro-forte"
+  },
+  "a11y": {
+    "role": "Idêntico ao Alert: 'alert' (aria-live assertivo) pra intent=error/warning; 'status' (aria-live polido) pra intent=info/success. Cada Toast carrega sua própria role — o container do ToastProvider não precisa de um aria-live próprio, porque cada filho já anuncia sozinho ao montar.",
+    "requiredAria": ["aria-label ('Fechar') no botão de fechar"],
+    "keyboard": ["botão de fechar e botão de ação (quando existe) são <button> nativos — Tab move o foco, Enter/Espaço ativa", "passar o mouse OU focar (Tab) qualquer parte do Toast pausa o timer de auto-dispensa — não só hover, mesmo motivo já registrado em Tooltip (gatilho por foco+toque, não só mouse, pro público 60+)"],
+    "contrastMin": "AA (mínimo) como meta, não AAA — texto-invertido (branco) contra cada fundo forte: erro 5.18:1, sucesso 5.56:1, info 5.47:1, warning 5.11:1. Todos os 4 ficam abaixo de AAA (7:1) porque foram deliberadamente clareados um degrau em relação ao Badge (que atinge AAA em 3 dos 4) — ver decisions pro porquê dessa troca consciente.",
+    "notes": "Um elemento que desaparece sozinho é um risco de acessibilidade real (alguém pode não conseguir ler ou agir a tempo) — por isso hover/foco pausa o timer, e duration=0 existe como escape hatch pra casos que precisem ficar até ação manual."
+  },
+  "events": { "status": "não definido no contrato original" },
+  "composition": {
+    "canContain": ["Icon"],
+    "canBeContainedBy": ["ToastProvider — único lugar que efetivamente monta <Toast>, via useToast().toast(...)"],
+    "doNotCombine": ["<Toast> montado diretamente por quem consome, fora do ToastProvider — perde posicionamento fixo, empilhamento e a lógica de fila (ver forbidden)"]
+  },
+  "forbidden": [
+    "montar <Toast> diretamente na árvore do consumidor — o padrão de uso é sempre useToast().toast({...}), nunca import { Toast } seguido de JSX manual (Toast em si não tem posição fixa nem timer de fila own-managed fora do Provider)",
+    "actionLabel sem onAction ou onAction sem actionLabel — mutuamente dependentes",
+    "cor fora da whitelist de tokensAllowed pro intent ativo",
+    "novo intent fora da lista sem atualizar este contrato primeiro",
+    "esconder o ícone — mesma regra não-negociável do Alert, intent nunca só por cor",
+    "Toast sem onDismiss — erro em tempo de execução, mesmo padrão de obrigatoriedade do Alert/dismissible"
+  ],
+  "decisions": [
+    "CORRIGIDO — auditoria de contratos (2026-09-01): raio-xp, focusRing (foco-espessura) e borda-foco (border) adicionados — o botão de fechar e o botão de ação usam o mesmo anel de foco visível do resto do harness, mas tokensAllowed não declarava essas categorias.",
+    "RESOLVIDO com o usuário — escopo é o SISTEMA COMPLETO (Toast + ToastProvider + useToast()), não só o componente visual isolado. Diferente da decisão tomada pro Radio/RadioGroup (onde o grupo ficou pra depois por falta de caso de uso), aqui o usuário pediu a infraestrutura de fila/posicionamento junto desde já — decisão explícita, não especulação.",
+    "RESOLVIDO com o usuário — container ancorado no canto SUPERIOR DIREITO da viewport, fixo, renderizado via portal (createPortal em document.body) pra escapar de qualquer overflow/stacking context de um container pai.",
+    "RESOLVIDO com o usuário — máximo 3 toasts visíveis simultaneamente. Novos pedidos além do 3º entram numa fila interna (array ordenado, sem limite) e só passam a aparecer (e só então começam a contar o próprio timer de auto-dispensa) quando um dos 3 ativos sai — por timer OU fechamento manual. O timer de um toast NUNCA corre enquanto ele está só na fila, esperando vaga.",
+    "RESOLVIDO com o usuário — duration padrão 5000ms, com pausa ao passar o mouse OU focar (Tab) qualquer parte do toast (retomando ao sair/perder foco). duration=0 desativa a auto-dispensa por completo.",
+    "RESOLVIDO com o usuário — suporta ação secundária opcional (actionLabel + onAction, ex.: 'Desfazer'). onAction NÃO dispensa o toast sozinho — decisão pra manter Toast previsível (uma função só faz uma coisa): se quem consome quiser fechar ao clicar na ação, chama dismiss(id) dentro do próprio onAction. O id de cada toast é o retorno de toast(...), pensado exatamente pra esse uso.",
+    "REVISADO a pedido do usuário — empilhamento trocou de 'novo-em-cima' pra 'novo-embaixo': 'corrija para que os novos toasts sempre apareçam abaixo do toast existente'. Container trocou flex-direction de column-reverse pra column — como a fila já era mantida em ordem cronológica natural (mais antigo primeiro) internamente, um flex column comum já basta pra renderizar nessa mesma ordem visualmente (mais antigo no topo, mais recente embaixo), sem precisar inverter o array. Confirmado no navegador com 'Disparar 5 toasts': Notificação 1 aparece no topo, 2 e 3 entram abaixo dela conforme chegam.",
+    "MUDANÇA DE MODELO #2 (depois da entrega inicial) — RESOLVIDO com o usuário: visual mudou de tingido/claro (modelo do Alert, decisão original do agente) para SÓLIDO (fundo forte + texto branco, como o Badge), mas num tom mais claro que o Badge — motivo explícito do usuário: a área do Toast é bem maior que a de um Badge, e o mesmo tom escuro (texto-X, 700/800) ocuparia uma superfície grande demais pra ficar confortável, mesmo quando aparecem 2-3 empilhados ao mesmo tempo (a intenção era 'chamar atenção', não 'pesar a tela').",
+    "Investigação de contraste ANTES de aplicar 'um tom mais claro': tom 500 (borda-X, o próximo mais claro que existia como token semântico) falha contraste com texto branco pras 4 cores (1.87–3.78:1, todas abaixo do mínimo AA 4.5:1) — não dava pra simplesmente trocar o token. texto-X sobre borda-X (dark-on-medium) também falha (2.02–2.73:1). A saída viável foi trazer um tom intermediário (600 na escala primitiva do Vermelho/Verde, 700 no Azul) que ainda não existe como token semântico no Figma — criados agora em tokens.css como fundo-erro-forte/fundo-sucesso-forte/fundo-info-forte, com uma nota explícita no arquivo marcando que são um degrau novo, não confirmado pelo Figma ainda, candidato a virar token oficial se o design formalizar essa necessidade.",
+    "warning é EXCEÇÃO nessa clareada: amarelo-600 (o equivalente ao que os outros 3 ganharam) fica em 3.10:1 com texto branco, abaixo do mínimo — não existe tom intermediário utilizável pro amarelo. warning continua usando semantic.texto-aviso (amarelo-700, o mesmo valor que já era usado como texto no modelo tingido antigo), sem token novo.",
+    "info efetivamente TAMBÉM clareou um degrau, mesmo sem token 'forte' dedicado nomeado como tal nas outras 3: o texto-info original usava azul-800 (7.35:1, AAA) — fundo-info-forte usa azul-700 (5.47:1, AA), um degrau mais claro que o texto-info que o Badge herdaria se reaproveitasse a mesma fórmula.",
+    "Texto e ícone sempre semantic.texto-invertido (branco) nas 4 variantes agora — não mais um tom escuro por intent (que só fazia sentido no modelo tingido antigo, fundo claro).",
+    "Sem sombra/elevação — mesma limitação já registrada em card.contract.json (não existe coleção de tokens de sombra em tokens.json hoje). Revisitar junto do item 'Card com sombra' da fila combinada com o usuário, quando os tokens existirem.",
+    "Sem sombra/elevação — mesma limitação já registrada em card.contract.json (não existe coleção de tokens de sombra em tokens.json hoje). Toast se distingue do fundo da página só pela borda colorida + fundo tingido opaco, sem profundidade. Revisitar junto do item 'Card com sombra' da fila combinada com o usuário, quando os tokens existirem — não é uma decisão nova, é a mesma pendência.",
+    "API do sistema (não cabe no campo 'props', que documenta só o componente visual <Toast>): `useToast(): { toast(options): string, dismiss(id): void }`. `options` é `{ intent, message, actionLabel?, onAction?, duration? }`, espelhando exatamente as props do Toast (menos onDismiss, que o Provider já injeta sozinho). `toast(...)` retorna o id gerado, usado com `dismiss(id)` pra remoção manual de um toast específico (ex.: dentro de onAction). `<ToastProvider>` deve envolver a árvore uma vez (mesmo espírito do import único de tokens.css no bootstrap), não precisa envolver o app inteiro — no Playground, cada story que demonstra Toast envolve só o próprio conteúdo da demo.",
+    "role dinâmica idêntica ao Alert (alert pra warning/error, status pra info/success) — reaproveitada sem reabrir a decisão, já validada lá.",
+    "HISTÓRICO (válido só no modelo tingido antigo, superado pela mudança de modelo #2) — a decisão original tinha descartado um verde de link universal (semantic.acao-link-texto) pro texto da ação, preferindo reaproveitar texto-{intent}. Com o fundo virando sólido, essa distinção deixou de existir: texto e ação são sempre texto-invertido (branco) agora, só o sublinhado/peso (texto-rotulo-botao) diferencia 'isto é clicável' de 'isto é só a mensagem'.",
+    "BUG REAL encontrado pelo usuário depois da mudança de modelo #2 — o botão de ação (actionLabel) ficou com a cor padrão do navegador (escura) em vez de branco, destoando do resto do conteúdo. Causa: <button> não herda `color` do elemento pai por padrão (diferente de texto solto num <span>/<div>), então mesmo com .toast definindo color:texto-invertido, o .action (um <button>) ficava com a cor default do user-agent stylesheet. Corrigido adicionando `color: inherit` explícito em .action. Confirmado via estilo computado no navegador (rgb(249, 250, 251) = texto-invertido) depois do fix.",
+    "REVISADO — a decision anterior 'warning é EXCEÇÃO' (fundo texto-aviso + texto-invertido) e 'texto e ícone sempre texto-invertido nas 4 variantes' ficaram desatualizadas: BUG REAL corrigido em teste no navegador (modo escuro) — texto-aviso (o token de texto-aviso, pensado pra TEXTO sobre fundo claro) clareia no tema escuro pra continuar legível como texto; reaproveitado como FUNDO do Toast warning, virou um amarelo claro com texto branco por cima, ilegível. Trocado pra semantic.fundo-aviso-forte — o mesmo token '-forte' que os outros 3 intents já usavam, resolvendo de vez a assimetria que a decision #70 the documentava como limitação permanente (não tinha tom intermediário 'utilizável com texto branco' na época). Texto/ícone do warning viraram semantic.texto-escuro-fixo (token novo, não muda de valor entre temas — contraparte fixa de texto-invertido) em vez de texto-invertido, já que fundo-aviso-forte continua um amarelo claro/saturado em qualquer tema, precisando de texto ESCURO sempre. Os outros 3 intents (info/success/error) continuam texto-invertido, sem mudança."
+  ],
+  "references": { "tokensFile": "tokens/tokens.json — mesmos grupos usados em alert.contract.json (Cores Semânticas Sinalização), Estrutural (raio-pp, espaco-pp/m, icone-medio), Tipografia Estilo (texto-m, texto-m-forte, texto-rotulo-botao)" }
+}

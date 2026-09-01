@@ -1,0 +1,157 @@
+{
+  "name": "QuantitySelector",
+  "originalName": "Incremental",
+  "oneLiner": "Valor numérico com botões de incrementar/decrementar (+/-) ao lado, edição por clique, sem digitação livre por padrão.",
+  "category": "data-entry",
+  "status": "draft",
+  "whenToUse": "Quantidade pequena e limitada (ex.: itens de um carrinho, quantidade de convidados) onde os passos são previsíveis e o usuário ajusta clicando, não digitando um número qualquer. Célula de tabela com uma quantidade editável é o caso real que originou este contrato (ver decisions).",
+  "whenNotToUse": "Valor pode ser qualquer número grande ou digitado livremente — use um input numérico normal (fora de escopo deste harness ainda); múltiplos passos de tamanhos diferentes não-lineares (ex.: 1, 5, 10, 50) — este contrato só incrementa/decrementa por um step fixo.",
+  "anatomy": [
+    "Botão decrementar (-) — à esquerda",
+    "Valor atual — texto central, não editável por digitação neste contrato (ver decisions)",
+    "Botão incrementar (+) — à direita"
+  ],
+  "dependencies": [
+    "Icon"
+  ],
+  "props": [
+    {
+      "name": "value",
+      "type": "number",
+      "required": true,
+      "description": "Controlado, mesmo padrão de value em TextField."
+    },
+    {
+      "name": "min",
+      "type": "number",
+      "required": false,
+      "description": "Quando omitido, decrementar não tem limite inferior."
+    },
+    {
+      "name": "max",
+      "type": "number",
+      "required": false,
+      "description": "Quando omitido, incrementar não tem limite superior."
+    },
+    {
+      "name": "step",
+      "type": "number",
+      "default": 1,
+      "required": false
+    },
+    {
+      "name": "accessibleLabel",
+      "type": "string",
+      "required": true,
+      "description": "Nome acessível do controle inteiro (ex.: 'Quantidade de Fone LVXFR'). Cada botão deriva seu próprio aria-label a partir deste (ex.: 'Diminuir Quantidade de Fone LVXFR')."
+    },
+    {
+      "name": "state",
+      "type": "enum",
+      "enum": [
+        "default",
+        "disabled"
+      ],
+      "default": "default",
+      "required": false
+    },
+    {
+      "name": "onChange",
+      "type": "function",
+      "required": false,
+      "description": "Assinatura (value: number) => void, disparado só quando o novo valor está dentro de min/max."
+    }
+  ],
+  "variants": [],
+  "states": [
+    "default",
+    "disabled",
+    "at-min",
+    "at-max"
+  ],
+  "tokensAllowed": {
+    "background": [
+      "semantic.fundo-superficie",
+      "semantic.fundo-secundario",
+      "semantic.fundo-campo"
+    ],
+    "border": [
+      "semantic.borda-base",
+      "semantic.borda-foco",
+      "semantic.borda-inativo"
+    ],
+    "text": [
+      "semantic.texto-primario",
+      "semantic.texto-inativo"
+    ],
+    "iconColor": [
+      "semantic.icone-secundario",
+      "semantic.icone-inativo"
+    ],
+    "iconSize": [
+      "structural.icone-pequeno"
+    ],
+    "radius": [
+      "structural.raio-pp"
+    ],
+    "focusRing": [
+      "structural.foco-espessura"
+    ],
+    "spacing": [
+      "structural.espaco-xp",
+      "structural.espaco-pp"
+    ],
+    "typography": [
+      "type-style.texto-p"
+    ]
+  },
+  "a11y": {
+    "role": "group (o conjunto dos 3 elementos) com aria-label=accessibleLabel; cada botão é um <button> nativo com seu próprio aria-label derivado; o valor central usa aria-live=\"polite\" pra anunciar mudanças sem precisar que o foco se mova.",
+    "requiredAria": [
+      "aria-label no grupo com accessibleLabel",
+      "aria-label 'Diminuir {accessibleLabel}' / 'Aumentar {accessibleLabel}' em cada botão",
+      "aria-live=\"polite\" no elemento que mostra o valor atual",
+      "aria-disabled (via disabled nativo) no botão de decrementar quando value=min, e no de incrementar quando value=max"
+    ],
+    "keyboard": [
+      "Tab move o foco entre os dois botões (o valor central não é focável, não é um input)",
+      "Enter/Espaço no botão ativa o incremento/decremento (comportamento nativo de <button>)",
+      "botão no limite (min/max) fica disabled — sai da ordem de tabulação, mesmo padrão de outros controles disabled deste harness"
+    ],
+    "contrastMin": "AAA (7:1) pro texto do valor, AA (3:1) mínimo pros ícones dos botões (mesma régua de ícone de UI usada em Button).",
+    "notes": "Não é um <input type=\"number\">: decisão deliberada de não permitir digitação livre nesta v1 (ver decisions) — todo ajuste é via clique nos botões."
+  },
+  "events": {
+    "status": "não definido no contrato original"
+  },
+  "composition": {
+    "canContain": [
+      "Icon"
+    ],
+    "canBeContainedBy": [
+      "Datatable (célula de coluna)",
+      "formulários",
+      "cards"
+    ],
+    "doNotCombine": []
+  },
+  "forbidden": [
+    "permitir digitar o valor central diretamente — v1 é só clique nos botões (ver decisions)",
+    "incrementar/decrementar além de max/min — o botão correspondente fica disabled antes de chegar lá, nunca dispara onChange com valor fora do intervalo",
+    "onChange com assinatura diferente de (value: number) => void",
+    "cor fora da whitelist de tokensAllowed",
+    "reimplementar Icon inline pros glifos de +/-"
+  ],
+  "decisions": [
+    "RENOMEADO — este componente se chamava 'Stepper' até um pedido novo do usuário precisar desse nome pro componente de verdade 'passo a passo' (indicador de etapas de um formulário/fluxo, ver contratos/stepper.contract.json). Como os dois nomes descreviam coisas completamente diferentes (incrementar um número vs. navegar por etapas), renomeado pra QuantitySelector — descreve exatamente o que o componente faz (selecionar uma quantidade via +/-), sem compartilhar raiz com 'Stepper' e sem qualquer chance de confusão futura entre os dois. Arquivo, componente, props (QuantitySelectorProps/QuantitySelectorState) e todo uso (Datatable, Playground) atualizados juntos nesta mudança.",
+    "Nasceu como um dos 'tipos de célula' pedidos pra Datatable (datatable.contract.json) — célula de quantidade editável com +/-. Ganhou contrato próprio em vez de virar lógica embutida na Datatable, seguindo a decisão já tomada de manter tipos de célula como átomos reaproveitáveis usados via column.render, não um sistema de column.type.",
+    "Sem digitação livre do valor nesta v1 — decisão do agente por simplicidade (evita lidar com estado intermediário de um <input type=\"number\"> sendo digitado, formatação, colar texto não-numérico etc.). Se surgir um caso real que precise digitar o valor direto, é decisão nova (provavelmente um prop `editable` que troca o texto central por um input).",
+    "Valor central usa aria-live='polite' em vez de mover o foco pro texto a cada clique — o foco permanece no botão que o usuário acabou de clicar (importante pra cliques repetidos em sequência), e leitor de tela ainda anuncia o novo valor.",
+    "step é sempre um número fixo (default 1) — não suporta múltiplos passos de tamanhos diferentes; caso real disso é decisão nova.",
+    "Value/min/max controlados de fora — mesmo padrão do resto do harness de data-entry (TextField, Select), nenhuma lógica de clamping vive fora do componente: o QuantitySelector decide sozinho quando desabilitar os botões, mas quem decide o valor real é o consumidor via onChange.",
+    "AJUSTADO a pedido do usuário — fundo do campo trocado de semantic.fundo-superficie pra semantic.fundo-campo (token novo): 'o fundo dos inputs de forma geral, devem ser levemente mais escuros que a cor de fundo da página onde estão, para destacar melhor'. No modo claro fundo-campo é idêntico a fundo-superficie (sem mudança visual, branco com borda já bastava) — só no modo escuro os dois valores divergem (fundo-campo um degrau mais escuro que a página), porque era só ali que o campo ficava indistinguível da própria página por trás."
+  ],
+  "references": {
+    "tokensFile": "tokens/tokens.json — Cores Semânticas (Fundos, Bordas, Textos, Ícones), Estrutural (raio-pp, foco-espessura, espaco-xp/pp, icone-pequeno), Tipografia Estilo (texto-p)"
+  }
+}

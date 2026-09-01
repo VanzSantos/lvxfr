@@ -1,0 +1,64 @@
+{
+  "name": "Breadcrumb",
+  "originalName": "Trilha de Navegação",
+  "oneLiner": "Trilha hierárquica de navegação (ex.: 'Início / Configurações / Perfil') — o último item é sempre a página atual, nunca um link.",
+  "category": "action",
+  "status": "draft",
+  "whenToUse": "Mostrar onde o usuário está dentro de uma hierarquia de páginas/seções navegável (ex.: categoria > subcategoria > produto), com atalho pra voltar a qualquer nível acima.",
+  "whenNotToUse": "Navegação principal do site/produto (isso é NavBar, fora do harness ainda); passos de um fluxo sequencial tipo wizard (a ordem aqui é hierárquica, não sequencial); só 1 nível (sem hierarquia real pra mostrar).",
+  "anatomy": [
+    "<nav aria-label> envolvendo tudo",
+    "Lista de itens (<ol>) — Link pra cada nível navegável, texto simples (aria-current=page) pro último",
+    "Ícone opcional (firstItemIcon) antes do label do primeiro item — dev escolhe qual, sem ícone fixo por padrão",
+    "Reticências clicáveis (só quando items.length > collapseThreshold) — botão com ícone 'dots-three', abre um popover (menu) listando os itens intermediários ocultos, cada um como Link real",
+    "Separador entre itens (ícone caret-right, decorativo)"
+  ],
+  "dependencies": ["Link", "Icon"],
+  "props": [
+    { "name": "items", "type": "array", "required": true, "description": "Array de { label: string, href?: string }, na ordem hierárquica (do mais geral pro mais específico). O ÚLTIMO item é sempre tratado como página atual — mesmo que tenha href, ele é ignorado e o item renderiza como texto, não link (ver decisions)." },
+    { "name": "firstItemIcon", "type": "string", "required": false, "description": "Nome de ícone (IconName) mostrado antes do label do PRIMEIRO item da trilha (ex.: 'house'). Sem valor fixo/obrigatório — o dev escolhe qual ícone faz sentido pro contexto (não precisa ser uma casinha)." },
+    { "name": "collapseThreshold", "type": "number", "default": 3, "required": false, "description": "A partir de quantos items a trilha colapsa. Com items.length > collapseThreshold, mostra sempre: primeiro item + reticências clicáveis (com os itens do meio) + últimos 2 itens (pai imediato + página atual). Com items.length <= collapseThreshold, mostra tudo sem colapsar. Default 3 = colapsa a partir de 4 níveis (ver decisions)." }
+  ],
+  "variants": [],
+  "states": ["static"],
+  "tokensAllowed": {
+    "text": ["semantic.acao-link-texto", "semantic.acao-link-texto-sobreposto", "semantic.texto-secundario", "semantic.texto-primario"],
+    "separatorColor": ["semantic.icone-secundario"],
+    "spacing": ["structural.espaco-xp"],
+    "iconSize": ["structural.icone-pequeno"],
+    "typography": ["type-style.texto-p"]
+  },
+  "a11y": {
+    "role": "nav com aria-label=\"trilha de navegação\" envolvendo um <ol> — lista ordenada porque a hierarquia importa (não é uma lista de itens intercambiáveis). Cada item intermediário é um Link real (<a href>); o último é <span aria-current=\"page\">, nunca um link.",
+    "requiredAria": ["aria-label no <nav>", "aria-current=\"page\" no último item", "aria-hidden no ícone separador (puramente decorativo, a ordem do DOM já comunica a hierarquia)", "aria-label='Mostrar caminhos intermediários' + aria-haspopup='menu' + aria-expanded no botão de reticências, quando colapsado"],
+    "keyboard": ["Tab navega entre os links (comportamento nativo de <a>, via Link — não reimplementado)", "Enter/Espaço no botão de reticências abre o popover com os itens ocultos; Esc fecha e devolve o foco pro botão (mesmo padrão de popover já usado em Select/Datatable, via @floating-ui/react)"],
+    "contrastMin": "Herda os números já validados em link.contract.json pros itens navegáveis (7.13:1 AAA); o item atual usa texto-primario (mesmo par de alto contraste do resto do harness)."
+  },
+  "events": { "status": "não definido no contrato original" },
+  "composition": {
+    "canContain": ["Link", "Icon"],
+    "canBeContainedBy": ["cabeçalhos de página", "páginas com hierarquia de navegação"],
+    "doNotCombine": ["Breadcrumb com só 1 item — não há hierarquia pra mostrar, ver whenNotToUse"]
+  },
+  "forbidden": [
+    "menos de 2 items — sem hierarquia real",
+    "item intermediário (qualquer um exceto o último) sem href — erro em tempo de execução, mesmo padrão de obrigatoriedade já usado em Alert/dismissible e Chip/removable",
+    "tornar o último item clicável — ele é sempre a página atual, texto estático com aria-current=page",
+    "reimplementar o link dos itens intermediários fora do átomo Link (<a> cru, etc.)",
+    "cor fora da whitelist de tokensAllowed",
+    "colapsar escondendo o primeiro ou o último item — só os do MEIO vão pras reticências, primeiro e último (+ penúltimo) sempre visíveis",
+    "abrir mais de um popover de reticências ao mesmo tempo (não se aplica — só existe 1 grupo de reticências por Breadcrumb, mas documentado por consistência com outros popovers do harness)"
+  ],
+  "decisions": [
+    "O último item de 'items' NUNCA renderiza como link, mesmo que venha com href preenchido — href nessa posição é simplesmente ignorado, não é erro (é comum o consumidor montar o array de forma genérica a partir de uma lista de rotas, onde a última rota também tem uma URL válida; forçar o consumidor a lembrar de omitir href só pro último item seria mais fricção do que ajuda). Documentado aqui pra não parecer bug silencioso.",
+    "Itens intermediários reaproveitam o átomo Link inteiro (não um <a> customizado) — herda toda a semântica/contraste/foco já validados em link.contract.json, inclusive underline/estado disabled se algum dia fizer sentido num nível da trilha.",
+    "Separador é Icon 'caret-right' (Phosphor CaretRight, adicionado agora ao registro fechado — Breadcrumb é o primeiro consumidor real, mesma disciplina de crescimento sob demanda já usada nos outros ícones), sempre aria-hidden — a ordem do DOM/<ol> já comunica a hierarquia pra quem usa leitor de tela, o separador visual é redundante pra acessibilidade.",
+    "RESOLVIDO — truncamento de trilhas longas implementado a pedido do usuário. Padrão: primeiro item + reticências (clicáveis, abrem popover) + últimos 2 itens (pai imediato + página atual), a partir de items.length > collapseThreshold (default 3, ou seja, colapsa com 4+ níveis — número literal que o usuário usou como exemplo). collapseThreshold é configurável por instância pra quem tiver uma hierarquia tipicamente mais profunda e não quiser colapsar tão cedo ('podem ser mais, se for interessante e usual').",
+    "Reticências abrem um popover (não um <select> ou navegação inline) com @floating-ui/react — mesmo padrão já usado em Select/Tooltip/Datatable (colunas visíveis, exportação), não introduz uma terceira forma de resolver 'elemento ancorado que não pode sair da viewport'. Sem sombra, só borda, mesma convenção flat do resto do harness.",
+    "RESOLVIDO — bug real reportado: texto dos itens dentro do popover de reticências não herdava a fonte do harness (caía no padrão do navegador). Causa: FloatingPortal renderiza o popover fora da árvore de .list (escapa do <nav>), e Link não tem tipografia própria — depende inteiramente de herdar font-family/size do contexto (ver link.contract.json). Corrigido declarando type-style.texto-p explicitamente em .menu, já que o contexto herdado real (fora do portal) não é mais o do Breadcrumb.",
+    "Sempre mostra EXATAMENTE 2 itens depois das reticências (pai imediato + atual), não 1 — dá contexto de onde a página atual está aninhada sem precisar abrir o popover pra descobrir. Mostrar só a página atual sozinha depois de '...' perderia informação útil que cabe tranquilamente no espaço.",
+    "firstItemIcon é uma prop de nome de ícone (IconName), não fixada em 'house' — pedido explícito do usuário ('pode ser uma casinha ou outro que o usuário escolha'). Sem valor default: a maioria das trilhas não precisa de ícone no primeiro item, forçar um ícone fixo (mesmo que 'house') seria decidir por produtos que talvez não usem esse padrão visual.",
+    "<ol> em vez de <ul> — a ordem dos itens carrega significado hierárquico real (não é uma lista de opções intercambiáveis), mesma lógica que já rege outras decisões de semântica HTML no harness (ex.: Divider usa role=separator explícito em vez de depender de estilo)."
+  ],
+  "references": { "tokensFile": "tokens/tokens.json — Cores Semânticas (Ações/Link, Textos), Estrutural (espaco-xp, icone-pequeno), Tipografia Estilo (texto-p)" }
+}

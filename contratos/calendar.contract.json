@@ -1,0 +1,70 @@
+{
+  "name": "Calendar",
+  "originalName": "Calendario",
+  "oneLiner": "Grade de mês com seleção de uma data — navegação simples (mês anterior/próximo) e complexa (pular direto pra outro mês/ano) na mesma interação.",
+  "category": "data-entry",
+  "status": "draft",
+  "whenToUse": "Selecionar uma única data de calendário, seja como campo isolado (ex.: data de um evento) ou como base visual reaproveitada por DatePicker/DateTimePicker (que o abrem dentro de um popover ancorado num campo de texto).",
+  "whenNotToUse": "Selecionar um intervalo de datas diretamente (isso é DatePicker com range, que reaproveita este Calendar por dentro, mas decide a lógica de início/fim por fora); selecionar hora (isso é TimePicker); mostrar eventos/compromissos de uma agenda (fora de escopo deste harness — Calendar aqui é só um seletor de data, não uma agenda visual).",
+  "anatomy": [
+    "Cabeçalho — botão mês anterior (Icon caret-left), rótulo clicável 'Mês de Ano' (abre o seletor rápido de mês/ano), botão próximo mês (Icon caret-right)",
+    "Grade de dias da semana (Dom–Sáb, abreviado) — só rótulos, não interativos",
+    "Grade de dias do mês — sempre 6 linhas × 7 colunas (42 células) fixas, mesmo quando o mês cabe em 5 linhas; dias de meses adjacentes aparecem esmaecidos e não são clicáveis",
+    "Seletor rápido de mês/ano (alterna com a grade de dias ao clicar no rótulo do cabeçalho) — navegação de ano (setas) + grade de 12 meses do ano exibido"
+  ],
+  "dependencies": ["Icon"],
+  "props": [
+    { "name": "value", "type": "string", "required": true, "description": "Data selecionada no formato ISO 'AAAA-MM-DD', ou null se nenhuma. 100% controlado, mesmo padrão de TextField/Select — Calendar nunca decide sozinho qual data está 'selecionada'." },
+    { "name": "onChange", "type": "function", "required": true, "description": "Assinatura (value: string) => void, chamado com a data ISO clicada. Só dispara pra dias do mês corrente e habilitados (ver minDate/maxDate/disabledDate)." },
+    { "name": "minDate", "type": "string", "required": false, "description": "Data ISO mínima selecionável (inclusive). Dias antes dela ficam desabilitados." },
+    { "name": "maxDate", "type": "string", "required": false, "description": "Data ISO máxima selecionável (inclusive). Dias depois dela ficam desabilitados." },
+    { "name": "disabledDate", "type": "function", "required": false, "description": "Assinatura (value: string) => boolean. Quando retorna true pra uma data ISO específica, esse dia fica desabilitado além do intervalo min/max (ex.: feriados, dias sem vaga)." },
+    { "name": "accessibleLabel", "type": "string", "required": false, "default": "Calendário", "description": "Nome acessível do componente inteiro (role=group)." }
+  ],
+  "variants": [],
+  "states": ["default", "selected", "today", "disabled", "adjacent-month"],
+  "tokensAllowed": {
+    "background": ["semantic.fundo-superficie", "semantic.fundo-secundario", "semantic.acao-primaria"],
+    "border": ["semantic.borda-base", "semantic.borda-foco"],
+    "text": ["semantic.texto-primario", "semantic.texto-secundario", "semantic.texto-inativo", "semantic.acao-primaria", "semantic.acao-primaria-texto"],
+    "iconColor": ["semantic.icone-secundario"],
+    "iconSize": ["structural.icone-pequeno"],
+    "radius": ["structural.raio-circular", "structural.raio-pp"],
+    "focusRing": ["structural.foco-espessura"],
+    "spacing": ["structural.espaco-xp", "structural.espaco-pp", "structural.espaco-p", "structural.espaco-m"],
+    "typography": ["type-style.texto-p", "type-style.texto-micro", "type-style.texto-rotulo-botao"]
+  },
+  "a11y": {
+    "role": "group (aria-label=accessibleLabel) no container. Dias são <button> normais na ordem natural de Tab, não uma grade ARIA completa (role=grid/row/gridcell) — ver decisions.",
+    "requiredAria": ["aria-label por dia com a data completa por extenso (ex.: '15 de agosto de 2026'), não só o número visível", "aria-current=\"date\" no dia de hoje (token específico da spec ARIA pra 'hoje' num calendário, diferente de aria-current=\"page\"/\"step\" já usados em NavBar/Link/Breadcrumb e Stepper)", "aria-pressed no dia selecionado (true só nele)", "aria-expanded no rótulo do cabeçalho, refletindo se o seletor rápido de mês/ano está aberto", "dias de mês adjacente e desabilitados (minDate/maxDate/disabledDate) saem da ordem de tabulação (tabIndex=-1), mesmo padrão de opção disabled usado em Select/ComboBox/Stepper/Accordion"],
+    "keyboard": ["Tab navega entre os controles do cabeçalho e os dias habilitados do mês corrente, na ordem natural do DOM — sem navegação por seta dentro da grade nesta v1 (ver decisions)", "Enter/Espaço seleciona o dia focado ou aciona os botões de navegação (comportamento nativo de <button>)"],
+    "contrastMin": "AAA (7:1) pro texto dos dias do mês corrente/cabeçalho; dias de mês adjacente e desabilitados usam semantic.texto-inativo, deliberadamente fora dessa régua (mesma exceção documentada em outros contratos pra estados 'disabled' ou 'não é o foco principal').",
+    "notes": "Grade sempre 6 linhas fixas — evita a altura do Calendar pular ao trocar de mês (mesmo racional de altura previsível já aplicado em Skeleton/Datatable)."
+  },
+  "events": { "status": "não definido no contrato original" },
+  "composition": {
+    "canContain": ["Icon"],
+    "canBeContainedBy": ["páginas", "cards", "popover ancorado a um campo (DatePicker/DateTimePicker, fora deste contrato)"],
+    "doNotCombine": ["Calendar dentro de Calendar", "usar Calendar sozinho pra selecionar um intervalo — isso é responsabilidade do DatePicker (fila do roadmap), que orquestra dois valores (início/fim) por fora, reaproveitando este componente pra cada extremidade ou pra uma única grade com lógica de range acrescentada no futuro"]
+  },
+  "forbidden": [
+    "dias de mês adjacente clicáveis/selecionáveis — só decorativos, nunca disparam onChange",
+    "grade com menos de 6 linhas (deixar a altura variar por mês)",
+    "value fora do intervalo [minDate, maxDate] chegando via onChange",
+    "reimplementar Icon inline pras setas de navegação",
+    "cor fora da whitelist de tokensAllowed",
+    "adicionar prop de i18n/locale nesta v1 sem um caso de uso real (harness inteiro é pt-BR)"
+  ],
+  "decisions": [
+    "Navegação 'simples' (setas mês anterior/próximo, sempre visíveis) e 'complexa' (pular direto pra outro mês/ano) resolvidas como UMA interação no mesmo componente, não como duas variantes/props: as setas do cabeçalho cobrem o caso comum (navegar 1 mês), e clicar no rótulo 'Mês de Ano' abre um seletor rápido de mês (grade de 12 meses do ano exibido, com setas de ano) pra pular direto quando a data está longe. São complementares, não alternativas — não fazia sentido esconder um dos dois atrás de uma prop.",
+    "Mês/ano exibido (viewYear/viewMonth) e o modo do seletor (dias vs. meses) são estado interno, transiente, NÃO controlado por fora — só value (a data selecionada) é controlada. Inicializado a partir de value (ou 'hoje' se value for null) na primeira renderização, mas não resincroniza automaticamente se value mudar por uma causa externa depois — mesma classe de decisão já usada em Datatable pra editingRowKey/openFilterColumnKey: é estado de navegação/UI, não um dado de negócio que precise ser espelhado por fora.",
+    "Dias de mês adjacente (antes do dia 1 ou depois do último dia do mês corrente, usados só pra completar a grade de 42 células) aparecem esmaecidos e NUNCA são clicáveis nesta v1 — evita a ambiguidade de 'cliquei num dia e o mês mudou sozinho'. Se surgir um pedido real pra esse atalho (comum em alguns calendários), é decisão nova.",
+    "Grade sempre 6 linhas × 7 colunas fixas (42 células), mesmo em meses que cabem em 5 linhas (a maioria) — evita que a altura do Calendar mude ao trocar de mês, o que seria especialmente ruim dentro de um popover de DatePicker (a posição do popover teria que recalcular a cada navegação).",
+    "Sem grade ARIA completa (role=grid/row/gridcell + navegação por seta tipo planilha) nesta v1 — dias são <button> normais na ordem de Tab, com aria-label descrevendo a data por extenso pra compensar a falta da navegação por seta. Mesma classe de simplificação já usada em Accordion (sem roving tabindex) e Stepper (só horizontal): o padrão ARIA Grid completo fica pra quando um caso de uso real (uso pesado por teclado) pedir.",
+    "aria-current=\"date\" pro dia de hoje — token correto da spec ARIA especificamente pra 'data atual' num calendário, seguindo a mesma disciplina já usada em aria-current=\"page\" (Breadcrumb/NavBar/Link) e aria-current=\"step\" (Stepper): cada contexto usa o valor de aria-current mais específico da spec, nunca um genérico 'true'.",
+    "minDate/maxDate/disabledDate compõem juntos num único estado visual 'disabled' — o dia fica cinza e não-clicável independente de qual das três regras o desabilitou; a distinção do motivo (fora do intervalo vs. bloqueado especificamente) não tem um caso de uso real ainda que justifique estados visuais separados.",
+    "Locale fixo em pt-BR (nomes de mês e dia da semana hardcoded), sem prop de internacionalização — o harness inteiro já é pt-BR (mesmo racional de Alert/Toast/Datatable não terem prop de idioma).",
+    "Dias de mês adjacente usam opacity: 0.5 (valor cru, não é um token de cor) sobre a mesma cor semantic.texto-inativo, em vez de um token de opacidade dedicado — mesma classe de exceção documentada em border-width de Checkbox/Radio/Switch e no padding 0 do Datatable condensed: resolve uma necessidade visual real (esmaecer sem inventar uma nova cor) sem token formal ainda existente pra 'opacidade' no harness."
+  ],
+  "references": { "tokensFile": "tokens/tokens.json — Cores Semânticas (Fundos, Bordas, Textos, Ações/Primária, Ícones), Estrutural (raio-circular/pp, foco-espessura, espaco-xp/pp/p/m, icone-pequeno), Tipografia Estilo (texto-p, texto-micro, texto-rotulo-botao)" }
+}

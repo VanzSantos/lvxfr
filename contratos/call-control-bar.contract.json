@@ -1,0 +1,85 @@
+{
+  "name": "CallControlBar",
+  "originalName": "BarraDeControleDeChamada",
+  "oneLiner": "Fileira de botões circulares pra controlar uma videochamada — encerrar (sempre vermelho), microfone e câmera (toggle mudo/ligado via troca de ícone, cada um com um chevron adjacente pra escolher o dispositivo) e configurações (alto-falante + desfoque de fundo, opcional).",
+  "category": "action",
+  "status": "draft",
+  "whenToUse": "Tela de videochamada/telemedicina (entrevista qualificada, avaliação de saúde, teleconsulta) precisa de um controle padrão de encerrar/mutar/câmera, normalmente fixado na parte inferior da área de vídeo. Padrão identificado na análise de sistemas legados (analise-sistemas-legados.md, item 1.9) — repetido em pelo menos 4 telas do mesmo fluxo de videochamada.",
+  "whenNotToUse": "Qualquer ação isolada fora do contexto de uma chamada em andamento (isso é só Button); controles de mídia que não sejam de uma CHAMADA (ex.: player de vídeo gravado) — semântica diferente, fora deste contrato.",
+  "anatomy": [
+    "Cápsula escura (fundo-invertido, raio-circular) envolvendo os controles",
+    "Botão encerrar chamada — sempre vermelho (acao-destrutiva), sempre presente, primeiro da fileira",
+    "Botão microfone — círculo translúcido, ícone troca entre microphone/microphone-slash conforme micOn; chevron adjacente (opcional, só quando micDevices é fornecido) abre um Popover tone='dark' (role='menu', placement='top') listando os dispositivos, item ativo marcado com ícone check. Botão principal + chevron formam uma cápsula única contínua (gap de 2px entre os dois, cantos internos retos, cantos externos arredondados — raio-circular de cada lado — pra parecer uma elipse partida ao meio, não dois controles soltos)",
+    "Botão câmera — mesmo padrão do microfone (toggle de ícone + chevron adjacente opcional pra escolher câmera, só quando cameraDevices é fornecido, mesma cápsula contínua)",
+    "Botão configurações (opcional, só quando há pelo menos uma opção de configuração pertinente — speakerDevices ou onToggleBackgroundBlur, ver decisions) — abre um Popover tone='dark' (role='dialog', placement='top-end') com as opções: lista de alto-falante (mesmo padrão de lista com check do chevron de dispositivo) e/ou Switch 'Desfoque de fundo'"
+  ],
+  "dependencies": ["Icon", "Popover", "Switch"],
+  "props": [
+    { "name": "micOn", "type": "boolean", "required": true, "description": "Estado atual do microfone. Controlado — CallControlBar não guarda esse estado sozinho." },
+    { "name": "onToggleMic", "type": "function", "required": true, "description": "Assinatura () => void, chamado ao clicar no botão de microfone. Quem decide o próximo valor de micOn é o consumidor." },
+    { "name": "micDevices", "type": "array", "required": false, "description": "Array de { id: string, label: string }. Presença (junto de onSelectMicDevice) ativa o chevron ao lado do botão de microfone — ausência = sem chevron, só o botão de toggle." },
+    { "name": "selectedMicDeviceId", "type": "string", "required": false, "description": "id do dispositivo de microfone atualmente selecionado — marca esse item com um ícone check no menu do chevron." },
+    { "name": "onSelectMicDevice", "type": "function", "required": false, "description": "Assinatura (deviceId: string) => void, chamado ao escolher um item no menu do chevron do microfone. Fecha o menu automaticamente ao selecionar." },
+    { "name": "cameraOn", "type": "boolean", "required": true, "description": "Estado atual da câmera. Mesmo padrão controlado de micOn." },
+    { "name": "onToggleCamera", "type": "function", "required": true },
+    { "name": "cameraDevices", "type": "array", "required": false, "description": "Mesmo shape/racional de micDevices, pro chevron de câmera." },
+    { "name": "selectedCameraDeviceId", "type": "string", "required": false },
+    { "name": "onSelectCameraDevice", "type": "function", "required": false },
+    { "name": "onHangUp", "type": "function", "required": true, "description": "Assinatura () => void. CallControlBar não pede confirmação antes de chamar — se um 'tem certeza que quer sair?' for necessário, é responsabilidade de quem consome (ex.: abrir um ConfirmDialog antes de repassar pra essa função), ver decisions." },
+    { "name": "speakerDevices", "type": "array", "required": false, "description": "Array de { id: string, label: string } — lista de alto-falante dentro do painel de Configurações. Presença (junto de onSelectSpeakerDevice) ativa essa seção do painel; se nem essa prop nem onToggleBackgroundBlur forem fornecidos, o botão de Configurações inteiro não renderiza (ver decisions)." },
+    { "name": "selectedSpeakerDeviceId", "type": "string", "required": false },
+    { "name": "onSelectSpeakerDevice", "type": "function", "required": false },
+    { "name": "backgroundBlurEnabled", "type": "boolean", "required": false, "description": "Estado do Switch 'Desfoque de fundo' dentro do painel de Configurações. Controlado, mesmo padrão de micOn/cameraOn." },
+    { "name": "onToggleBackgroundBlur", "type": "function", "required": false, "description": "Assinatura () => void. Presença (mesmo com backgroundBlurEnabled ausente, tratado como false) ativa a seção 'Desfoque de fundo' do painel de Configurações — e sozinha já é suficiente pra fazer o botão de Configurações aparecer." }
+  ],
+  "variants": [],
+  "states": ["default"],
+  "tokensAllowed": {
+    "background": ["semantic.fundo-invertido", "semantic.acao-destrutiva", "semantic.acao-destrutiva-sobreposta", "semantic.fundo-secundario"],
+    "border": ["semantic.borda-foco"],
+    "text": ["semantic.texto-primario", "semantic.texto-secundario"],
+    "iconColor": ["semantic.texto-invertido", "semantic.acao-secundaria"],
+    "iconSize": ["structural.icone-medio", "structural.icone-pequeno"],
+    "focusRing": ["structural.foco-espessura"],
+    "radius": ["structural.raio-circular", "structural.raio-xp"],
+    "spacing": ["structural.espaco-pp", "structural.espaco-p", "structural.espaco-xp"],
+    "typography": ["type-style.texto-p"]
+  },
+  "a11y": {
+    "role": "group (role=\"group\" com aria-label=\"Controles da chamada\" no container) — os 3-4 botões formam um conjunto relacionado, mesmo padrão de agrupamento semântico já usado em outros conjuntos de controles do harness (ex.: SegmentedControl).",
+    "requiredAria": ["aria-label em cada botão (todos são ícone-only, sem texto visível) — 'Encerrar chamada', 'Silenciar microfone'/'Ativar microfone' (dinâmico conforme micOn), 'Desligar câmera'/'Ligar câmera' (dinâmico conforme cameraOn), 'Escolher microfone'/'Escolher câmera' nos chevrons, 'Configurações da chamada'", "aria-pressed nos botões de microfone/câmera, refletindo o estado MUDO (não o estado ligado) — ver decisions", "aria-expanded/aria-haspopup nos chevrons e no botão de Configurações, aplicados automaticamente pelo Popover via cloneElement"],
+    "keyboard": ["Tab percorre a fileira na ordem visual: encerrar → microfone → chevron do microfone (se presente) → câmera → chevron da câmera (se presente) → configurações (se presente)", "Enter/Espaço ativa qualquer botão, comportamento nativo de <button>", "Esc fecha qualquer popover aberto (chevron ou configurações) e devolve o foco pro gatilho, mesmo comportamento herdado do Popover"],
+    "contrastMin": "texto-invertido (ícones) sobre fundo-invertido (cápsula) e sobre acao-destrutiva (botão de encerrar) — os dois pares de maior contraste já validados no harness (mesmos usados em Badge variant='dark'/Button variant='destructive').",
+    "notes": "O estado mudo/câmera-desligada NUNCA depende só da troca de ícone sozinha pra quem usa leitor de tela — aria-pressed e aria-label dinâmico comunicam o estado em texto, o ícone é reforço visual pra quem enxerga."
+  },
+  "events": { "status": "não definido no contrato original" },
+  "composition": {
+    "canContain": ["Icon", "Popover", "Switch"],
+    "canBeContainedBy": ["telas de videochamada/telemedicina", "sobreposto (position absolute/fixed, decisão de quem consome) na parte inferior de uma área de vídeo"],
+    "doNotCombine": ["CallControlBar dentro de CallControlBar", "usar CallControlBar fora do contexto de uma chamada ativa"]
+  },
+  "forbidden": [
+    "onHangUp chamado sem confirmação embutida no PRÓPRIO CallControlBar — o componente não implementa um dialog de confirmação interno (mesmo racional de qualquer callback do harness que pode ter consequência séria: quem decide se confirma antes é o consumidor, não o átomo/molécula)",
+    "trocar a cor do botão de encerrar chamada — sempre acao-destrutiva, nunca configurável (é a única cor fixa e não-neutra da barra, por design)",
+    "reimplementar Icon/Popover/Switch inline em vez de reaproveitar os átomos",
+    "cor fora da whitelist de tokensAllowed",
+    "omitir aria-pressed/aria-label dinâmico nos botões de microfone/câmera — o estado mudo precisa ser sempre anunciável, nunca só visual",
+    "chevron de dispositivo sem lista de dispositivos por trás — chevron só existe quando micDevices/cameraDevices tem pelo menos 1 item",
+    "botão de Configurações renderizando sem nenhuma opção pertinente dentro do painel — precisa de pelo menos speakerDevices ou onToggleBackgroundBlur pra existir"
+  ],
+  "decisions": [
+    "CORRIGIDO — auditoria de contratos (2026-09-01): border (borda-foco, anel de foco dos botões) e typography (texto-p, rótulo 'Alto-falante'/'Desfoque de fundo' no painel de configurações) adicionados a tokensAllowed — categorias usadas no CSS mas não declaradas.",
+    "Nasceu da análise de sistemas legados (analise-sistemas-legados.md, item 1.9) — fileira de botões circulares (encerrar/microfone/câmera/configurações) repetida em pelo menos 4 telas do fluxo de videochamada (Entrevista qualificada, Avaliação, Notas). Telemedicina entrou no roadmap do harness (confirmado com o usuário em 2026-08-23) antes deste componente ser construído.",
+    "Microfone/câmera comunicam mudo/desligado TROCANDO O ÍCONE (microphone↔microphone-slash, video-camera↔video-camera-slash), não trocando a cor do botão — reflete fielmente o padrão observado nos prints legados (os botões de microfone/câmera mudo continuavam com o mesmo estilo visual escuro/translúcido dos demais, só o glifo mudava). Evita inventar uma segunda convenção de cor (ex.: vermelho quando mudo) que os prints reais não usam.",
+    "Botão de encerrar chamada é SEMPRE vermelho (acao-destrutiva) e sempre o primeiro da fileira — não é toggle (não tem um estado 'ligado/desligado' como mic/câmera), é uma ação destrutiva de uma via só. Cor fixa por design, não exposta como prop — é o único elemento não-neutro da barra inteira, existe pra se destacar visualmente das outras 3 ações.",
+    "onHangUp não pede confirmação sozinho — CallControlBar segue o mesmo padrão de responsabilidade do resto do harness (ex.: Datatable pede confirmação via Modal INTERNO pra ações que ela mesma define como arriscadas, tipo excluir/desabilitar, mas isso é uma decisão de CADA contrato, não uma regra universal). Aqui, decidiu-se deixar a confirmação (se houver) por conta de quem consome, porque nem toda chamada precisa desse atrito (ex.: uma chamada de teste rápida) — se o caso de uso real pedir confirmação sempre, é decisão nova.",
+    "micOn/cameraOn são props controladas (booleans), sem estado interno — mesmo padrão de todo o resto do harness (TextField/value, Checkbox/checked). CallControlBar nunca decide sozinho se o mic está ligado, só reflete o que recebe e avisa quando o usuário pede pra mudar.",
+    "5 novos ícones adicionados ao registro do Icon (phone-x, microphone, microphone-slash, video-camera, video-camera-slash) — nenhum ícone existente cobria controles de chamada; CallControlBar é o primeiro consumidor real desse domínio.",
+    "AJUSTADO a pedido do usuário — onSettings (callback simples, sem UI própria) substituído por um painel de configurações REAL, aberto num Popover (role='dialog', placement='top-end') com opções pertinentes: escolha de alto-falante (speakerDevices, mesmo padrão de lista com check dos chevrons de mic/câmera) e um Switch 'Desfoque de fundo' (backgroundBlurEnabled/onToggleBackgroundBlur). O botão de Configurações só aparece se pelo menos uma dessas seções tiver conteúdo — nunca um botão vazio. Alto-falante e desfoque de fundo foram escolhidos como as 'opções pertinentes' porque são configurações de CHAMADA em si (não de microfone/câmera, que já ganharam seus próprios chevrons) — mesmo racional de outros apps de chamada (Zoom/Meet) que agrupam esse tipo de ajuste no ícone de engrenagem.",
+    "AJUSTADO a pedido do usuário — botões de microfone e câmera ganharam um chevron adjacente (ícone caret-up, 24×44px, dentro da mesma cápsula visual) que abre um Popover (role='menu', placement='top') com a lista de dispositivos disponíveis (micDevices/cameraDevices), item ativo marcado com um ícone check. Presença do array de devices (+ callback onSelect) ativa o chevron; ausência = só o botão de toggle, sem chevron — mesmo padrão de 'presença de prop ativa a feature' usado em todo o resto do harness. Chevron aponta pra cima (caret-up) porque o CallControlBar normalmente fica ancorado na parte INFERIOR da tela de chamada — o menu de dispositivo abre pra cima, sempre visível.",
+    "Chevron implementado como um botão IRMÃO do botão de toggle (dentro de um wrapper .cluster), não uma extensão visual do mesmo <button> — mantém cada controle com seu próprio alvo de clique/foco/aria-label, evitando problemas de acessibilidade de 'split button' mal implementado (um único elemento fazendo duas coisas).",
+    "AJUSTADO a pedido do usuário — botão de toggle (mic/câmera) + chevron adjacente agora formam uma cápsula visualmente única: gap reduzido pra 2px, o botão principal perde o arredondamento do lado que encosta no chevron (raio-circular só do lado externo) e o chevron perde o arredondamento do lado que encosta no botão (raio-circular só do lado externo, oposto) — juntos leem como uma elipse partida ao meio por uma linha fininha, em vez de dois controles soltos com um respiro visível entre eles. Cada um continua sendo um <button> nativo independente (mesmo racional de acessibilidade já documentado), só a geometria dos cantos mudou.",
+    "EXTENSÃO no contrato do Popover (contratos/popover.contract.json) — nova prop tone ('light' padrão | 'dark'), usada aqui nos 3 popovers (chevron de mic, chevron de câmera, configurações) porque o painel branco padrão destoava de um gatilho que já vive numa cápsula escura. Popover.tone só resolve fundo/borda do painel; as cores de TEXTO dentro do conteúdo continuam responsabilidade de CallControlBar — .deviceItem trocou de texto-primario pra texto-invertido, hover de fundo-secundario pra um overlay translúcido de texto-invertido (mesma técnica já usada nos botões da cápsula), .settingsLabel virou um texto-invertido a 70% de opacidade (color-mix) pro rótulo secundário 'Alto-falante'/'Desfoque de fundo', e o ícone de check do item selecionado trocou de acao-primaria (verde escuro, baixo contraste sobre fundo quase preto) pra acao-secundaria (verde-limão, alto contraste sobre fundo-invertido)."
+  ],
+  "references": { "tokensFile": "tokens/tokens.json — Cores Semânticas (Ações/Destrutiva, Fundos, Textos), Estrutural (raio-circular, foco-espessura, espaco-pp/p, icone-medio)" }
+}

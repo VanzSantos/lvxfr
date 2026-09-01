@@ -1,0 +1,80 @@
+{
+  "name": "ActionCard",
+  "originalName": "CartaoDeAcao",
+  "oneLiner": "Cartão de ação administrativa — ícone simples (colorido ou não) + título + descrição + status opcional + botão(ões) de ação, com utilitários de info/configuração opcionais no canto. Pensado pra grades de ações num painel de supervisão/administração.",
+  "category": "display",
+  "status": "draft",
+  "whenToUse": "Listar ações administrativas/operacionais disponíveis num painel (ex.: 'Cancelar contratos em lote', 'Suspender vendas', 'Verificar assinaturas'), cada uma com contexto suficiente (descrição, status atual) pra o operador decidir se/quando acionar. Padrão identificado na análise de sistemas legados (analise-sistemas-legados.md, item 1.4) — grade 3×3 de ações num 'Painel de supervisão'.",
+  "whenNotToUse": "Ação simples sem contexto/descrição (isso é só um Button); card de dado read-only sem ação nenhuma (isso é StatCard ou um Card genérico); item de uma lista longa e repetitiva (isso é uma linha de Datatable, não um cartão individual).",
+  "anatomy": [
+    "Card (reaproveita o átomo Card, padding='medium', elevation='none') envolvendo um wrapper de conteúdo em flex column, height:100% (ver decisions, alinhamento das ações ao fim do card)",
+    "Cabeçalho — ícone principal dentro de um círculo de fundo BEM CLARO na mesma cor do ícone (esquerda) + utilitários opcionais de info/configuração (direita, ícones pequenos, só quando onInfo/onSettings são fornecidos)",
+    "Título (negrito)",
+    "Descrição (texto secundário)",
+    "Status opcional — bolinha colorida (ativo/inativo) + rótulo",
+    "Ação(ões) — botão principal (obrigatório) + botão secundário opcional (variant/outlined configuráveis — link em texto por padrão, ou um segundo botão sólido/contornado real, ver decisions), sempre ancoradas no FIM do card (margin-top: auto — ver decisions)"
+  ],
+  "dependencies": ["Card", "Icon", "Button"],
+  "props": [
+    { "name": "icon", "type": "IconName", "required": true, "description": "Ícone principal do cartão, size='large'/weight='bold', dentro de um círculo de fundo translúcido na mesma cor (ver decisions)." },
+    { "name": "iconTone", "type": "enum", "enum": ["default", "destructive", "neutral"], "default": "default", "required": false, "description": "Cor do ícone principal (e do círculo de fundo translúcido ao redor). default = acao-primaria (verde, ação normal/segura), fundo acao-primaria-transparente. destructive = acao-destrutiva (vermelho, ação de risco — ex.: 'Cancelar contratos em lote', 'Suspender vendas'), fundo acao-destrutiva-transparente. neutral = icone-secundario (cinza, sem carga semântica de risco/segurança), fundo fundo-secundario." },
+    { "name": "title", "type": "string", "required": true },
+    { "name": "description", "type": "string", "required": true },
+    { "name": "status", "type": "object", "required": false, "description": "{ label: string, active: boolean }. Quando presente, mostra uma bolinha (verde se active, cinza se não) + o rótulo (ex.: 'Vendas ativas', 'Aprovação suspensa'). Ausente = nenhuma linha de status é renderizada — nem todo ActionCard representa um toggle com estado ligado/desligado." },
+    { "name": "primaryLabel", "type": "string", "required": true, "description": "Texto do botão de ação principal — sempre presente, todo ActionCard tem pelo menos 1 ação." },
+    { "name": "onPrimaryAction", "type": "function", "required": true, "description": "Assinatura () => void." },
+    { "name": "primaryVariant", "type": "ButtonVariant", "default": "primary", "required": false, "description": "Reaproveita o enum já definido em button.contract.json, sem redefinir aqui. Deixa o consumidor escolher 'destructive' pra ações de risco, 'neutral' pra ações administrativas neutras, etc — ActionCard não força uma cor de botão fixa por iconTone (ver decisions)." },
+    { "name": "secondaryLabel", "type": "string", "required": false, "description": "Texto do botão de ação secundário, opcional. Requer onSecondaryAction (ver forbidden)." },
+    { "name": "onSecondaryAction", "type": "function", "required": false },
+    { "name": "secondaryVariant", "type": "ButtonVariant", "default": "link", "required": false, "description": "Reaproveita o enum de button.contract.json. Default 'link' (texto sublinhado, rodapé com 1 botão + 1 link — o padrão original). Setar pra 'neutral'/'primary'/etc produz um SEGUNDO botão real no rodapé lado a lado com o principal — ex.: secondaryVariant='neutral' + secondaryOutlined=true reproduz o mesmo par 'Cancelar (contornado) / Confirmar (sólido)' já usado nos Modals de confirmação do harness (ver decisions)." },
+    { "name": "secondaryOutlined", "type": "boolean", "default": false, "required": false, "description": "Repassado direto pro prop outlined do Button do botão secundário. Só faz sentido combinado com secondaryVariant diferente de 'link' (link não tem estado outlined)." },
+    { "name": "onInfo", "type": "function", "required": false, "description": "Assinatura () => void. Presença ativa o ícone de informação (i) no cabeçalho — ausência = ícone não renderiza. ActionCard não decide o que 'info' abre (tooltip, modal, etc.), só expõe o gatilho." },
+    { "name": "onSettings", "type": "function", "required": false, "description": "Assinatura () => void. Mesmo racional de onInfo, pro ícone de engrenagem (configuração)." }
+  ],
+  "variants": [],
+  "states": ["default", "static"],
+  "tokensAllowed": {
+    "background": ["semantic.acao-primaria-transparente", "semantic.acao-destrutiva-transparente", "semantic.icone-inativo", "semantic.fundo-secundario"],
+    "text": ["semantic.texto-primario", "semantic.texto-secundario"],
+    "iconColor": ["semantic.icone-secundario", "semantic.acao-primaria", "semantic.acao-destrutiva"],
+    "iconSize": ["structural.icone-pequeno", "structural.icone-grande"],
+    "focusRing": ["structural.foco-espessura"],
+    "radius": ["structural.raio-xp", "structural.raio-circular"],
+    "spacing": ["structural.espaco-xp", "structural.espaco-p", "structural.espaco-m"],
+    "typography": ["type-style.texto-m-forte", "type-style.texto-p"]
+  },
+  "a11y": {
+    "role": "nenhuma role própria — Card é um <div> genérico (herdado do átomo Card), o conteúdo interno usa elementos nativos com semântica própria (<button> pros utilitários e pras ações, via Button).",
+    "requiredAria": ["aria-label nos botões utilitários de info/configuração ('Mais informações sobre {title}' / 'Configurar {title}'), já que são ícone-only sem texto visível", "botões de ação (Button) herdam toda a a11y já definida em button.contract.json"],
+    "keyboard": ["Tab percorre, na ordem do DOM: utilitários (info → configuração, se presentes) → botão principal → botão secundário (se presente) — mesma ordem visual", "Enter/Espaço ativa qualquer botão, comportamento nativo"],
+    "contrastMin": "AAA — texto-primario (título) e texto-secundario (descrição/status) sobre fundo-superficie, mesma régua já validada em outros contratos do harness. Ícone principal usa acao-primaria/acao-destrutiva/icone-secundario (mesmos tokens de ícone já validados em Rating/Timeline) sobre um círculo de fundo translúcido a 10% de opacidade (acao-primaria-transparente/acao-destrutiva-transparente) — a opacidade baixa mantém o contraste ícone-vs-fundo praticamente equivalente a 'ícone sobre fundo-superficie', só com um leve tingimento de cor ao redor.",
+    "notes": "A bolinha de status nunca é a única forma de comunicar ativo/inativo — sempre acompanhada do rótulo em texto (mesmo racional de Badge/Alert/Timeline nunca dependerem só de cor)."
+  },
+  "events": { "status": "não definido no contrato original" },
+  "composition": {
+    "canContain": ["Card", "Icon", "Button"],
+    "canBeContainedBy": ["grades de ações administrativas (grid CSS de N ActionCard)", "painéis de supervisão/dashboard"],
+    "doNotCombine": ["ActionCard dentro de ActionCard", "ActionCard como substituto de StatCard — ActionCard sempre tem uma ação, StatCard nunca tem (é só leitura de indicador)"]
+  },
+  "forbidden": [
+    "secondaryLabel sem onSecondaryAction — erro em tempo de execução, mesmo padrão de dismissible/onDismiss no Alert",
+    "omitir primaryLabel/onPrimaryAction — todo ActionCard tem pelo menos 1 ação, não existe um modo 'só informativo' (isso é Card genérico ou StatCard)",
+    "reimplementar Card, Icon ou Button inline em vez de reaproveitar os átomos",
+    "cor fora da whitelist de tokensAllowed",
+    "onInfo/onSettings abrindo algo diretamente dentro do próprio ActionCard (ex.: um popover hardcoded) — ActionCard só expõe o gatilho (onClick), o que abre é responsabilidade de quem consome"
+  ],
+  "decisions": [
+    "Nasceu da análise de sistemas legados (analise-sistemas-legados.md, item 1.4) — grade 3×3 de cartões de ação no 'Painel de supervisão' de um sistema de corretor, cada um com ícone colorido, 2 ícones utilitários, título, descrição, status opcional e 1-2 botões.",
+    "primaryVariant é uma prop exposta (não fixa por iconTone) — decisão do agente: nos prints legados, a cor do botão principal nem sempre acompanhava a cor do ícone (ex.: 'Cancelar contratos em lote' tinha ícone vermelho mas botão escuro/neutro, não vermelho) — forçar uma correspondência automática icone→botão inventaria uma regra que os prints reais não seguem. Deixar como prop livre (reaproveitando ButtonVariant) é mais simples e não assume um padrão que não existe.",
+    "status é um objeto opcional { label, active }, não duas props separadas (statusLabel/statusActive) — os dois sempre andam juntos (não faz sentido ter só um dos dois), mesmo racional de objeto único já usado em DatatableColumn/TimelineItem pra dados que sempre aparecem em conjunto.",
+    "onInfo/onSettings são independentes e opcionais — um ActionCard pode não ter nenhum, só um, ou os dois utilitários. Ausência = ícone correspondente simplesmente não renderiza (em vez de renderizar desabilitado), mesmo racional de badgeLabel ausente no SelectableCard não renderizar um Badge vazio.",
+    "iconTone só tem 2 opções (default/destructive), não o enum inteiro de status do Badge — decisão do agente: o ícone do ActionCard comunica 'isto é uma ação seguro/normal' vs 'isto é uma ação de risco', uma distinção binária. Se surgir necessidade real de mais tons (ex.: 'ação de aviso'), é decisão nova.",
+    "Reaproveita o átomo Card (padding='medium') como superfície externa, em vez de estilizar um <div> do zero — ActionCard é fundamentalmente uma composição de Card+Icon+Button com um layout de conteúdo fixo, não uma superfície nova.",
+    "Novo nome de ícone 'gear' adicionado ao registro do Icon (icon.contract.json: 'cresce sob demanda de um consumidor real') — ActionCard é o primeiro consumidor real que precisa de um ícone de configuração; nenhum ícone existente no registro cobria esse caso.",
+    "AJUSTADO a pedido do usuário — ícone principal deixou de ter um fundo/badge colorido (quadrado com cantos arredondados + ícone branco dentro) e virou um ícone simples, colorido diretamente (sem caixa ao redor). Motivo explícito: 'os ícones na parte superior esquerda estão muito parecidos com botões, isso pode confundir os usuários'. O badge com fundo sólido tinha a MESMA linguagem visual de um botão iconOnly do harness (fundo colorido + cantos arredondados + ícone branco), então lia como clicável mesmo sendo só decorativo — removido o fundo, o ícone agora é só o glifo colorido (ou cinza, via iconTone='neutral', nova opção — 'podem ser coloridos ou não'), sem nenhuma affordance de botão.",
+    "AJUSTADO a pedido do usuário — novo par de props secondaryVariant/secondaryOutlined, pra viabilizar uma versão do ActionCard com DOIS botões reais no rodapé (não só botão principal + link secundário). secondaryVariant reaproveita o mesmo ButtonVariant de primaryVariant (nenhum enum novo) — default 'link' preserva o comportamento original (rodapé com botão sólido + texto em link), mas setar secondaryVariant='neutral' + secondaryOutlined=true reproduz exatamente o par 'Cancelar (contornado) / Confirmar (sólido)' que já é o padrão estabelecido nos Modals de confirmação do Datatable (ver datatable.contract.json) — ActionCard não inventou um layout novo de dois-botões, só passou a permitir o mesmo padrão já validado em outro lugar do harness.",
+    "AJUSTADO a pedido do usuário — as ações (botão principal + secundário, se houver) agora ficam SEMPRE ancoradas no fim do card, mesmo quando o card é esticado além da altura do próprio conteúdo (ex.: grid CSS com align-items:stretch padrão, cards vizinhos com mais conteúdo/mais alto na mesma linha). Pedido explícito: 'o botão ou os botões de ação devem ficar alinhados no bottom criando o espaço em branco entre o texto e o botão' — em vez do espaço extra sobrar embaixo dos botões (like antes). Implementado envolvendo TODO o conteúdo do card (cabeçalho até ações) num wrapper `display:flex; flex-direction:column; height:100%` dentro do Card, com `.actions { margin-top: auto; padding-top: espaco-m }` — o padding-top garante um espaçamento mínimo mesmo sem sobra de altura, e o margin-top:auto consome qualquer altura extra empurrando as ações pro fim. Confirmado no navegador via medição de posição (getBoundingClientRect): dois ActionCard na mesma linha da grade, um com menos conteúdo que o outro, com os botões alinhados no mesmo Y.",
+    "REVISADO — o ícone principal voltou a ter um círculo de fundo ao redor (que tinha sido removido no ajuste anterior por lembrar um botão), mas agora TRANSLÚCIDO/bem claro na mesma cor do ícone (acao-primaria-transparente/acao-destrutiva-transparente, os mesmos tokens de opacidade 10% já usados como estado 'transparente' das Ações do harness — reaproveitados aqui pela primeira vez fora do contexto de Button/interação), em vez de um fundo SÓLIDO com ícone branco por dentro. Pedido explícito do usuário: 'os ícones da esquerda estão muito sutis... crie uma div redonda ao redor dele, com a cor de fundo na mesma cor do ícone, só que bem clarinha'. Diferença chave que evita reintroduzir o problema anterior ('parece botão'): um fundo sólido + ícone branco imita a aparência de um botão iconOnly preenchido (alto contraste, convite a interação); um fundo translúcido claro com o ícone colorido por cima lê como um selo/indicador decorativo (baixo contraste entre fundo e ícone, sem a assinatura visual 'botão' do resto do harness). Ícone também aumentou de size='medium' (20px) pra size='large' (24px) e ganhou weight='bold' (era 'regular', o peso padrão do Icon) — pedido explícito 'deixe eles um pouquinho maior, com um peso levemente maior também'."
+  ],
+  "references": { "tokensFile": "tokens/tokens.json — Cores Semânticas (Ações/Primária, Ações/Destrutiva incluindo variantes -transparente, Fundos, Textos, Ícones), Estrutural (raio-xp/circular, foco-espessura, espaco-xp/p/m, icone-pequeno/grande), Tipografia Estilo (texto-m-forte, texto-p)" }
+}

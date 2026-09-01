@@ -1,0 +1,43 @@
+.group {
+  display: inline-flex;
+  padding: var(--espaco-xp);
+  background: var(--fundo-secundario);
+  border: 1px solid var(--borda-base);
+  border-radius: var(--raio-pp);
+  gap: var(--espaco-xp);
+}
+
+.groupDisabled {
+  opacity: 0.6;
+}
+
+.segment {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-xp);
+  padding: var(--espaco-xp) var(--espaco-pp);
+  background: none;
+  border: none;
+  border-radius: var(--raio-pp);
+  cursor: pointer;
+  color: var(--texto-secundario);
+  font-family: var(--texto-rotulo-botao-family);
+  font-size: var(--texto-rotulo-botao-size);
+  font-weight: var(--texto-rotulo-botao-weight);
+  line-height: var(--texto-rotulo-botao-line-height);
+}
+
+.segment:disabled {
+  color: var(--texto-inativo);
+  cursor: not-allowed;
+}
+
+.segment.selected {
+  background: var(--fundo-superficie);
+  color: var(--texto-primario);
+}
+
+.segment:focus-visible {
+  outline: var(--foco-espessura) solid var(--borda-foco);
+  outline-offset: 2px;
+}

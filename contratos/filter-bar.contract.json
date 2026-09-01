@@ -1,0 +1,61 @@
+{
+  "name": "FilterBar",
+  "originalName": "BarraDeFiltros",
+  "oneLiner": "Barra de busca + filtros livres + resumo dos filtros ativos (Chips removíveis) — a mesma necessidade que a toolbar da Datatable já resolve, mas pra qualquer lista/grade fora dela.",
+  "category": "action",
+  "status": "draft",
+  "whenToUse": "Topo de uma lista/grade (galeria, cards, resultados de busca) que precisa de busca textual e/ou filtros, fora do contexto de uma Datatable (que já tem sua própria toolbar embutida).",
+  "whenNotToUse": "Dentro de uma Datatable — ela já tem toolbar/busca/filtro por coluna embutidos, não deveria compor FilterBar por dentro; um único campo de busca isolado sem mais filtros (nesse caso, um TextField com leftIcon='magnifying-glass' direto já resolve, sem precisar do FilterBar inteiro)."
+  ,
+  "anatomy": [
+    "Linha principal — campo de busca opcional (reaproveita TextField, leftIcon='magnifying-glass') + slot livre (filters) pra qualquer controle de filtro (Select, DatePicker, SegmentedControl, etc.)",
+    "Linha de filtros ativos — só aparece quando activeFilters não está vazio: um Chip removível por filtro ativo + link 'Limpar tudo'"
+  ],
+  "dependencies": ["TextField", "Chip"],
+  "props": [
+    { "name": "searchValue", "type": "string", "required": false, "description": "Valor do campo de busca. Presença de onSearchChange decide se o campo aparece (ver decisions)." },
+    { "name": "onSearchChange", "type": "function", "required": false, "description": "Assinatura (value: string) => void. Ausente = sem campo de busca nesta FilterBar." },
+    { "name": "searchPlaceholder", "type": "string", "required": false, "default": "Buscar...", "description": "Placeholder do campo de busca." },
+    { "name": "filters", "type": "node", "required": false, "description": "Slot livre pra controles de filtro — FilterBar não sabe nem decide o que tem dentro (mesmo padrão de toolbarActions da Datatable)." },
+    { "name": "activeFilters", "type": "array", "required": false, "description": "Array de { key: string, label: string } — um Chip removível por filtro ativo, resumindo o que está aplicado (ex.: { key: 'status', label: \"Status: Ativo\" })." },
+    { "name": "onRemoveFilter", "type": "function", "required": false, "description": "Assinatura (key: string) => void, chamado ao remover um Chip de activeFilters." },
+    { "name": "onClearAll", "type": "function", "required": false, "description": "Assinatura () => void. Quando fornecida junto de activeFilters não-vazio, mostra o link 'Limpar tudo'." },
+    { "name": "accessibleLabel", "type": "string", "required": false, "default": "Filtros", "description": "Nome acessível da barra inteira (role=search quando há campo de busca, senão role=group)." }
+  ],
+  "variants": [],
+  "states": ["default"],
+  "tokensAllowed": {
+    "background": ["semantic.fundo-superficie"],
+    "border": ["semantic.borda-base"],
+    "text": ["semantic.texto-secundario", "semantic.acao-link-texto"],
+    "spacing": ["structural.espaco-xp", "structural.espaco-pp", "structural.espaco-p", "structural.espaco-m"],
+    "typography": ["type-style.texto-p", "type-style.texto-rotulo-botao"]
+  },
+  "a11y": {
+    "role": "role='search' no container quando onSearchChange está presente (landmark de busca), senão role='group' — mesma distinção semântica que outros componentes já fazem conforme a combinação de props presentes.",
+    "requiredAria": ["aria-label na barra (accessibleLabel)", "cada Chip de activeFilters já carrega seu próprio aria-label de remoção (herdado do átomo Chip)", "'Limpar tudo' é um botão/link real, nunca só texto clicável via onClick num <span>"],
+    "keyboard": ["Tab navega pelo campo de busca, pelos filtros (ordem definida por quem consome via filters) e pelos Chips de activeFilters, na ordem natural do DOM", "cada Chip removível segue o próprio padrão de teclado do átomo Chip"],
+    "contrastMin": "AA pro texto 'Limpar tudo' e labels dos Chips, mesma régua do resto do harness.",
+    "notes": "FilterBar não sabe filtrar nada sozinha — só orquestra a apresentação (busca + filtros livres + resumo). A lógica de filtragem de verdade é sempre responsabilidade de quem consome, aplicada aos dados por fora."
+  },
+  "events": { "status": "não definido no contrato original" },
+  "composition": {
+    "canContain": ["TextField", "Chip", "qualquer controle de filtro via filters (Select, DatePicker, SegmentedControl, Slider, etc.)"],
+    "canBeContainedBy": ["páginas", "cards", "topo de galerias/grades de resultado"],
+    "doNotCombine": ["FilterBar dentro de Datatable — ela já tem sua própria toolbar/busca/filtro por coluna"]
+  },
+  "forbidden": [
+    "renderizar o campo de busca quando onSearchChange não foi fornecida",
+    "renderizar a linha de filtros ativos quando activeFilters está vazio/ausente",
+    "FilterBar decidir/aplicar a lógica de filtragem sozinha — só apresentação, mesmo racional de onExport da Datatable",
+    "cor fora da whitelist de tokensAllowed"
+  ],
+  "decisions": [
+    "Campo de busca é opt-in via presença de onSearchChange — mesmo padrão já usado em Datatable pra bulkActions/toolbarActions e em DatePicker/TimePicker pro seletor de itens: a prop decide SE aquele pedaço da UI aparece, sem um boolean redundante tipo showSearch.",
+    "filters é um slot livre (ReactNode), não um array de configuração tipado — diferente de Tabs/Select (que usam array de dados porque a estrutura é rígida), aqui cada filtro pode ser QUALQUER controle do harness (Select, DatePicker, SegmentedControl, Slider...) com props totalmente diferentes entre si; forçar uma API de configuração unificada pra isso seria mais complexo que só deixar o consumidor compor livremente (mesmo racional de toolbarActions/bulkActions da Datatable).",
+    "activeFilters é só um RESUMO visual (Chips) do que está aplicado, não a fonte da verdade dos filtros — quem consome já sabe quais filtros estão ativos (é o próprio estado que alimenta filters); FilterBar só recebe esse resumo já pronto pra exibir, sem inferir sozinha o que mudou.",
+    "'Limpar tudo' só aparece quando onClearAll é fornecida E activeFilters não está vazio — dupla condição evita mostrar um link 'Limpar tudo' que não faz nada (sem onClearAll) ou que aparece sem nenhum filtro pra limpar.",
+    "FilterBar nunca sabe filtrar nada sozinha — é só apresentação (busca + slot livre + resumo); a filtragem de verdade nos dados é sempre responsabilidade de quem consome, aplicada por fora, mesmo racional de onExport/sortMode/paginationMode da Datatable delegarem a operação real pro consumidor."
+  ],
+  "references": { "tokensFile": "tokens/tokens.json — Cores Semânticas (Fundos, Bordas, Textos, Ação Link), Estrutural (espaco-xp/pp/p/m), Tipografia Estilo (texto-p, texto-rotulo-botao)" }
+}

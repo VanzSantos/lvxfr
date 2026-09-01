@@ -1,0 +1,114 @@
+.dialog {
+  padding: 0;
+  border: 1px solid var(--borda-base);
+  border-radius: var(--raio-pp);
+  box-sizing: border-box;
+  max-height: min(85vh, 720px);
+  overflow: hidden;
+  background: var(--fundo-superficie);
+  color: var(--texto-primario);
+}
+
+/* display só entra quando o <dialog> está de fato aberto (atributo [open],
+   ligado pelo showModal()/close() nativos). Aplicar display:flex incondicional
+   na .dialog sobrescreve a regra padrão do navegador "dialog:not([open]) {
+   display: none }" — como CSS de autor sempre vence o do user-agent, o modal
+   ficaria visível (fora do top-layer, mal posicionado) mesmo fechado. Mesmo
+   bug já documentado e corrigido no ContractDialog interno do Playground. */
+.dialog[open] {
+  display: flex;
+  flex-direction: column;
+}
+
+.dialog::backdrop {
+  background: var(--fundo-sobreposicao);
+}
+
+/* Tamanho (largura) — nomes de classe deliberadamente distintos de
+   padding-small/medium/large abaixo, que controlam uma coisa diferente
+   (espaçamento interno) em outro elemento (.content, não .dialog). Reusar
+   os mesmos nomes de classe pros dois faria uma única regra CSS aplicar
+   width E padding em qualquer elemento com aquela classe. */
+.small {
+  width: min(400px, calc(100vw - var(--espaco-g) * 2));
+}
+
+.medium {
+  width: min(560px, calc(100vw - var(--espaco-g) * 2));
+}
+
+.large {
+  width: min(720px, calc(100vw - var(--espaco-g) * 2));
+}
+
+/* Padding — mesma escala e mesmos tokens do Card (contratos/card.contract.json),
+   aplicada como UMA padding só ao redor do cabeçalho+corpo juntos, não duas
+   paddings independentes. */
+.content {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-m);
+  overflow: hidden;
+}
+
+.padding-small {
+  padding: var(--espaco-p);
+}
+
+.padding-medium {
+  padding: var(--espaco-g);
+}
+
+.padding-large {
+  padding: var(--espaco-gg);
+}
+
+/* Cabeçalho sem divisória — decisão explícita do usuário, cabeçalho e corpo
+   formam uma superfície visualmente contínua. */
+.header {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--espaco-m);
+}
+
+.title {
+  flex: 1;
+  margin: 0;
+  font-family: var(--texto-m-forte-family);
+  font-size: var(--texto-m-forte-size);
+  font-weight: var(--texto-m-forte-weight);
+  line-height: var(--texto-m-forte-line-height);
+  color: var(--texto-primario);
+}
+
+.closeButton {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: none;
+  border: none;
+  border-radius: var(--raio-xp);
+  cursor: pointer;
+}
+
+.closeButton:hover {
+  background: var(--fundo-secundario);
+}
+
+.closeButton:focus-visible {
+  outline: var(--foco-espessura) solid var(--borda-foco);
+  outline-offset: 1px;
+}
+
+.body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}

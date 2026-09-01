@@ -1,0 +1,116 @@
+.alert {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--espaco-pp);
+  padding: var(--espaco-m);
+  border: 1px solid transparent;
+  border-radius: var(--raio-pp);
+  box-sizing: border-box;
+}
+
+.content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-xp);
+}
+
+.title {
+  font-family: var(--texto-m-forte-family);
+  font-size: var(--texto-m-forte-size);
+  font-weight: var(--texto-m-forte-weight);
+  line-height: var(--texto-m-forte-line-height);
+}
+
+.descriptionRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--espaco-m);
+}
+
+.description {
+  min-width: 0;
+  font-family: var(--texto-m-family);
+  font-size: var(--texto-m-size);
+  font-weight: var(--texto-m-weight);
+  line-height: var(--texto-m-line-height);
+}
+
+.action {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  padding: 0;
+  color: currentColor;
+  text-decoration: underline;
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: var(--texto-m-forte-family);
+  font-size: var(--texto-m-forte-size);
+  font-weight: var(--texto-m-forte-weight);
+  line-height: var(--texto-m-forte-line-height);
+}
+
+.action:focus-visible {
+  outline: var(--foco-espessura) solid var(--borda-foco);
+  outline-offset: 2px;
+  border-radius: var(--raio-xp);
+}
+
+.dismissButton {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: none;
+  border: none;
+  border-radius: var(--raio-xp);
+  cursor: pointer;
+}
+
+.dismissButton:hover {
+  background: color-mix(in srgb, currentColor 10%, transparent);
+}
+
+.dismissButton:focus-visible {
+  outline: var(--foco-espessura) solid var(--borda-foco);
+  outline-offset: 1px;
+}
+
+/* Contorno suavizado via color-mix (mistura a cor forte da borda com o
+   próprio fundo tintado do intent) em vez da cor de borda "crua" — mesmo
+   tom, bem menos saturado. Pedido explícito do usuário ("cores genéricas
+   demais"), sem introduzir nenhum token de cor novo. */
+.info {
+  background: var(--fundo-info);
+  border-color: color-mix(in srgb, var(--borda-info) 35%, var(--fundo-info));
+  color: var(--texto-info);
+}
+
+.success {
+  background: var(--fundo-sucesso);
+  border-color: color-mix(in srgb, var(--borda-sucesso) 35%, var(--fundo-sucesso));
+  color: var(--texto-sucesso);
+}
+
+.warning {
+  background: var(--fundo-aviso);
+  border-color: color-mix(in srgb, var(--borda-aviso) 35%, var(--fundo-aviso));
+  color: var(--texto-aviso);
+}
+
+.error {
+  background: var(--fundo-erro);
+  border-color: color-mix(in srgb, var(--borda-erro) 35%, var(--fundo-erro));
+  color: var(--texto-erro);
+}
+
+.neutral {
+  background: var(--fundo-secundario);
+  border-color: var(--borda-base);
+  color: var(--texto-primario);
+}

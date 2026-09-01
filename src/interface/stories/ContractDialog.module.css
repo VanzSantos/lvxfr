@@ -1,0 +1,82 @@
+.dialog {
+  width: min(720px, calc(100vw - var(--espaco-g) * 2));
+  max-height: min(80vh, 720px);
+  padding: 0;
+  border: 1px solid var(--borda-base);
+  border-radius: var(--raio-pp);
+  box-sizing: border-box;
+  /* o dialog em si nunca rola — só o .code, mais abaixo */
+  overflow: hidden;
+}
+
+/* display só entra quando o <dialog> está de fato aberto (atributo [open],
+   ligado pelo showModal()/close() nativos). Aplicar display:flex incondicional
+   na .dialog sobrescreve a regra padrão do navegador "dialog:not([open]) {
+   display: none }" — como CSS de autor sempre vence o do user-agent, o modal
+   ficava visível (fora do top-layer, mal posicionado) mesmo fechado. Bug real
+   relatado: aparecia fixo no fim de toda página. */
+.dialog[open] {
+  display: flex;
+  flex-direction: column;
+}
+
+.dialog::backdrop {
+  background: var(--fundo-sobreposicao);
+}
+
+.header {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espaco-m);
+  padding: var(--espaco-pp) var(--espaco-m);
+  border-bottom: 1px solid var(--borda-base);
+  background: var(--fundo-secundario);
+}
+
+.fileName {
+  font-family: "SF Mono", Menlo, Consolas, monospace;
+  font-size: 13px;
+  color: var(--texto-primario);
+}
+
+.closeButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  border-radius: var(--raio-xp);
+  color: var(--texto-secundario);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.closeButton:hover {
+  background: var(--fundo-superficie);
+}
+
+.closeButton:focus-visible {
+  outline: var(--foco-espessura) solid var(--borda-foco);
+  outline-offset: 1px;
+}
+
+.code {
+  flex: 1;
+  /* crítico: sem isso, um filho flex nunca encolhe além do conteúdo e o
+     scroll acaba subindo pro .dialog em vez de ficar só aqui dentro */
+  min-height: 0;
+  margin: 0;
+  padding: var(--espaco-m);
+  overflow: auto;
+  font-family: "SF Mono", Menlo, Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--texto-primario);
+  background: var(--fundo-superficie);
+}

@@ -1,0 +1,25 @@
+/* AJUSTADO a pedido do usuário — font-family/font-size explícitos aqui.
+   BUG real: o painel é renderizado via FloatingPortal (fora da árvore de DOM
+   estilizada do app, direto num nó solto no fim do <body>) — conteúdo livre
+   (`content`) que dependesse de `font: inherit`/herança normal de CSS caía
+   pra fonte padrão do navegador, NÃO a fonte do resto da interface, já que
+   html/body não define font-family nenhuma (cada componente declara a
+   própria, ver base.css). Mesmo racional do fix de cor em base.css, aplicado
+   aqui pra fonte: dá um valor padrão sensato pra qualquer conteúdo livre
+   dentro do popover, sem precisar que cada consumidor lembre de declarar
+   font-family manualmente no próprio conteúdo. */
+.popover {
+  z-index: 1000;
+  background: var(--fundo-superficie);
+  border: 1px solid var(--borda-base);
+  border-radius: var(--raio-pp);
+  box-shadow: var(--sombra-p);
+  padding: var(--espaco-pp);
+  font-family: var(--texto-p-family);
+  font-size: var(--texto-p-size);
+}
+
+.dark {
+  background: var(--fundo-invertido);
+  border-color: var(--fundo-invertido);
+}

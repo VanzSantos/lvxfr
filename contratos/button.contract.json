@@ -1,0 +1,86 @@
+{
+  "name": "Button",
+  "originalName": "Botao",
+  "oneLiner": "Dispara uma ação do usuário, com hierarquia visual definida pela variante.",
+  "category": "action",
+  "status": "draft",
+  "whenToUse": "Usuário precisa executar uma ação (enviar, confirmar, cancelar, navegar por ação).",
+  "whenNotToUse": "Destino é navegação entre páginas por hyperlink puro — nesse caso use variant='link', que existe justamente pra fronteira entre ação e navegação.",
+  "anatomy": ["Container (fundo, borda, raio)", "Ícone esquerdo (opcional)", "Rótulo / label (texto)", "Ícone direito (opcional)", "Spinner de carregamento — substitui o conteúdo quando state=loading"],
+  "dependencies": ["Icon", "Spinner"],
+  "props": [
+    { "name": "variant", "type": "enum", "enum": ["primary", "secondary", "neutral", "subtle", "destructive", "link"], "default": "primary", "required": true },
+    { "name": "outlined", "type": "boolean", "default": false, "required": false, "description": "false = preenchido. true = contornado (borda + fundo transparente em repouso). Inválido com variant='subtle' — erro em tempo de execução (ver forbidden e decisions)." },
+    { "name": "state", "type": "enum", "enum": ["default", "hover", "pressed", "disabled", "loading"], "default": "default", "required": false, "description": "hover/pressed normalmente vêm de eventos reais (mouse/teclado); a prop só força um valor pontual para Storybook/testes. disabled/loading sempre vêm da prop." },
+    { "name": "showLabel", "type": "boolean", "default": true, "required": false, "description": "false só é válido em modo iconOnly." },
+    { "name": "label", "type": "string", "required": false, "description": "Texto do rótulo." },
+    { "name": "leftIcon", "type": "string", "required": false, "description": "Nome do ícone (não boolean — decisão corrigida: precisa saber QUAL ícone, não só se existe)." },
+    { "name": "rightIcon", "type": "string", "required": false },
+    { "name": "iconOnly", "type": "boolean", "default": false, "required": false },
+    { "name": "fullWidth", "type": "boolean", "default": false, "required": false },
+    { "name": "accessibleLabel", "type": "string", "required": false, "requiredWhen": "iconOnly = true", "description": "Ausência tratada como erro em tempo de execução." },
+    { "name": "onPress", "type": "function", "required": false, "description": "Handler único que funciona em web e React Native (não onClick)." },
+    { "name": "type", "type": "enum", "enum": ["button", "submit"], "default": "button", "required": false, "description": "Adicionado após o contrato original não prever formulários: atributo nativo do <button> HTML, necessário pra permitir submit (Enter no campo aciona o botão). Só existe na implementação web — Pressable do React Native não tem esse conceito." }
+  ],
+  "variants": ["primary", "secondary", "neutral", "subtle", "destructive", "link"],
+  "states": ["default", "hover", "pressed", "disabled", "loading"],
+  "tokensAllowed": {
+    "background": [
+      "semantic.acao-primaria", "semantic.acao-primaria-sobreposta", "semantic.acao-primaria-pressionada", "semantic.acao-primaria-transparente",
+      "semantic.acao-secundaria", "semantic.acao-secundaria-sobreposta", "semantic.acao-secundaria-pressionada", "semantic.acao-secundaria-transparente",
+      "semantic.acao-neutra", "semantic.acao-neutra-sobreposta", "semantic.acao-neutra-pressionada", "semantic.acao-neutra-transparente",
+      "semantic.acao-sutil", "semantic.acao-sutil-sobreposta", "semantic.acao-sutil-pressionada", "semantic.acao-sutil-transparente",
+      "semantic.acao-destrutiva", "semantic.acao-destrutiva-sobreposta", "semantic.acao-destrutiva-pressionada", "semantic.acao-destrutiva-transparente",
+      "semantic.acao-link", "semantic.acao-inativa", "semantic.acao-carregando", "transparent (palavra-chave CSS — 'Base/transparente' é primitiva, não exposta pelo pipeline de tokens)"
+    ],
+    "text": [
+      "semantic.acao-primaria-texto", "semantic.acao-secundaria-texto", "semantic.acao-neutra-texto", "semantic.acao-sutil-texto", "semantic.acao-destrutiva-texto",
+      "semantic.acao-link-texto", "semantic.acao-link-texto-sobreposto", "semantic.acao-inativa-texto", "semantic.acao-carregando-texto"
+    ],
+    "radius": ["structural.raio-pp"],
+    "focusRing": ["structural.foco-espessura"],
+    "spacing": ["structural.espaco-xp", "structural.espaco-pp", "structural.espaco-m"],
+    "iconSize": ["structural.icone-medio"],
+    "typography": ["type-style.texto-rotulo-botao"]
+  },
+  "variantTokenMap": {
+    "note": "Determinismo extra: tabela de tradução variant→sufixo do token (nomes de token concordam em feminino: 'primaria', 'secundaria', 'neutra', 'destrutiva'; valores de prop concordam em masculino: 'primary'→acao-primaria). Não assumir que o nome da prop bate direto com o token.",
+    "primary": "acao-primaria", "secondary": "acao-secundaria", "neutral": "acao-neutra", "subtle": "acao-sutil", "destructive": "acao-destrutiva", "link": "acao-link"
+  },
+  "a11y": {
+    "role": "button nativo (<button> web / Pressable React Native)",
+    "requiredAria": ["aria-label quando iconOnly=true", "aria-busy quando state=loading"],
+    "keyboard": ["Enter e Espaço ativam", "disabled sai da ordem de tabulação", "loading permanece focável — diferente de disabled, o contrato não pede sair do foco durante carregamento"],
+    "contrastMin": "AAA (7:1) como meta pro público 60+, não só o mínimo AA (4.5:1) — ver decisions pro resultado por variante, medido contra branco.",
+    "notes": "Não-negociável — reforçado pelo público-alvo 60+. Indicador de foco sempre visível, nunca removido sem substituto. Alvo de toque com área mínima adequada, atenção redobrada no modo iconOnly."
+  },
+  "events": { "status": "não definido no contrato original" },
+  "composition": {
+    "canContain": ["Icon", "Spinner"],
+    "canBeContainedBy": ["barras de ação", "formulários", "modais", "cards"],
+    "doNotCombine": ["não aninhar Button dentro de Button — para grupos de ação, usar um container de ações (fora deste harness)"]
+  },
+  "forbidden": [
+    "cor crua ou token fora da variantTokenMap para a variante ativa",
+    "usar onClick em vez de onPress",
+    "loading usando o atributo disabled nativo — loading só bloqueia o clique via handler + aria-busy, mantém focável; disabled usa disabled nativo de verdade e sai da tabulação",
+    "iconOnly sem accessibleLabel",
+    "outlined=true com variant='subtle' — nenhum tom da família 'sutil' é ao mesmo tempo legível (AA/AAA contra branco) e distinto o bastante do neutral outlined (mínimo de 3:1 entre os dois); usar variant='neutral' outlined nesse caso. Erro em tempo de execução, ver decisions.",
+    "novo estado/variante fora das listas acima sem atualizar este contrato primeiro"
+  ],
+  "decisions": [
+    "outlined: o preenchimento 10% (*-transparente) aparece só no hover, nunca em repouso.",
+    "Tipo 'neutral' inverte direção entre temas (escuro no Claro que clareia ao interagir; claro no Escuro que escurece) — já resolvido nos tokens, componente só consome.",
+    "leftIcon/rightIcon viraram nome do ícone (string), não boolean — corrigido do contrato original para evitar o estado inválido 'true mas sem saber qual ícone'.",
+    "Altura fixa 44px (não é token — mesma altura do TextField, para alinhar botões e campos em formulários).",
+    "Ícone e rótulo sempre no tamanho 'medium' do Icon (~20px), alinhado à altura de 44px do TextField.",
+    "Contraste do outlined revisto: borda/texto usam o tom '-pressionada'/'-sobreposta' em vez do tom base, exceto neutral e link (que servem de referência e não mudam).",
+    "AUDITORIA DE CONTRASTE (WCAG, medido contra fundo branco, motivada por relato de que subtle-outlined estava ilegível): primary-outlined 9.26:1 (AAA), secondary-outlined 3.25:1 com '-sobreposta' — falhava até o AA de texto (4.5:1) — corrigido pra '-pressionada' (5.23:1, AA; não alcança AAA porque é um verde-amarelado, hue com luminância alta mesmo escurecido — é o tom mais escuro que a família secundária tem), neutral-outlined 17.74:1 (AAA), destructive-outlined 8.10:1 (AAA), subtle-outlined tinha 1.47:1 (acao-sutil-pressionada, cinza-300 — praticamente invisível).",
+    "RESOLVIDO — outlined=true com variant='subtle' foi REMOVIDO (não é mais uma combinação válida; Button lança erro em tempo de execução se for usada). Tentativa anterior: usar semantic.texto-secundario (cinza-600, 7.56:1 contra branco, AAA) pro texto/borda, no lugar de acao-sutil-pressionada (cinza-300, 1.47:1, ilegível). Mas medir o contraste ENTRE os dois botões (não cada um contra o branco) mostrou só 2.35:1 de diferença — abaixo do mínimo de 3:1 que o WCAG pede pra distinguir componentes de UI entre si (SC 1.4.11), confirmado visualmente por revisão humana. Testada a régua de cinza inteira: cinza-500 chega a 3.67:1 de distinção do neutral mas só 4.83:1 contra branco (AA, não AAA); cinza-400 tem 6.99:1 de distinção mas só 2.54:1 contra branco (reprovado até no AA). Não existe tom na paleta atual que seja simultaneamente legível o bastante e distinto o bastante do neutral — é uma limitação estrutural da família 'sutil' (só tem tons claros de fundo, cinza-100/200/300; o único tom escuro nativo, acao-sutil-texto/cinza-900, é idêntico ao neutral). subtle continua existindo normalmente como variante preenchida, onde a diferença de fundo (cinza-100 claro vs. quase-preto do neutral) já é bem distinta.",
+    "Combinações válidas de ícone+label (não são variantes novas, são os estados já previstos nas props leftIcon/rightIcon/showLabel/iconOnly): (1) só label; (2) ícone esquerda + label; (3) ícone direita + label; (4) ícone esquerda + label + ícone direita; (5) iconOnly=true — visualmente só o ícone, mas accessibleLabel é obrigatório e funciona como o 'label' pra leitor de tela (ausência já é erro em tempo de execução, ver forbidden).",
+    "type ('button'/'submit') adicionado retroativamente — só web, sinalizado em vez de decidido em silêncio.",
+    "RESOLVIDO — spinner de state=loading extraído para o átomo Spinner (contratos/spinner.contract.json). Button consome com size='medium' (structural.icone-medio, 20px — antes eram 16px fixos sem token, inconsistente com o tamanho que leftIcon/rightIcon já usam) e color='var(--acao-carregando-texto)' explícito (antes herdava via currentColor implícito, prática que o próprio Icon já proíbe). decorative=true porque o <button> já expõe aria-busy — Spinner com role='status' próprio duplicaria o anúncio pro leitor de tela.",
+    "AJUSTADO a pedido do usuário (modo escuro) — o papel visual de variant='neutral' e variant='subtle' se INVERTE no tema escuro, só nos VALORES dos tokens (semantic.acao-neutra/acao-sutil), sem nenhuma mudança de código/CSS em Button: 'a variante neutral preenchido deve ter o fundo bem mais claro e as letras escuras' — acao-neutra virou um cinza quase-branco (#e5e4e1) com acao-neutra-texto escuro (#111827) só no dark override; no claro continuam #111827/branco, sem mudança. 'a variante subtle preenchido, precisa do fundo apenas um nível mais claro' (que a página, não tão claro quanto o neutral) — acao-sutil virou #3a3937 (um degrau acima de fundo-secundario) só no escuro. 'a variante neutral outlined precisa que tanto o texto, quanto a borda e os ícones sejam bem claros, quase brancos' — resolvido de graça pela MESMA troca de acao-neutra: outlined.neutral reaproveita a variável diretamente pra border-color E --btn-text (nenhum token extra), então virando #e5e4e1 no escuro, ficou automaticamente 'quase branco' nos três (texto/borda/ícone, que usa --btn-text via textColorVar no Button.tsx) sem precisar de nenhuma lógica nova no componente."
+  ],
+  "references": { "tokensFile": "tokens/tokens.json — Cores Semânticas (grupo Ações, todas as famílias), Estrutural (raio-pp, foco-espessura, espaco-*, icone-medio), Tipografia Estilo (texto-rotulo-botao)" }
+}

@@ -1,0 +1,260 @@
+{
+  "name": "TimePicker",
+  "originalName": "SeletorDeHorario",
+  "oneLiner": "Campo de texto que abre um popover com duas colunas roláveis (hora/minuto) — horário único ou intervalo (início/fim, como dois campos independentes, mesmo padrão do DatePicker).",
+  "category": "data-entry",
+  "status": "draft",
+  "whenToUse": "Formulário precisa capturar um horário (ou um intervalo de horários), digitado (com máscara automática) ou selecionado — ex.: horário de um compromisso, janela de atendimento.",
+  "whenNotToUse": "Selecionar data (isso é DatePicker); selecionar data E hora juntas (isso é DateTimePicker, que reaproveita DatePicker + TimePicker); granularidade de segundos (fora de escopo desta v1 — ver decisions).",
+  "anatomy": [
+    "Campo único — FieldLabel opcional + trigger com Icon 'clock' à esquerda (opcional, ver showIcon) + <input type='text'> com máscara automática 'HH:MM' (só dígitos aceitos, separador ':' inserido sozinho) + Icon caret-down decorativo à direita (só quando showPicker) + HelperText opcional",
+    "Popover (via @floating-ui, FloatingPortal, só quando showPicker=true) ancorado no campo — duas colunas roláveis lado a lado: Hora (00–23) e Minuto (00–59, incrementado por step), cada uma com um cabeçalho fixo (texto 'Hora'/'Min', texto-micro-forte, fundo levemente diferenciado) e opções em botões circulares (raio-circular); a opção selecionada vira um chip preenchido (semantic.acao-primaria); popover com borda + sombra (structural.sombra-p) pra elevação visual consistente com os outros popovers do harness; selecionar aqui também preenche o campo de texto",
+    "Modo range — dois campos independentes (Início/Fim), cada um com seu próprio campo+popover, mesmo padrão do DatePicker"
+  ],
+  "dependencies": [
+    "FieldLabel",
+    "HelperText",
+    "Icon"
+  ],
+  "props": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": false,
+      "description": "Rótulo do campo (ou dos dois campos no modo range, prefixado por startLabel/endLabel)."
+    },
+    {
+      "name": "required",
+      "type": "boolean",
+      "required": false,
+      "default": false,
+      "description": "Repassado pro FieldLabel."
+    },
+    {
+      "name": "withInfo",
+      "type": "boolean",
+      "required": false,
+      "default": false,
+      "description": "Repassado pro FieldLabel."
+    },
+    {
+      "name": "infoText",
+      "type": "string",
+      "required": false,
+      "description": "Texto do tooltip de informação, junto com withInfo."
+    },
+    {
+      "name": "state",
+      "type": "enum",
+      "enum": [
+        "default",
+        "error",
+        "disabled"
+      ],
+      "default": "default",
+      "required": false,
+      "description": "Mesmo enum de TextField/Select/DatePicker."
+    },
+    {
+      "name": "helperText",
+      "type": "string",
+      "required": false,
+      "description": "Texto de apoio/erro abaixo do campo."
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "required": false,
+      "description": "Nome pra integração com formulários nativos."
+    },
+    {
+      "name": "step",
+      "type": "number",
+      "required": false,
+      "default": 5,
+      "description": "Incremento (em minutos) da coluna de minutos — ex.: 5 mostra 00,05,10...55; 15 mostra 00,15,30,45."
+    },
+    {
+      "name": "minTime",
+      "type": "string",
+      "required": false,
+      "description": "Horário ISO 'HH:MM' mínimo selecionável (inclusive)."
+    },
+    {
+      "name": "maxTime",
+      "type": "string",
+      "required": false,
+      "description": "Horário ISO 'HH:MM' máximo selecionável (inclusive)."
+    },
+    {
+      "name": "placeholder",
+      "type": "string",
+      "required": false,
+      "default": "HH:MM",
+      "description": "Texto do campo quando vazio — mudou de 'Selecione um horário' pra 'HH:MM' junto com a digitação mascarada."
+    },
+    {
+      "name": "range",
+      "type": "boolean",
+      "required": false,
+      "default": false,
+      "description": "false (padrão) = campo único, value é 'HH:MM' ou null. true = dois campos (início/fim), value é { start, end }. Mesmo padrão de discriminated union do DatePicker."
+    },
+    {
+      "name": "showPicker",
+      "type": "boolean",
+      "required": false,
+      "default": true,
+      "description": "true (padrão) = campo abre o popover com as colunas Hora/Minuto ao focar/clicar, além de aceitar digitação. false = campo vira só-digitação: nunca abre popover, sem o ícone caret-down decorativo, sem aria-haspopup/aria-expanded. Mesma prop e racional do DatePicker/DateTimePicker."
+    },
+    {
+      "name": "showIcon",
+      "type": "boolean",
+      "required": false,
+      "default": true,
+      "description": "true (padrão) = mostra o Icon 'clock' fixo à esquerda do campo. false = campo sem esse ícone. Mesma prop e racional do DatePicker/DateTimePicker."
+    },
+    {
+      "name": "value",
+      "type": "string",
+      "required": true,
+      "description": "Modo único: horário 'HH:MM' ou null. Modo range: { start, end } (cada um 'HH:MM' ou null). 100% controlado."
+    },
+    {
+      "name": "onChange",
+      "type": "function",
+      "required": true,
+      "description": "Modo único: (value: string) => void. Modo range: (value: { start: string|null, end: string|null }) => void."
+    },
+    {
+      "name": "startLabel",
+      "type": "string",
+      "required": false,
+      "default": "Início",
+      "description": "Só no modo range."
+    },
+    {
+      "name": "endLabel",
+      "type": "string",
+      "required": false,
+      "default": "Fim",
+      "description": "Só no modo range."
+    }
+  ],
+  "variants": [
+    "single",
+    "range"
+  ],
+  "states": [
+    "default",
+    "error",
+    "disabled",
+    "open"
+  ],
+  "tokensAllowed": {
+    "background": [
+      "semantic.fundo-superficie",
+      "semantic.fundo-secundario",
+      "semantic.acao-primaria",
+      "semantic.fundo-campo"
+    ],
+    "border": [
+      "semantic.borda-base",
+      "semantic.borda-erro",
+      "semantic.borda-inativo",
+      "semantic.borda-foco"
+    ],
+    "text": [
+      "semantic.texto-primario",
+      "semantic.texto-secundario",
+      "semantic.texto-placeholder",
+      "semantic.texto-inativo",
+      "semantic.acao-primaria-texto"
+    ],
+    "iconColor": [
+      "semantic.icone-secundario",
+      "semantic.icone-inativo"
+    ],
+    "radius": [
+      "structural.raio-pp",
+      "structural.raio-p",
+      "structural.raio-circular"
+    ],
+    "focusRing": [
+      "structural.foco-espessura"
+    ],
+    "spacing": [
+      "structural.espaco-xp",
+      "structural.espaco-pp",
+      "structural.espaco-p",
+      "structural.espaco-m"
+    ],
+    "typography": [
+      "type-style.texto-m",
+      "type-style.texto-p",
+      "type-style.texto-micro-forte"
+    ],
+    "shadow": [
+      "structural.sombra-p"
+    ]
+  },
+  "a11y": {
+    "role": "campo é um <input type='text'> normal (não mais um <button>) com aria-haspopup=\"dialog\" e aria-expanded (mesmo padrão de DatePicker); o popover tem role=\"dialog\" com aria-label; cada coluna (Hora/Minuto) tem aria-label próprio ('Hora'/'Minuto') e cada opção é um <button> com aria-pressed no valor selecionado.",
+    "requiredAria": [
+      "aria-haspopup=\"dialog\" e aria-expanded no campo",
+      "aria-describedby do campo apontando pro HelperText quando presente",
+      "role=\"dialog\" no popover com aria-label",
+      "aria-pressed em cada opção de hora/minuto (true só na selecionada)",
+      "inputMode=\"numeric\" no campo"
+    ],
+    "keyboard": [
+      "digitar no campo aplica a máscara automaticamente; focar o campo já abre o popover (useFocus, além de useClick)",
+      "Esc fecha sem alterar value (useDismiss, mesmo padrão de DatePicker/Select)",
+      "Tab navega pelas opções de hora e minuto na ordem normal do DOM — sem roving tabindex nesta v1 (mesma classe de simplificação já usada em Accordion/Calendar/Stepper)"
+    ],
+    "contrastMin": "AA pro texto do gatilho e das opções, mesma régua de TextField/Select/DatePicker.",
+    "notes": "Diferente do DatePicker (que fecha ao selecionar o único valor possível — um dia), o popover do TimePicker só fecha por dismiss (clique fora/Esc) — hora e minuto são duas escolhas separadas, fechar automaticamente na primeira (ex.: só a hora) obrigaria reabrir pra escolher o minuto."
+  },
+  "events": {
+    "status": "não definido no contrato original"
+  },
+  "composition": {
+    "canContain": [
+      "Icon"
+    ],
+    "canBeContainedBy": [
+      "formulários",
+      "páginas",
+      "cards",
+      "DateTimePicker (fora deste contrato, reaproveita TimePicker ao lado de DatePicker)"
+    ],
+    "doNotCombine": [
+      "TimePicker dentro de TimePicker",
+      "usar range=true só pra manter um único horário — nesse caso é mais simples usar range=false"
+    ]
+  },
+  "forbidden": [
+    "abrir o popover quando state='disabled'",
+    "no modo range, permitir escolher fim antes de início (o campo 'Fim' aplica minTime = value.start automaticamente quando início já existe)",
+    "granularidade de segundos nesta v1 (só HH:MM)",
+    "cor fora da whitelist de tokensAllowed",
+    "reimplementar Icon inline pro caret do gatilho"
+  ],
+  "decisions": [
+    "Duas colunas roláveis (Hora 00–23 / Minuto 00–59 por step) em vez de uma lista única de horários pré-combinados (ex.: '08:00', '08:30', '09:00'...) — colunas separadas cobrem qualquer combinação real (inclusive minTime/maxTime cortando ambas as pontas) sem precisar gerar e rolar uma lista potencialmente longa de combinações prontas.",
+    "Popover NÃO fecha automaticamente ao escolher só a hora ou só o minuto — fecha por dismiss (clique fora/Esc), diferente do DatePicker (que fecha ao clicar um dia, porque um dia já é o valor completo). Escolher hora e depois minuto são duas ações separadas dentro da mesma interação; fechar cedo demais obrigaria reabrir o popover no meio do fluxo.",
+    "step (incremento da coluna de minutos) default 5 — granularidade comum o bastante pra maioria dos formulários (agendamento, horário comercial) sem virar uma lista de 60 opções por padrão; step=1 continua disponível pra quem precisa de precisão de minuto a minuto.",
+    "Sem granularidade de segundos nesta v1 — nenhum caso de uso real do harness até agora precisa de segundos; se aparecer, é decisão nova (provavelmente uma terceira coluna).",
+    "minTime/maxTime cortam AMBAS as colunas juntas (uma combinação hora+minuto fora do intervalo fica desabilitada mesmo que a hora isolada esteja dentro do intervalo) — mesmo racional de minDate/maxDate do Calendar, mas aplicado a um par de valores em vez de um único.",
+    "Modo range resolvido exatamente como no DatePicker: dois campos/popovers independentes (Início/Fim), com o campo Fim aplicando minTime = value.start — reaproveita a mesma decisão já validada, sem inventar uma segunda estratégia de range só porque o valor agora é hora em vez de data.",
+    "AJUSTADO a pedido do usuário — campo passou de <button> (só seleção pelas colunas) pra <input type='text'> com máscara automática 'HH:MM', mesma técnica e racional já aplicados no DatePicker: só dígitos aceitos, separador ':' inserido sozinho, sem ambiguidade de formato. Validação só considera o horário completo (4 dígitos): hora 0-23, minuto 0-59, dentro de minTime/maxTime — value só muda quando os 4 dígitos formam um horário válido. Blur com texto incompleto/inválido/fora do intervalo reverte pro último value confirmado.",
+    "BUG REAL corrigido em teste no navegador (mesma causa raiz do DatePicker) — onChange/onBlur do input eram sobrescritos silenciosamente pelo spread de getReferenceProps() do floating-ui (que também define seus próprios onChange/onBlur), porque vinham ANTES do spread no JSX. Corrigido passando os handlers como argumento — getReferenceProps({ onChange, onBlur }) — que compõe em vez de sobrescrever.",
+    "AJUSTADO a pedido do usuário — nova prop 'showPicker' (default true), mesma implementação e racional do DatePicker: hooks useClick/useFocus/useDismiss do floating-ui desabilitados via { enabled: showPicker } quando false, ícone caret-down e aria-haspopup/aria-expanded somem, digitação com máscara continua funcionando normalmente. Cobre o caso de um campo de horário só-digitação, sem o overhead das colunas de seleção.",
+    "AJUSTADO a pedido do usuário — popover visualmente refeito: cada coluna ganhou um cabeçalho fixo ('Hora'/'Min', texto-micro-forte, fundo semantic.fundo-secundario, separado por borda) pra deixar claro o que cada coluna representa sem depender só do aria-label; as opções passaram de retângulos finos ocupando a largura toda pra círculos de 40px centralizados (raio-circular), mais parecidos com o padrão visual de um relógio/seletor de hora e com alvo de clique mais confortável; o popover ganhou box-shadow (structural.sombra-p) além da borda que já tinha. Motivo: o layout anterior (colunas estreitas, sem cabeçalho, sem sombra) lia como uma lista crua em vez de um componente de seleção — o usuário classificou como 'esteticamente feinho'.",
+    "AJUSTADO a pedido do usuário — fundo do campo trocado de semantic.fundo-superficie pra semantic.fundo-campo (token novo): 'o fundo dos inputs de forma geral, devem ser levemente mais escuros que a cor de fundo da página onde estão, para destacar melhor'. No modo claro fundo-campo é idêntico a fundo-superficie (sem mudança visual, branco com borda já bastava) — só no modo escuro os dois valores divergem (fundo-campo um degrau mais escuro que a página), porque era só ali que o campo ficava indistinguível da própria página por trás.",
+    "AJUSTADO a pedido do usuário — novo Icon 'clock' fixo à esquerda do trigger (registro fechado do Icon ganhou esse nome, Phosphor Clock), com nova prop showIcon (default true) pra permitir escondê-lo. Antes o TimePicker não tinha ícone nenhum à esquerda (só o caret-down à direita) — mesmo pedido de uma vez pros três pickers de data/hora do harness (ver decisions do DatePicker), pra dar a mesma pista visual 'isso é um campo de horário' que o DatePicker já tinha, mas de forma opcional desde o início."
+  ],
+  "references": {
+    "tokensFile": "tokens/tokens.json — Cores Semânticas (Fundos, Bordas, Textos, Ações/Primária, Ícones), Estrutural (raio-pp, raio-p, raio-circular, foco-espessura, espaco-xp/pp/p/m, sombra-p), Tipografia Estilo (texto-m, texto-p, texto-micro-forte)"
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "name": "CopyButton",
+  "originalName": "BotaoDeCopiar",
+  "oneLiner": "Botão pequeno que copia um texto pra área de transferência, com confirmação visual transiente — ex.: ao lado de uma API key, um link de compartilhamento, um código.",
+  "category": "action",
+  "status": "draft",
+  "whenToUse": "Qualquer texto curto (chave, link, código, ID) que o usuário provavelmente vai querer copiar exatamente como está, sem selecionar manualmente.",
+  "whenNotToUse": "Copiar um bloco de texto longo/formatado onde a seleção manual já é natural (ex.: parágrafo de um artigo); a ação de 'copiar' já faz parte de um fluxo maior com outros botões — nesse caso, um Button comum com leftIcon='copy-simple' e a lógica de clipboard implementada ali é suficiente, não precisa deste átomo dedicado."
+  ,
+  "anatomy": [
+    "Botão iconOnly — ícone copy-simple por padrão; ao copiar com sucesso, troca pra check por ~2s e volta sozinho, sem exigir nova interação do usuário"
+  ],
+  "dependencies": ["Icon"],
+  "props": [
+    { "name": "value", "type": "string", "required": true, "description": "Texto que será copiado pra área de transferência ao clicar." },
+    { "name": "accessibleLabel", "type": "string", "required": false, "default": "Copiar", "description": "Nome acessível do botão no estado padrão. No estado copiado, o nome acessível muda pra confirmar a ação (ver a11y)." },
+    { "name": "onCopy", "type": "function", "required": false, "description": "Assinatura () => void, chamado depois que a cópia é bem-sucedida — pra quem consome reagir além do feedback visual próprio (ex.: log de analytics)." },
+    { "name": "state", "type": "enum", "enum": ["default", "disabled"], "default": "default", "required": false, "description": "disabled bloqueia o clique." }
+  ],
+  "variants": [],
+  "states": ["default", "copied", "disabled"],
+  "tokensAllowed": {
+    "iconColor": ["semantic.icone-secundario", "semantic.icone-sucesso", "semantic.icone-inativo"],
+    "iconSize": ["structural.icone-pequeno"],
+    "background": ["semantic.fundo-secundario"],
+    "radius": ["structural.raio-pp"],
+    "focusRing": ["structural.foco-espessura", "semantic.borda-foco"],
+    "spacing": ["structural.espaco-xp"]
+  },
+  "a11y": {
+    "role": "button nativo (<button>), iconOnly — mesmo padrão de acessibilidade de ícone-only já usado no átomo Button (aria-label obrigatório).",
+    "requiredAria": ["aria-label muda de accessibleLabel (ex.: 'Copiar') pra uma confirmação (ex.: 'Copiado!') durante o estado copied — leitor de tela recebe a confirmação sem precisar de um aria-live separado, já que o nome acessível do próprio elemento focado mudou", "aria-disabled quando state='disabled'"],
+    "keyboard": ["Enter/Espaço copia (comportamento nativo de <button>)", "foco permanece no botão depois de copiar — não perde o lugar na página"],
+    "contrastMin": "AA pro ícone, mesma régua de Icon/Button.",
+    "notes": "Falha de cópia (ex.: navigator.clipboard indisponível/permissão negada) não trava o componente nem lança exceção não tratada — ver decisions."
+  },
+  "events": { "status": "não definido no contrato original" },
+  "composition": {
+    "canContain": ["Icon"],
+    "canBeContainedBy": ["ao lado de TextField readonly, blocos de código, cards de API key/link"],
+    "doNotCombine": ["CopyButton dentro de CopyButton", "usar como botão de ação genérica — ele SEMPRE copia value pra área de transferência, nunca dispara outra ação"]
+  },
+  "forbidden": [
+    "abrir/copiar quando state='disabled'",
+    "manter o estado 'copied' indefinidamente (deve reverter sozinho, sem exigir nova interação)",
+    "lançar erro não tratado quando navigator.clipboard falha ou não existe",
+    "cor fora da whitelist de tokensAllowed",
+    "reimplementar Icon inline"
+  ],
+  "decisions": [
+    "Estado 'copied' é transiente e interno (~2s, via setTimeout), não uma prop controlada — mesma classe de decisão já usada pra outros estados de UI efêmeros do harness (ex.: editingRowKey do Datatable, popovers abertos): é feedback local de uma ação que já aconteceu, não um dado que precise ser espelhado por fora.",
+    "aria-label muda pra confirmar a cópia (em vez de depender só de uma mudança visual de ícone) — decisão de acessibilidade: quem usa leitor de tela precisa saber que a cópia funcionou sem precisar 'ver' o ícone virar um check.",
+    "navigator.clipboard.writeText falhando (permissão negada, contexto não-seguro, API ausente) é capturado e silenciosamente NÃO entra no estado 'copied' — sem lançar exceção, sem quebrar a página. Não foi adicionado um estado de erro visual nesta v1 (ex.: 'Falha ao copiar') porque esse caso é raro o bastante (a maioria dos navegadores modernos suporta em contexto HTTPS) pra não justificar mais um estado só pra ele agora; se aparecer um caso real, é decisão nova.",
+    "Sempre iconOnly, nunca com label de texto visível — CopyButton é pensado pra ficar ao lado de outro conteúdo (o texto que está sendo copiado já está visível em outro lugar), um botão com texto próprio ('Copiar') competiria visualmente com esse conteúdo principal."
+  ],
+  "references": { "tokensFile": "tokens/tokens.json — Cores Semânticas (Ícones: secundario/sucesso/inativo, Fundos), Estrutural (raio-pp, foco-espessura, espaco-xp, icone-pequeno)" }
+}

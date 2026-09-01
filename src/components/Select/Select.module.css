@@ -1,0 +1,101 @@
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-xp);
+  width: 100%;
+}
+
+.trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espaco-xp);
+  width: 100%;
+  height: 44px;
+  padding: 0 var(--espaco-pp);
+  background: var(--fundo-campo);
+  border: 1px solid var(--borda-base);
+  border-radius: var(--raio-pp);
+  box-sizing: border-box;
+  font-family: var(--texto-m-family);
+  font-size: var(--texto-m-size);
+  font-weight: var(--texto-m-weight);
+  line-height: var(--texto-m-line-height);
+  color: var(--texto-primario);
+  cursor: pointer;
+  text-align: left;
+}
+
+.trigger:focus-visible {
+  border-color: var(--borda-foco);
+  box-shadow: 0 0 0 var(--foco-espessura) color-mix(in srgb, var(--borda-foco) 30%, transparent);
+  outline: none;
+}
+
+.triggerText {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.placeholder {
+  color: var(--texto-placeholder);
+}
+
+.error {
+  border-color: var(--borda-erro);
+}
+
+.error:focus-visible {
+  border-color: var(--borda-erro);
+  box-shadow: 0 0 0 var(--foco-espessura) color-mix(in srgb, var(--borda-erro) 30%, transparent);
+}
+
+.disabled {
+  background: var(--fundo-secundario);
+  border-color: var(--borda-inativo);
+  color: var(--texto-inativo);
+  cursor: not-allowed;
+}
+
+.listbox {
+  z-index: 1000;
+  max-height: 240px;
+  overflow-y: auto;
+  background: var(--fundo-superficie);
+  border: 1px solid var(--borda-base);
+  border-radius: var(--raio-pp);
+  box-sizing: border-box;
+  padding: var(--espaco-xp);
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espaco-pp);
+  padding: var(--espaco-pp);
+  border-radius: var(--raio-xp);
+  font-family: var(--texto-m-family);
+  font-size: var(--texto-m-size);
+  color: var(--texto-primario);
+  cursor: pointer;
+}
+
+.optionActive {
+  background: var(--fundo-secundario);
+}
+
+.optionDisabled {
+  color: var(--texto-inativo);
+  cursor: not-allowed;
+}
+
+.optionLabel {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

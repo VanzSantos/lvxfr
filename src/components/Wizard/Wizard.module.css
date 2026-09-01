@@ -1,0 +1,15 @@
+.wizard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-g);
+}
+
+.content {
+  min-height: 120px;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--espaco-m);
+}

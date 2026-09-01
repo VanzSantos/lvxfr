@@ -1,0 +1,73 @@
+.nav {
+  width: 100%;
+}
+
+.list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--espaco-xp);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--texto-p-family);
+  font-size: var(--texto-p-size);
+  font-weight: var(--texto-p-weight);
+  line-height: var(--texto-p-line-height);
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-xp);
+}
+
+.current {
+  font-family: var(--texto-p-family);
+  font-size: var(--texto-p-size);
+  font-weight: var(--texto-p-weight);
+  line-height: var(--texto-p-line-height);
+  color: var(--texto-primario);
+}
+
+.ellipsisButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: var(--raio-xp);
+  cursor: pointer;
+}
+
+.ellipsisButton:hover {
+  background: var(--fundo-secundario);
+}
+
+.ellipsisButton:focus-visible {
+  outline: var(--foco-espessura) solid var(--borda-foco);
+  outline-offset: 1px;
+}
+
+/* font-family/size/weight/line-height explícitos aqui — bug real reportado:
+   o menu é renderizado via FloatingPortal (escapa da árvore de .list), e
+   Link não tem tipografia própria (herda do contexto, ver link.contract.json)
+   — sem repetir aqui, os itens do dropdown caíam na fonte padrão do
+   navegador em vez do texto-p do harness. */
+.menu {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-xp);
+  padding: var(--espaco-pp);
+  background: var(--fundo-superficie);
+  border: 1px solid var(--borda-base);
+  border-radius: var(--raio-pp);
+  font-family: var(--texto-p-family);
+  font-size: var(--texto-p-size);
+  font-weight: var(--texto-p-weight);
+  line-height: var(--texto-p-line-height);
+  z-index: 10;
+}

@@ -1,0 +1,57 @@
+{
+  "name": "Divider",
+  "originalName": "Divisor",
+  "oneLiner": "Linha estrutural que separa seções ou itens relacionados, com ou sem um rótulo curto no meio.",
+  "category": "display",
+  "status": "draft",
+  "whenToUse": "Separar visualmente blocos de conteúdo empilhados (horizontal) ou itens lado a lado num mesmo eixo (vertical, ex.: separador entre ações de uma toolbar); opcionalmente com um rótulo curto no meio (ex.: 'ou' entre dois botões de login).",
+  "whenNotToUse": "O espaçamento sozinho (margin/gap) já resolve a separação sem precisar de uma linha visível; a 'divisão' na verdade é o limite de um Card (Card já tem borda própria, não aninhar Divider dentro só pra reforçar a borda).",
+  "anatomy": [
+    "Linha (traço) — cor, espessura",
+    "Rótulo centralizado (opcional) — quebra a linha em dois segmentos com o texto no meio, só no eixo horizontal"
+  ],
+  "dependencies": [],
+  "props": [
+    { "name": "orientation", "type": "enum", "enum": ["horizontal", "vertical"], "default": "horizontal", "required": false, "description": "vertical exige que o elemento pai forneça uma altura (ex.: container flex com align-items: stretch) — Divider vertical sozinho, fora de um layout com altura definida, não tem o que esticar (ver decisions)." },
+    { "name": "label", "type": "string", "required": false, "description": "Texto curto centralizado, quebrando a linha em dois segmentos. Só válido com orientation='horizontal' (ver forbidden)." }
+  ],
+  "variants": [],
+  "states": ["static"],
+  "tokensAllowed": {
+    "line": ["semantic.borda-base"],
+    "label": ["semantic.texto-secundario"],
+    "spacing": ["structural.espaco-pp"],
+    "typography": ["type-style.texto-p"]
+  },
+  "a11y": {
+    "role": "separator — <div role=\"separator\" aria-orientation={orientation}>, já que <hr> nativo não comporta o rótulo centralizado como filho",
+    "requiredAria": ["aria-orientation sempre presente (mesmo no padrão horizontal, explícito em vez de depender do default do role)"],
+    "keyboard": ["nenhuma — Divider não é focável, não participa da ordem de tabulação"],
+    "contrastMin": "AAA (7:1) como meta pro texto do label, mesma régua dos demais átomos; a linha em si (decorativa) não precisa atingir contraste de texto.",
+    "notes": "Quando label existe, ele é conteúdo real lido por leitor de tela (não aria-hidden) — só as duas linhas do traço são decorativas (aria-hidden). Divider sem label é puramente estrutural; role=separator já comunica a divisão, sem precisar de texto."
+  },
+  "events": { "status": "não definido no contrato original — componente só estrutural, não dispara eventos" },
+  "composition": {
+    "canContain": [],
+    "canBeContainedBy": ["páginas", "listas", "toolbars", "qualquer container de layout"],
+    "doNotCombine": ["Divider dentro de Card só pra reforçar a borda que o Card já tem — ver whenNotToUse"]
+  },
+  "forbidden": [
+    "label com orientation='vertical' — texto centralizado num traço vertical estreito não tem tratamento visual definido neste contrato; se surgir caso real, é decisão nova",
+    "cor de linha ou texto fora da whitelist de tokensAllowed",
+    "usar Divider como substituto de margin/gap simples — ver whenNotToUse",
+    "espessura da linha diferente de 1px (não é token — ver decisions) sem atualizar este contrato primeiro"
+  ],
+  "decisions": [
+    "RESOLVIDO com o usuário — suporta horizontal E vertical desde já (diferente do padrão 'espera um caso de uso real' aplicado a Radio/RadioGroup): o prop orientation já cobre os dois eixos porque a implementação de ambos é simétrica (só troca qual dimensão é 1px vs 100%), não há custo real de manter os dois versus só um.",
+    "RESOLVIDO com o usuário — suporta label opcional centralizado (ex.: 'ou' entre botões de login social). label só é válido com orientation='horizontal' — combinar com vertical fica proibido neste contrato até surgir um caso real que justifique o tratamento visual de texto num traço vertical estreito.",
+    "Espessura da linha fixa em 1px — não é token (tokens.json não tem uma coleção de espessura de borda genérica, só foco-espessura, que é especificamente pro anel de foco). Mesma disciplina de 'constante não-tokenizada' já usada na borda de 2px do Checkbox/Radio e no traço do Spinner — 1px aqui porque Divider é uma linha estrutural fina (hairline), não um controle de formulário que precisa de peso visual maior.",
+    "Cor da linha reaproveita semantic.borda-base, o mesmo token neutro já usado como borda padrão em Checkbox/Radio/Switch/TextField — não cria uma família de cor 'divisor' separada.",
+    "Cor do label usa semantic.texto-secundario (tom mais discreto que texto-primario) — o rótulo de um divisor é auxiliar/contextual, não o conteúdo principal da tela, mesmo raciocínio de contraste reduzido já usado em HelperText (texto-secundario) vs texto de campo (texto-primario).",
+    "Tipografia do label usa type-style.texto-p (14px), menor que texto-m (16px usado em Checkbox/Radio/Switch) — um rótulo de divisor é deliberadamente mais discreto que o texto de um controle interativo.",
+    "Sem states além de 'static' — Divider é puramente estrutural/visual, sem interação, mesmo padrão já usado em Card.",
+    "Vertical exige altura do contexto (container pai com altura definida ou flex align-items:stretch) — Divider não fixa uma altura própria em pixels porque não tem como saber a altura correta do conteúdo que está separando; é responsabilidade de layout do consumidor, não do componente.",
+    "role=separator com aria-orientation explícito nos dois casos (não só quando vertical, que é quando teria efeito real no default do role) — decisão de sempre declarar explicitamente em vez de confiar no valor implícito do navegador, mesma filosofia de 'não deixar implícito o que pode ser explícito' já usada em outros contratos (ex.: aria-invalid explícito em vez de inferido do estilo)."
+  ],
+  "references": { "tokensFile": "tokens/tokens.json — Cores Semânticas (Bordas/borda-base, Textos/texto-secundario), Estrutural (espaco-pp), Tipografia Estilo (texto-p)" }
+}

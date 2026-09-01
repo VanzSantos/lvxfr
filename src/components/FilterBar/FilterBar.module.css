@@ -1,0 +1,47 @@
+.bar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-pp);
+}
+
+.mainRow {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-p);
+  flex-wrap: wrap;
+}
+
+.searchField {
+  min-width: 220px;
+  flex: 1;
+  max-width: 360px;
+}
+
+.filters {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-pp);
+  flex-wrap: wrap;
+}
+
+.activeRow {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-pp);
+  flex-wrap: wrap;
+}
+
+.clearAll {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  color: var(--acao-link-texto);
+  font-family: var(--texto-rotulo-botao-family);
+  font-size: var(--texto-rotulo-botao-size);
+  font-weight: var(--texto-rotulo-botao-weight);
+}
+
+.clearAll:hover {
+  text-decoration: underline;
+}

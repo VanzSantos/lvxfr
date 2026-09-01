@@ -1,0 +1,21 @@
+.shell {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--fundo-superficie);
+}
+
+.main {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+}
+
+/* Página isolada aberta via "?standalone=<id>" (StoryDetail, Templates/Páginas)
+   — sem sidebar nem chrome da Playground, só o exemplo ocupando a aba/iframe
+   inteira, pra testar breakpoints reais sem a confusão de frame vs. viewport. */
+.standalone {
+  height: 100vh;
+  overflow: auto;
+  background: var(--fundo-superficie);
+}

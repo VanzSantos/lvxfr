@@ -1,0 +1,61 @@
+{
+  "name": "SegmentedControl",
+  "originalName": "GrupoDeSegmentos",
+  "oneLiner": "Grupo de botões de seleção única, lado a lado, pra alternar filtro/visualização — não é navegação (isso é Tabs), é uma escolha exclusiva entre opções sempre visíveis.",
+  "category": "action",
+  "status": "draft",
+  "whenToUse": "Alternar entre um pequeno número de visualizações/filtros do MESMO conteúdo, todos com o mesmo peso visual e sempre visíveis lado a lado (ex.: 'Lista' / 'Grade', 'Dia' / 'Semana' / 'Mês', 'Todos' / 'Ativos' / 'Inativos').",
+  "whenNotToUse": "Navegar entre seções de conteúdo diferentes, cada uma com seu próprio painel (isso é Tabs); menos de 2 opções (não faz sentido alternar entre 1 coisa só); mais de ~5 opções (fica apertado visualmente — nesse caso considere Select ou RadioGroup).",
+  "anatomy": [
+    "Container único (role=radiogroup) com borda/fundo, sem espaçamento entre os segmentos — visualmente 'uma peça só' dividida em N partes",
+    "Segmentos — botões lado a lado (role=radio), o selecionado com fundo sólido; label + ícone opcional por segmento"
+  ],
+  "dependencies": ["Icon"],
+  "props": [
+    { "name": "items", "type": "array", "required": true, "description": "Array de { value: string, label: string, icon?: IconName, disabled?: boolean }." },
+    { "name": "value", "type": "string", "required": true, "description": "value do segmento selecionado. 100% controlado, mesmo padrão de Tabs/RadioGroup." },
+    { "name": "onChange", "type": "function", "required": true, "description": "Assinatura (value: string) => void. Disparado ao clicar num segmento OU ao navegar com seta (ativação automática, mesmo padrão de Tabs)." },
+    { "name": "state", "type": "enum", "enum": ["default", "disabled"], "default": "default", "required": false, "description": "disabled desabilita o grupo inteiro (além do disabled por item individual)." },
+    { "name": "accessibleLabel", "type": "string", "required": false, "default": "Opções", "description": "Nome acessível do grupo (role=radiogroup)." }
+  ],
+  "variants": [],
+  "states": ["default", "selected", "disabled"],
+  "tokensAllowed": {
+    "background": ["semantic.fundo-secundario", "semantic.fundo-superficie"],
+    "border": ["semantic.borda-base"],
+    "text": ["semantic.texto-secundario", "semantic.texto-primario", "semantic.texto-inativo"],
+    "iconColor": ["semantic.icone-secundario", "semantic.texto-primario"],
+    "iconSize": ["structural.icone-pequeno"],
+    "radius": ["structural.raio-pp"],
+    "focusRing": ["structural.foco-espessura", "semantic.borda-foco"],
+    "spacing": ["structural.espaco-xp", "structural.espaco-pp"],
+    "typography": ["type-style.texto-rotulo-botao"]
+  },
+  "a11y": {
+    "role": "radiogroup no container (aria-label=accessibleLabel), radio em cada segmento (aria-checked=true só no selecionado).",
+    "requiredAria": ["aria-checked em cada segmento (true só no selecionado)", "aria-disabled/aria-label quando o grupo ou um item específico está desabilitado", "tabindex roving: só o segmento selecionado tem tabIndex=0, os outros -1 — mesmo padrão de Tabs, nunca todos tabbable ao mesmo tempo"],
+    "keyboard": ["seta esquerda/direita move o foco E seleciona o próximo/anterior segmento habilitado (ativação automática, pula os disabled) — mesmo padrão de Tabs", "Home vai pro primeiro segmento habilitado, End pro último"],
+    "contrastMin": "AA como meta pro texto do segmento selecionado/não-selecionado, mesma régua de Tabs.",
+    "notes": "role=radiogroup (não tablist) porque semanticamente é uma escolha única entre opções EQUIVALENTES sempre visíveis, sem a noção de 'painel associado' que Tabs carrega — mesmo dado (value/onChange) mas significado diferente de 'aba que controla o que está visível na tela'."
+  },
+  "events": { "status": "não definido no contrato original" },
+  "composition": {
+    "canContain": ["Icon"],
+    "canBeContainedBy": ["toolbars", "cabeçalhos de seção", "filtros de página"],
+    "doNotCombine": ["SegmentedControl dentro de SegmentedControl", "usar como substituto de Tabs quando cada opção deveria controlar um painel de conteúdo diferente — nesse caso é Tabs, não SegmentedControl"]
+  },
+  "forbidden": [
+    "menos de 2 items",
+    "value que não corresponde a nenhum item.value",
+    "mais de um segmento com aria-checked=true ao mesmo tempo",
+    "reimplementar Icon inline",
+    "cor fora da whitelist de tokensAllowed"
+  ],
+  "decisions": [
+    "role=radiogroup/radio (não tablist/tab, apesar da implementação de teclado ser quase idêntica à de Tabs) — decisão deliberada de semântica: SegmentedControl é uma escolha única entre opções equivalentes sempre visíveis (mais parecido com um RadioGroup visualmente compacto), enquanto Tabs controla explicitamente qual painel de conteúdo está visível. Reaproveitar tablist/tab aqui confundiria leitores de tela sobre a relação com um TabPanel que não existe.",
+    "Ativação automática por seta (mesmo padrão de Tabs) — decisão do agente, não perguntada ao usuário, pelo mesmo motivo já documentado em tabs.contract.json: é o padrão mais comum e o custo de troca é baixo (não há painel caro sendo carregado).",
+    "items é array de dados (value/label/icon/disabled), não children JSX livre — mesmo padrão de Tabs/Select, fonte única sem slot arbitrário.",
+    "Sem contador (count) como o Tabs tem — não foi pedido pra este componente; SegmentedControl tende a ter labels mais curtos (ex.: 'Dia'/'Semana'/'Mês') onde um número ao lado quebraria a leitura compacta que o padrão visual pressupõe. Se aparecer pedido real, decisão nova."
+  ],
+  "references": { "tokensFile": "tokens/tokens.json — Cores Semânticas (Fundos, Bordas, Textos, Ícones), Estrutural (raio-pp, foco-espessura, espaco-xp/pp, icone-pequeno), Tipografia Estilo (texto-rotulo-botao)" }
+}

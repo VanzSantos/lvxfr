@@ -1,0 +1,109 @@
+/* AJUSTADO a pedido do usuário — área de clique do gatilho precisa ocupar
+   toda a caixa (ícone + canto do Badge), não só o glifo do ícone. Button
+   variant="link" colapsa pro tamanho exato do conteúdo (padding:0), então o
+   tamanho/hit-box maior vive aqui no wrapper, com o onClick reforçando o
+   canto onde o Badge fica. */
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--raio-pp);
+  cursor: pointer;
+}
+
+.trigger:hover {
+  background: var(--fundo-secundario);
+}
+
+/* AJUSTADO a pedido do usuário — o Badge precisa SOBREPOR o ícone do sino,
+   não flutuar no canto da área de clique maior (.trigger, 40x40). .iconBox
+   é dimensionado igual ao ícone (24px, tamanho 'medium' do Icon) e é ELE
+   quem vira o contexto de posicionamento do Badge (position:relative) —
+   Badge position='top-right' ancora no canto do ÍCONE de verdade, não no
+   canto do wrapper de clique. */
+.iconBox {
+  position: relative;
+  display: inline-flex;
+  width: 24px;
+  height: 24px;
+  align-items: center;
+  justify-content: center;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-m);
+  height: 100%;
+}
+
+.bulkActionsRow {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-m);
+  flex-shrink: 0;
+}
+
+.selectionBar {
+  flex-shrink: 0;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-xp);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+}
+
+.item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--espaco-pp);
+  padding: var(--espaco-p);
+  border-radius: var(--raio-pp);
+}
+
+.item:hover {
+  background: var(--fundo-secundario);
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.titleUnread {
+  font-family: var(--texto-p-family);
+  font-size: var(--texto-p-size);
+  font-weight: 700;
+  color: var(--texto-primario);
+}
+
+.titleRead {
+  font-family: var(--texto-p-family);
+  font-size: var(--texto-p-size);
+  font-weight: 400;
+  color: var(--texto-primario);
+}
+
+.description {
+  font-family: var(--texto-p-family);
+  font-size: var(--texto-p-size);
+  color: var(--texto-secundario);
+}
+
+.timestamp {
+  font-family: var(--texto-micro-family);
+  font-size: var(--texto-micro-size);
+  color: var(--texto-secundario);
+}

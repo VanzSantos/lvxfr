@@ -1,0 +1,34 @@
+/* Fundo sempre igual ao fundo da PÁGINA ao redor do SideNav, não ao fundo do
+   próprio SideNav — mesmo par de regras por tema já usado em
+   SideNav.module.css/BackofficeTemplate.module.css: fundo-secundario no
+   claro, fundo-superficie no escuro (o SideNav usa o par OPOSTO, então o
+   cartão sempre contrasta levemente com o painel ao redor, nos dois temas). */
+.card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espaco-pp);
+  width: 100%;
+  border: none;
+  border-radius: var(--raio-p);
+  padding: var(--espaco-pp);
+  background: var(--fundo-secundario);
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+:root[data-theme="dark"] .card {
+  background: var(--fundo-superficie);
+}
+
+.card:focus-visible {
+  outline: var(--foco-espessura) solid var(--borda-foco);
+  outline-offset: 2px;
+}
+
+.identity {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-pp);
+  min-width: 0;
+}

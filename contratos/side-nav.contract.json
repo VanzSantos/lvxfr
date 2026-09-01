@@ -1,0 +1,259 @@
+{
+  "name": "SideNav",
+  "originalName": "MenuLateral",
+  "oneLiner": "Menu de navegação vertical persistente, lateral — um nível só ou uma árvore de até 4 níveis (grupos expansíveis, indentados); colapsa num Drawer abaixo de 768px; opcionalmente um trilho recolhido de só ícones que expande sobre o conteúdo ao passar o mouse.",
+  "category": "action",
+  "status": "draft",
+  "whenToUse": "Navegação lateral persistente de um produto com várias seções (típico de admin/dashboard/settings) — sempre visível ao lado do conteúdo, com ou sem hierarquia real entre as seções (algumas seções podem ter subseções, até 4 níveis).",
+  "whenNotToUse": "Navegação de topo, horizontal (isso é NavBar); hierarquia de onde o usuário está DENTRO de uma página (isso é Breadcrumb); passos de um fluxo sequencial (isso é Stepper/Wizard); um menu de opções contextual de um item específico, não persistente (isso é Popover).",
+  "anatomy": [
+    "<nav aria-label> envolvendo tudo, layout vertical, largura fixa (ver prop width), fundo fundo-secundario (um tom a mais que fundo-superficie, a cor de fundo típica de página) — SEM borda nenhuma separando o painel do conteúdo ao lado, nem entre header/lista/footer dentro dele",
+    "Lista de itens (<ul>) — item folha (sem children) é o átomo Link real com Icon opcional à esquerda; item em repouso usa texto-primario; item ativo (aria-current=page) OU em hover tem o MESMO destaque visual: fundo acao-primaria sólido (não mais transparente) preenchendo a linha toda, texto/ícone texto-invertido (branco fixo, não muda entre os temas)",
+    "Item COM children vira um <button> (mesmo padrão do Accordion: aria-expanded + aria-controls, Icon 'caret-down' rotacionando) — clicar expande/recolhe os filhos LOGO ABAIXO, indentados um passo a mais por nível (até o 4º); os filhos herdam o mesmo formato (folha = Link, com children = outro botão expansível). Em hover, o item COM children recebe o MESMO destaque visual dos itens-folha (fundo acao-primaria + texto/ícone texto-invertido, incluindo o caret) — não tem um estado 'ativo' persistente próprio (não é uma página em si), só hover",
+    "Abaixo de 768px de viewport: o painel inteiro (<nav>, expandido OU trilho recolhido) some e um botão de hambúrguer aparece no lugar onde o consumidor posicionar o SideNav — clicar abre o Drawer (componente já existente do harness, reaproveitado) com a MESMA árvore de itens, mesmo formato de árvore expansível de dentro do painel normal",
+    "Modo recolhido (collapsed=true, só existe quando o consumidor passa onCollapsedChange) — o <nav> normal vira um trilho estreito (64px) só com os ícones do 1º nível (item com children mostra o ícone do grupo, sem interação própria — a árvore completa só aparece no hover, ver abaixo); headerCollapsed (opcional) fica fixado no topo do trilho, SEM o botão de recolher/expandir (que só existe dentro do painel completo, ver abaixo). Passar o mouse (ou focar via Tab) em cima do trilho abre um painel completo (mesma largura normal, header/body/footer, árvore inteira, incluindo o botão de recolher/expandir) ANCORADO na borda esquerda do trilho, flutuando POR CIMA do conteúdo ao lado (position:absolute, não empurra layout); tirar o mouse (ou sair do foco) fecha esse painel e volta ao trilho. Clicar no botão de recolher/expandir dentro desse painel chama onCollapsedChange(false), que tira o SideNav do modo recolhido por completo — o <nav> normal volta a ocupar espaço real no layout (empurra o conteúdo ao lado), não é mais um overlay",
+    "No painel expandido/overlay (não no trilho), o botão de recolher/expandir fica na MESMA linha do conteúdo de header, encostado à direita (ex.: logo à esquerda, botão à direita) — não numa linha própria acima. No Drawer mobile o header aparece sozinho, sem o botão (recolher/expandir não é um conceito mobile).",
+    "footerCollapsed (opcional) — quando presente, aparece fixado embaixo do TRILHO recolhido (tipicamente só o Avatar do cartão de usuário, sem nome/e-mail/chevron); sem essa prop, o rodapé simplesmente some no trilho (comportamento anterior). Só tem efeito com collapsed=true — no painel expandido/overlay, quem aparece é o `footer` normal.",
+    "headerCollapsed (opcional) — quando presente, aparece fixado no TOPO do trilho recolhido (tipicamente só o ícone da marca, sem o nome por extenso); sem essa prop, o topo do trilho simplesmente some (comportamento anterior a esta prop). Só tem efeito com collapsed=true — no painel expandido/overlay, quem aparece é o `header` normal.",
+    "mobileOpen/onMobileOpenChange (opcional, os dois sempre juntos) — quando presentes, o botão de hambúrguer embutido some (display none, não é só escondido via CSS — nem chega a renderizar) e o consumidor é quem decide onde/como desenhar o próprio gatilho, chamando onMobileOpenChange(true) pra abrir o MESMO Drawer que o SideNav já renderiza. Existe porque o hambúrguer embutido sempre renderizava como IRMÃO do <nav>/trilho no DOM — dentro de um layout de página com header próprio (ex.: BackofficeTemplate), isso o deixava fora do header, num lugar arbitrário do layout, sem nenhuma forma de reposicioná-lo.",
+    "footerMobile (opcional) — quando presente, o Drawer mobile renderiza ESSE conteúdo no topo (antes da árvore de itens) em vez de header+footer normais (header some por completo nesse contexto, footer normal não aparece). Pensado pro caso de um rodapé com apresentação DIFERENTE no mobile (ex.: um User Card com collapse inline no topo, em vez do Popover usado no painel expandido) — sem duplicar Drawer/árvore, só o conteúdo em volta muda."
+  ],
+  "dependencies": [
+    "Link",
+    "Icon",
+    "Drawer"
+  ],
+  "props": [
+    {
+      "name": "items",
+      "type": "array",
+      "required": true,
+      "description": "Árvore recursiva de { key: string, label: string, href?: string, icon?: IconName, active?: boolean, children?: SideNavItem[] }. key é obrigatório em todo item (folha ou com children) — usado pro estado de expansão (openKeys), mesmo padrão do Accordion. Item com children não precisa de href; item sem children e sem href é erro. active marcado pelo consumidor em qualquer nível. Profundidade máxima de 4 níveis (array raiz = nível 1) — 5º nível é erro em tempo de execução."
+    },
+    {
+      "name": "openKeys",
+      "type": "array",
+      "default": "[]",
+      "required": false,
+      "description": "Keys dos itens com children que estão expandidos no momento — controlado, mesmo padrão do Accordion (openKeys/onOpenKeysChange). Sem valor, todos os grupos começam recolhidos."
+    },
+    {
+      "name": "onOpenKeysChange",
+      "type": "function",
+      "required": false,
+      "description": "(openKeys: string[]) => void — chamado quando o usuário expande/recolhe um item com children. Só é chamado (e só faz sentido) se algum item tiver children; SideNav sem hierarquia (só itens-folha) pode omitir openKeys/onOpenKeysChange inteiramente."
+    },
+    {
+      "name": "accessibleLabel",
+      "type": "string",
+      "default": "Navegação lateral",
+      "required": false,
+      "description": "Nome acessível do <nav>. Tem default sensato, mesmo racional do accessibleLabel padrão da NavBar."
+    },
+    {
+      "name": "width",
+      "type": "enum",
+      "enum": [
+        "small",
+        "medium",
+        "large"
+      ],
+      "default": "medium",
+      "required": false,
+      "description": "Largura fixa do painel: small=200px, medium=248px, large=296px — mesma escala de 3 tamanhos nomeados já usada em drawer.contract.json (small/medium/large), só com valores menores porque SideNav é sempre um painel mais estreito que um Drawer de conteúdo."
+    },
+    {
+      "name": "header",
+      "type": "node",
+      "required": false,
+      "description": "Slot livre acima da lista de itens (ex.: logo/wordmark do produto, seletor de workspace) — mesma filosofia de slot livre já usada em brand da NavBar. SideNav não sabe nada sobre o que tem dentro."
+    },
+    {
+      "name": "headerCollapsed",
+      "type": "node",
+      "required": false,
+      "description": "Slot livre pro TOPO do trilho recolhido (ex.: só o ícone da marca, sem o nome por extenso do header normal) — omitido, o topo do trilho simplesmente não aparece. Só tem efeito com collapsed=true; no painel expandido/overlay, header (o normal) que aparece. Mesmo racional de footer/footerCollapsed."
+    },
+    {
+      "name": "footer",
+      "type": "node",
+      "required": false,
+      "description": "Slot livre abaixo da lista de itens, sempre fixo no rodapé do painel expandido/overlay (ex.: Avatar+nome do usuário, botão de logout) — mesmo racional de header. NÃO aparece no trilho recolhido — ver footerCollapsed."
+    },
+    {
+      "name": "footerCollapsed",
+      "type": "node",
+      "required": false,
+      "description": "Slot livre pro rodapé do TRILHO recolhido (ex.: só o Avatar, sem nome/e-mail/chevron do footer normal) — omitido, o rodapé simplesmente não aparece no trilho (comportamento anterior a esta prop). Só tem efeito com collapsed=true."
+    },
+    {
+      "name": "collapsed",
+      "type": "boolean",
+      "default": false,
+      "required": false,
+      "description": "true = painel vira um trilho de 64px só com ícones do 1º nível; passar o mouse/focar abre o painel completo por cima do conteúdo (ver anatomy). false (padrão) = painel sempre expandido, comportamento idêntico a antes desta prop existir. Só tem efeito prático quando onCollapsedChange também é passado (ver abaixo)."
+    },
+    {
+      "name": "onCollapsedChange",
+      "type": "function",
+      "required": false,
+      "description": "(collapsed: boolean) => void — chamado quando o usuário clica no botão de recolher/expandir. A PRESENÇA desta prop é o que ativa a funcionalidade inteira (botão visível, trilho, hover-expand); sem ela, collapsed é ignorado e o SideNav nunca mostra o botão nem o trilho — mesmo racional de actionLabel/onAction em empty-state.contract.json (duas metades de um recurso opcional só existem juntas)."
+    },
+    {
+      "name": "mobileOpen",
+      "type": "boolean",
+      "required": false,
+      "description": "Estado controlado (opcional) do Drawer mobile (abaixo de 768px). Ausente = comportamento original (hambúrguer embutido, estado interno). Presente, sempre acompanhado de onMobileOpenChange — ver essa prop."
+    },
+    {
+      "name": "onMobileOpenChange",
+      "type": "function",
+      "required": false,
+      "description": "Assinatura (open: boolean) => void. Presença desta prop é o que ATIVA o modo controlado do Drawer mobile — o hambúrguer embutido do SideNav PARA de renderizar, e o consumidor assume o gatilho (ex.: um botão próprio dentro do header da página, posicionado onde fizer sentido pro layout dela), chamando onMobileOpenChange(true) pra abrir. O Drawer em si (a árvore de navegação) continua 100% responsabilidade do SideNav — só o BOTÃO-gatilho muda de dono. Mesmo racional já usado em onCollapsedChange (presença ativa o recurso) e no controlled/uncontrolled de popover.contract.json."
+    },
+    {
+      "name": "footerMobile",
+      "type": "node",
+      "required": false,
+      "description": "Conteúdo alternativo pro rodapé, só dentro do DRAWER MOBILE — quando presente, substitui TANTO header quanto footer nesse contexto específico: header para de aparecer, footerMobile renderiza no TOPO (antes da árvore de itens), não embaixo. Omitido = comportamento original do Drawer mobile (header no topo se presente, footer embaixo se presente, igual ao painel expandido). Sem efeito no painel expandido/overlay (desktop)."
+    }
+  ],
+  "variants": [
+    "flat",
+    "grouped"
+  ],
+  "states": [
+    "default",
+    "item-active",
+    "item-expanded",
+    "item-collapsed",
+    "mobile-menu-open",
+    "rail-hover-expanded"
+  ],
+  "tokensAllowed": {
+    "background": [
+      "semantic.fundo-superficie",
+      "semantic.fundo-secundario",
+      "semantic.acao-primaria"
+    ],
+    "text": [
+      "semantic.texto-primario",
+      "semantic.texto-secundario",
+      "semantic.texto-invertido"
+    ],
+    "iconColor": [
+      "semantic.icone-secundario",
+      "semantic.texto-primario",
+      "semantic.texto-invertido"
+    ],
+    "border": [
+      "semantic.borda-foco"
+    ],
+    "focusRing": [
+      "structural.foco-espessura"
+    ],
+    "radius": [
+      "structural.raio-pp",
+      "structural.raio-p"
+    ],
+    "spacing": [
+      "structural.espaco-xp",
+      "structural.espaco-pp",
+      "structural.espaco-p",
+      "structural.espaco-m",
+      "structural.espaco-g"
+    ],
+    "typography": [
+      "type-style.texto-p",
+      "type-style.texto-rotulo-botao"
+    ],
+    "shadow": [
+      "structural.sombra-p"
+    ]
+  },
+  "a11y": {
+    "role": "navigation nativo via <nav aria-label>, envolvendo um <ul>. Item-folha é um Link real (<a href>); item ativo tem aria-current=\"page\". Item com children é um <button aria-expanded aria-controls>, mesmo padrão exato do Accordion (headerId/panelId, region com aria-labelledby) — reaproveita a mesma semântica de disclosure já validada ali, só trocando o conteúdo do painel por uma sublista em vez de conteúdo livre.",
+    "requiredAria": [
+      "aria-label no <nav> (accessibleLabel)",
+      "aria-current=\"page\" no item ativo, em qualquer nível",
+      "aria-expanded + aria-controls no botão de item com children (mesmo padrão do Accordion)",
+      "role=\"region\" + aria-labelledby no painel de filhos expandido",
+      "aria-label ('Abrir menu de navegação') + aria-expanded no botão de hambúrguer do modo mobile",
+      "aria-label ('Recolher menu'/'Expandir menu', conforme o estado) no botão de colapso, quando onCollapsedChange está presente",
+      "aria-label em cada ícone do trilho recolhido (o item não tem texto visível ali, o aria-label vira o único nome acessível)"
+    ],
+    "keyboard": [
+      "Tab navega entre os links/botões de navegação em ordem de DOM, incluindo dentro de grupos expandidos — sem roving tabindex nesta v1 (mesma simplificação já usada em Accordion/Calendar/Stepper/Breadcrumb/NavBar)",
+      "Enter/Espaço num botão de item com children expande/recolhe (mesmo comportamento do Accordion)",
+      "dentro do Drawer mobile, Esc fecha o Drawer inteiro (comportamento nativo já herdado do componente Drawer)",
+      "no trilho recolhido, focar (Tab) qualquer item do trilho também abre o painel completo por cima do conteúdo — mesmo efeito do hover do mouse, via onFocus/onBlur no wrapper (ver decisions) — sem isso o painel completo ficaria inacessível por teclado"
+    ],
+    "contrastMin": "texto-primario contra fundo-superficie em repouso; texto-invertido (branco fixo) contra acao-primaria (verde) em hover/ativo — mesmo par de alto contraste já usado em Badge/CallControlBar no modo escuro, nos dois temas."
+  },
+  "events": {
+    "status": "não definido no contrato original"
+  },
+  "composition": {
+    "canContain": [
+      "Link",
+      "Icon",
+      "Drawer (internamente, só no modo mobile)",
+      "qualquer conteúdo livre em header/footer/footerCollapsed"
+    ],
+    "canBeContainedBy": [
+      "layout de página com área de conteúdo ao lado (ex.: DashboardTemplate, SettingsTemplate)"
+    ],
+    "doNotCombine": [
+      "SideNav dentro de SideNav",
+      "usar SideNav pra navegação de topo — isso é NavBar",
+      "usar SideNav pra hierarquia de localização dentro da página — isso é Breadcrumb"
+    ]
+  },
+  "forbidden": [
+    "reimplementar o link dos itens-folha fora do átomo Link",
+    "item ativo virando texto estático sem href",
+    "SideNav assumir ou importar qualquer biblioteca de roteamento — active é sempre informado de fora",
+    "cor fora da whitelist de tokensAllowed",
+    "mais de 4 níveis de profundidade em items — erro em tempo de execução",
+    "item sem children E sem href — erro em tempo de execução",
+    "item (folha ou com children) sem key — erro em tempo de execução, key é o identificador de estado de expansão",
+    "reimplementar o painel do Drawer mobile com uma div/position:fixed própria — reaproveita o componente Drawer existente",
+    "flyout lateral (submenu abrindo pro lado, tipo mega-menu) — decisão explícita de usar só árvore indentada expansível dentro do próprio painel (ver decisions)",
+    "trilho recolhido (collapsed=true) abrir o painel completo só no hover do mouse, sem equivalente de teclado — precisa abrir também no foco (onFocus/onBlur), senão o painel completo fica inacessível pra quem navega só por teclado",
+    "botão de recolher/expandir aparecer sem onCollapsedChange estar presente — collapsed sozinho (sem o par) nunca ativa o trilho",
+    "borda visível separando o painel/trilho do conteúdo ao lado, ou separando header/footer da lista de itens — o componente não usa borda em lugar nenhum, a separação visual vem só da diferença de fundo entre o painel e a página ao redor (qual token é mais claro dos dois se inverte por tema, ver decisions)",
+    "sublinhado no hover dos itens-folha — Link sublinha por padrão no :hover (link.contract.json), mas dentro do SideNav o item já ganha fundo+cor sólidos no hover, então o componente sobrescreve pra não sublinhar (ver decisions)"
+  ],
+  "decisions": [
+    "CORRIGIDO — auditoria de A11y (2026-09-01): itens de grupo (item com children) no trilho recolhido renderizavam como `<span aria-hidden=\"true\">`, sem tabIndex nem aria-label — BUG REAL, contradizia duas promessas do próprio contrato (a11y.requiredAria: 'aria-label em cada ícone do trilho' e a11y.keyboard: 'focar qualquer item do trilho abre o painel completo'). Na prática, um usuário de teclado não conseguia alcançar nem nomear esses itens, e se um trilho fosse só de grupos, o painel completo ficaria inacessível por teclado. Corrigido trocando o `<span>` por `<button type=\"button\">` real (focável nativamente, sem precisar de tabIndex manual) com aria-label={item.label} — o onFocus/onBlur que já existia no wrapper (delega hovering=true/false) continua funcionando sem mudança, porque focus bubbla até o container.",
+    "CORRIGIDO — auditoria de contratos (2026-09-01): border (borda-foco) e focusRing (foco-espessura) adicionados a tokensAllowed, pro anel de foco visível dos itens interativos (link, botão de item com children, botão de hambúrguer/colapso) — não confundir com a decisão anterior de remover border do contrato: aquela era sobre a borda de SEPARAÇÃO entre painel e conteúdo (removida por completo), não sobre o anel de foco por teclado, que é uma categoria diferente e continua necessário.",
+    "Criado a pedido do usuário — não existia nenhum componente de menu lateral persistente no harness antes deste contrato (só o NavBar horizontal de topo, e um Sidebar interno da própria Playground que NÃO é um componente do design system, é só chrome da ferramenta).",
+    "Estrutura em componente SEPARADO do NavBar (não uma prop orientation='vertical' no NavBar) — decisão tomada com o usuário: NavBar e SideNav resolvem a hierarquia de nível 2+ de formas visuais bem diferentes (dropdown em cascata vs. árvore indentada expansível), unificar os dois num componente só misturaria duas interações distintas num contrato só, tornando ambos os casos mais confusos de configurar.",
+    "Multi-nível resolvido como ÁRVORE INDENTADA EXPANSÍVEL (mesmo padrão do Accordion, um nível de indentação a mais por profundidade), NÃO como flyout lateral — decisão tomada com o usuário. Flyout economiza espaço vertical mas depende de hover/clique fora do fluxo normal de teclado e foge do padrão mais comum em admin dashboards (que é justamente árvore expansível, ex.: o próprio Sidebar interno da Playground, só que com mais níveis).",
+    "openKeys/onOpenKeysChange reaproveita EXATAMENTE o mesmo padrão de props já validado em accordion.contract.json — SideNav com hierarquia é conceitualmente um Accordion recursivo aplicado a itens de navegação em vez de conteúdo livre; manter a mesma forma de controlar o estado evita um segundo padrão de 'array de chaves abertas' com nome diferente no harness.",
+    "AJUSTADO a pedido do usuário — colapso responsivo abaixo de 768px (mesmo breakpoint das páginas de auth e do NavBar), reaproveitando o Drawer já existente no harness em vez de um painel novo: abaixo do breakpoint, o <nav> normal some, um botão de hambúrguer aparece no lugar, e clicar nele abre a MESMA árvore de itens dentro de um Drawer (modal=true) — sem duplicar a lógica de expansão de grupos, é literalmente o mesmo componente de lista renderizado dentro do Drawer em vez de dentro do <nav>.",
+    "width usa a mesma nomenclatura de 3 tamanhos (small/medium/large) já usada em drawer.contract.json, só com valores absolutos menores (200/248/296px em vez de 320/440/560px) — SideNav é sempre mais estreito que um Drawer de conteúdo típico, mas reaproveitar o mesmo VOCABULÁRIO de tamanho (em vez de inventar pequeno/médio/grande com outro nome) mantém previsibilidade entre os dois contratos.",
+    "header/footer são slots livres (ReactNode) opcionais, mesma filosofia de slot livre já usada em brand/actions da NavBar — cobre casos comuns (logo no topo, usuário logado no rodapé) sem o SideNav precisar saber nada sobre esse conteúdo.",
+    "variants ['flat', 'grouped'] descrevem só a FORMA dos dados (items todos sem children = flat/1 nível; algum item com children = grouped/multi-nível) — não são props separadas, o próprio formato de items já determina automaticamente qual variante está em uso; documentado aqui só porque o pedido original do usuário foi explícito em 'pensando em apenas um nível de menu e também com múltiplos níveis', então os dois casos precisam continuar sendo primeira classe no contrato, não um 'modo avançado' escondido.",
+    "AJUSTADO a pedido do usuário — REVISA a paleta de cor dos itens: em repouso agora é texto-primario (branco no modo escuro, tom neutro escuro no modo claro) em vez das cores fixas de Link (acao-link-texto/-sobreposto). Cor reaplicada por cima do átomo Link via seletor CSS de maior especificidade (`.item a`) no próprio SideNav (Link continua intacto); o ícone (fill, atributo de apresentação passado pelo Phosphor via Icon) é sobrescrito pela mesma técnica, sem precisar de !important — atributo de apresentação tem prioridade mais baixa que qualquer regra CSS normal.",
+    "REVISADO a pedido do usuário (mesmo dia, rodada seguinte) — hover E ativo/selecionado viraram o MESMO tratamento visual: fundo acao-primaria SÓLIDO (não mais transparente) preenchendo a linha toda + texto/ícone texto-invertido (branco fixo, não acao-primaria como na primeira versão). Isso também passou a valer pros itens 'pai' de submenu (groupHeader) — antes só tinham um hover cinza neutro (fundo-secundario), sem relação com o restante da paleta; agora hover em QUALQUER item de navegação (folha ou pai) usa a mesma dupla fundo-verde/texto-branco. Implementação: o fundo saiu do `<li>` (.itemActive) e foi pro próprio `<a>` (agora `width:100%` pra preencher a linha) — hover e `[aria-current=\"page\"]` acionam a MESMA regra CSS, não existe mais 'ativo com hover' visualmente diferente de 'só hover'. `.itemActive` foi removida do componente (a classe não existe mais em SideNav.tsx) — o destaque agora é 100% dirigido pelo atributo `aria-current` que o próprio Link já expõe, sem precisar de uma classe paralela no `<li>`.",
+    "AJUSTADO a pedido do usuário — novo modo recolhido (collapsed/onCollapsedChange). Decisões de implementação: (1) o trilho mostra só o 1º NÍVEL de items, não uma lista achatada de todas as folhas em qualquer profundidade — um item com children no trilho vira um ícone não-interativo (sem href, não é link), porque a interação real desse item (expandir/ver filhos) só existe dentro da árvore completa; achatar níveis profundos no trilho faria itens sem ícone próprio (comum em filhos de 3º/4º nível, que normalmente não repetem ícone) aparecerem como espaços vazios sem sentido. (2) O painel completo que aparece no hover NÃO é um Drawer nem um Popover novo — é o próprio `<nav>` normal (mesmo componente, mesma largura de `width`), só que posicionado com `position:absolute` ancorado na borda do trilho, escapando do espaço reservado de 64px — reaproveita 100% a árvore/lógica de expansão já existente, não duplica nada. (3) hover E foco (onMouseEnter/Leave + onFocus/Blur no wrapper) abrem/fecham o painel — só mouse deixaria o recurso inacessível por teclado. (4) O trilho é sempre 64px fixo, independente da prop `width` (que só se aplica ao painel expandido/overlay) — um trilho mais largo que isso deixaria de parecer um 'trilho de ícones'. (5) header NÃO aparece no trilho recolhido, só no painel expandido/overlay — é ReactNode livre, não dá pra garantir que caiba/faça sentido reduzido a 64px; footer segue a mesma regra (some no trilho), mas REVISADO a pedido do usuário: footerCollapsed dá um jeito explícito do consumidor decidir o que aparece no rodapé do trilho (tipicamente só o Avatar), sem tentar adivinhar/recortar automaticamente o `footer` normal — SideNav não tem como saber qual pedaço de um ReactNode livre é 'só o avatar'.",
+    "AJUSTADO a pedido do usuário — botão de recolher/expandir passou a dividir a mesma linha do `header` (antes ficava numa linha própria acima, sempre alinhado à direita sozinho). Implementado com um `headerRow` interno (flex, space-between) que envolve `{header}{toggleButton}` — undefined vira `null`/nada renderizado, sem quebrar o layout quando só um dos dois está presente.",
+    "AJUSTADO a pedido do usuário — removidas TODAS as bordas do componente (painel↔conteúdo, trilho↔conteúdo, header↔lista, footer↔lista, botão de hambúrguer) e o fundo do painel/trilho passou de fundo-superficie (igual à cor de página) pra fundo-secundario (um tom a mais) — a separação visual do conteúdo ao lado passou a vir só da diferença de fundo, não de uma linha. Consequência: o token `border` saiu do tokensAllowed porque o componente simplesmente não usa borda em lugar nenhum mais (a única borda relacionada ao SideNav que ainda existe é do 'User Card' de exemplo no footer — mas isso é CONTEÚDO LIVRE do consumidor, composto na demo com fundo-superficie (o tom mais escuro de novo, contrastando com o fundo-secundario do painel ao redor) e uma borda um pouco mais escura que borda-base via color-mix — não faz parte deste contrato, só do exemplo).",
+    "AJUSTADO a pedido do usuário — sem sublinhado no hover dos itens-folha. Link sublinha por padrão no próprio :hover (link.contract.json) — dentro do contexto de navegação do SideNav isso ficava redundante em cima do destaque de fundo+cor sólidos já aplicado; sobrescrito via `text-decoration: none` na mesma regra CSS que já reaplica fundo/cor no hover, sem tocar em Link.tsx nem no contrato do átomo.",
+    "REVISADO a pedido do usuário — o fundo do painel/trilho deixou de ser sempre fundo-secundario (rodada anterior) e passou a ser CONDICIONAL AO TEMA: fundo-superficie (branco) no modo claro, fundo-secundario no modo escuro. Motivo: fundo-secundario é mais ESCURO que fundo-superficie no modo claro, mas mais CLARO que fundo-superficie no modo escuro (mesma inversão de brilho já documentada no fix de Avatar.fallback) — nenhum token único expressa \"sempre a superfície mais clara das duas\" nos dois temas ao mesmo tempo, por isso o par de regras / sobrescrevendo o valor padrão. A \"página\" ao lado (fora do componente, no exemplo/demo) segue exatamente o padrão oposto (fundo-secundario no claro, fundo-superficie no escuro), mantendo o SideNav sempre um tom mais claro que o conteúdo ao redor nos dois temas.",
+    "AJUSTADO a pedido do usuário — espaçamento entre ícone e rótulo aumentado nos itens de menu (folha): gap de espaco-m (16px) reaplicado em , sobrescrevendo o gap padrão do átomo Link (espaco-xp/4px, definido em link.contract.json) via seletor de maior especificidade — mesma técnica já usada pra cor/fill/text-decoration nesse mesmo seletor, Link continua intacto.",
+    "REVISADO a pedido do usuário — o fundo do painel/trilho deixou de ser sempre fundo-secundario (rodada anterior) e passou a ser CONDICIONAL AO TEMA: fundo-superficie (branco) no modo claro, fundo-secundario no modo escuro. Motivo: fundo-secundario é mais ESCURO que fundo-superficie no modo claro, mas mais CLARO que fundo-superficie no modo escuro (mesma inversão de brilho já documentada no fix de Avatar.fallback) — nenhum token único expressa \"sempre a superfície mais clara das duas\" nos dois temas ao mesmo tempo, por isso o par de regras `:root[data-theme=\"dark\"] .nav`/`.rail` sobrescrevendo o valor padrão. A \"página\" ao lado (fora do componente, no exemplo/demo) segue exatamente o padrão oposto (fundo-secundario no claro, fundo-superficie no escuro), mantendo o SideNav sempre um tom mais claro que o conteúdo ao redor nos dois temas.",
+    "AJUSTADO a pedido do usuário — espaçamento entre ícone e rótulo aumentado nos itens de menu (folha): gap de espaco-m (16px) reaplicado em `.item a`, sobrescrevendo o gap padrão do átomo Link (espaco-xp/4px, definido em link.contract.json) via seletor de maior especificidade — mesma técnica já usada pra cor/fill/text-decoration nesse mesmo seletor, Link continua intacto.",
+    "REVISADO a pedido do usuário — nota sobre a decisão anterior (User Card no footer, exemplo/conteúdo livre, não faz parte deste contrato): a borda que ela mencionava foi removida e o fundo passou a acompanhar o fundo da página (mesma classe .pageArea usada nos placeholders de conteúdo da demo), não mais um tom fixo/distinto — segue sendo só exemplo composto na demo, sem afetar o contrato do SideNav em si.",
+    "AJUSTADO a pedido do usuário — o botão de recolher/expandir (chevron) NÃO aparece mais no trilho recolhido em repouso (só os ícones ficam visíveis). Ele só existe dentro do headerRow do painel completo, que só é renderizado quando o mouse está sobre o trilho (hovering=true) — ou seja, a única forma de fixar o SideNav aberto (onCollapsedChange(false)) é primeiro passar o mouse por cima pra revelar o painel, e então clicar no chevron que aparece nele. Antes o mesmo botão aparecia TAMBÉM fixo no topo do trilho estreito, redundante com a versão dentro do painel completo.",
+    "AJUSTADO a pedido do usuário — nova prop headerCollapsed (mesmo racional de footerCollapsed, só que no topo do trilho em vez do rodapé): antes o header normal simplesmente não aparecia em NENHUM lugar no modo recolhido (só no painel completo/overlay) — pedido explícito do usuário pra continuar mostrando a marca (só o ícone, sem o nome por extenso) mesmo com o SideNav fechado. header continua não aparecendo no trilho — headerCollapsed é um slot SEPARADO, o consumidor decide explicitamente o que cabe reduzido a 64px, SideNav não tenta adivinhar/recortar automaticamente o header normal (mesma razão já documentada pra footerCollapsed).",
+    "AJUSTADO a pedido do usuário — o logo/marca (header) deve continuar visível SEMPRE, nos dois estados: completo (ícone+nome) quando expandido/hover, só o ícone quando o trilho está recolhido em repouso. Isso já era possível via headerCollapsed (ver decision anterior), mas a demo do próprio SideNav (SideNavDemo.tsx, seção 'Recolhido') não estava passando essa prop — o logo sumia por completo no trilho, mesmo bug que o BackofficeTemplate teve na primeira versão. Corrigido: SideNavDemo agora passa headerCollapsed (só o ícone do WorkspaceHeader, extraído numa função própria WorkspaceLogoIcon) na seção 'Recolhido' — documentado aqui como boa prática pra qualquer consumidor que use `header` junto com `collapsed`/`onCollapsedChange`: sempre passar `headerCollapsed` também, senão o logo desaparece no trilho.",
+    "AJUSTADO a pedido do usuário — BUG REAL encontrado no BackofficeTemplate: o hambúrguer embutido do SideNav sempre renderizava como irmão do <nav>/trilho (fora do header da página), então no modo responsivo ele aparecia solto no canto superior esquerdo da tela, ACIMA do header (fora do fluxo do Breadcrumb+NotificationCenter) — pedido explícito do usuário era o hambúrguer aparecer DENTRO do header, à direita do botão de notificações. Como o hambúrguer embutido não tinha como ser reposicionado (fixo no DOM do próprio SideNav), a solução foi um par controlled opcional (mobileOpen/onMobileOpenChange, mesmo racional de collapsed/onCollapsedChange): quando presente, o hambúrguer embutido some por completo e o consumidor desenha o próprio gatilho onde quiser, controlando o mesmo Drawer por fora. BackofficeTemplate passou a usar esse par, com um botão de hambúrguer próprio dentro do `<header>`, depois do NotificationCenter. Efeito colateral corrigido junto: o hambúrguer solto também estava causando o padding assimétrico reportado pelo usuário ('o padding esquerdo... está maior que o direito') — ele ocupava espaço como item extra no flex row de `.page`, empurrando o conteúdo; sem ele ali, o padding voltou a ficar simétrico.",
+    "AJUSTADO a pedido do usuário — padding do Drawer mobile reduzido pra padding='small' (era o padrão 'large' do próprio Drawer) — só afeta o menu mobile, o painel expandido/overlay usa o padding próprio de .header/.body/.footer, intocado.",
+    "EXTENSÃO — nova prop footerMobile, pra um caso real do BackofficeTemplate: no mobile, o User Card devia aparecer no TOPO do Drawer (não embaixo) e abrir um menu como collapse inline (não Popover), sem o logo do header repetido (já visível no header da própria página). Como o Drawer mobile é 100% renderizado pelo SideNav (o consumidor não tem acesso ao DOM interno pra reordenar/trocar conteúdo), a única forma de viabilizar isso sem reimplementar o Drawer foi um slot NOVO e específico desse contexto — footerMobile substitui header+footer só ali, mesmo racional de headerCollapsed/footerCollapsed (conteúdo alternativo pra um contexto de renderização específico, não um resize/recorte automático do conteúdo normal)."
+  ],
+  "references": {
+    "tokensFile": "tokens/tokens.json — Cores Semânticas (Fundos, Bordas, Textos, Ações/Primária, Ícones), Estrutural (raio-pp/p, espaco-xp/pp/p/m/g, sombra-p), Tipografia Estilo (texto-p, texto-rotulo-botao)"
+  }
+}

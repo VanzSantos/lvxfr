@@ -1,0 +1,90 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ComponentContract",
+  "description": "v2 — ajustado ao padrão real dos contratos em português enviados pelo usuário. Nomes de componente/prop em inglês; description e notas em português (lidas por humanos). Referências de token usam a notação de token-notation.md.",
+  "type": "object",
+  "required": ["name", "originalName", "category", "status", "props", "variants", "states", "tokensAllowed", "a11y", "forbidden"],
+  "properties": {
+    "name": { "type": "string", "description": "Nome do componente em inglês (nome de API/código)." },
+    "originalName": { "type": "string", "description": "Nome original em português, para rastreabilidade com o contrato-fonte." },
+    "oneLiner": { "type": "string", "description": "Uma linha, em português, do que o componente é." },
+    "category": {
+      "type": "string",
+      "enum": ["action", "display", "overlay", "data-entry"],
+      "description": "action=ação, display=exibição, overlay=sobreposição, data-entry=entrada de dados."
+    },
+    "status": { "type": "string", "enum": ["draft", "stable", "deprecated"] },
+    "whenToUse": { "type": "string", "description": "Português. Quando usar este componente." },
+    "whenNotToUse": { "type": "string", "description": "Português. Quando NÃO usar / o que usar no lugar." },
+    "anatomy": { "type": "array", "items": { "type": "string" }, "description": "Partes visuais do componente, em português." },
+    "dependencies": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Nomes (em inglês) de outros componentes deste harness que este componente consome."
+    },
+    "props": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "type", "required"],
+        "properties": {
+          "name": { "type": "string" },
+          "type": { "type": "string", "enum": ["string", "number", "boolean", "enum", "node", "function", "array"] },
+          "enum": { "type": "array" },
+          "default": {},
+          "required": { "type": "boolean" },
+          "requiredWhen": { "type": "string", "description": "Português. Condição que torna a prop obrigatória, se não for sempre." },
+          "description": { "type": "string", "description": "Português." }
+        }
+      }
+    },
+    "variants": { "type": "array", "items": { "type": "string" } },
+    "states": { "type": "array", "items": { "type": "string" } },
+    "tokensAllowed": {
+      "type": "object",
+      "description": "Whitelist por propriedade visual. Cada valor é uma lista de tokens na notação de token-notation.md. Fora daqui é violação de contrato.",
+      "additionalProperties": { "type": "array", "items": { "type": "string" } }
+    },
+    "a11y": {
+      "type": "object",
+      "required": ["role"],
+      "properties": {
+        "role": { "type": "string" },
+        "requiredAria": { "type": "array", "items": { "type": "string" } },
+        "keyboard": { "type": "array", "items": { "type": "string" } },
+        "contrastMin": { "type": "string" },
+        "notes": { "type": "string", "description": "Português. Requisito de acessibilidade que não cabe nos campos acima." }
+      }
+    },
+    "events": {
+      "type": ["object", "null"],
+      "description": "Camada de tracking. Os contratos originais não definiam isso — fica null com uma nota até ser decidido, em vez de inventado.",
+      "properties": {
+        "status": { "type": "string" },
+        "group": { "type": "string", "enum": ["Action", "Input", "Selection", "Overlay"] },
+        "suggestedEvent": { "type": "string" }
+      }
+    },
+    "composition": {
+      "type": "object",
+      "properties": {
+        "canContain": { "type": "array", "items": { "type": "string" } },
+        "canBeContainedBy": { "type": "array", "items": { "type": "string" } },
+        "doNotCombine": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "forbidden": { "type": "array", "items": { "type": "string" }, "description": "Português. Proibições diretas." },
+    "decisions": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Português. Histórico de decisões já tomadas — preservado do contrato original, é memória institucional e evita reabrir debate."
+    },
+    "references": {
+      "type": "object",
+      "properties": {
+        "figmaNode": { "type": "string" },
+        "tokensFile": { "type": "string" }
+      }
+    }
+  }
+}

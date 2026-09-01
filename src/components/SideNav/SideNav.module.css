@@ -1,0 +1,343 @@
+/* AJUSTADO a pedido do usuário — sem borda nenhuma (nem lateral, nem entre
+   header/lista/footer); a separação visual do conteúdo ao lado vem só da cor
+   de fundo. REVISADO — o SideNav precisa ser sempre a superfície mais CLARA
+   das duas (ele vs. a página), mas qual token é "mais claro" se inverte entre
+   os temas (fundo-secundario é mais escuro que fundo-superficie no modo claro,
+   mais claro no modo escuro — mesmo comportamento documentado no fix do
+   Avatar.fallback) — por isso o par de regras abaixo, não um token só. */
+.nav {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--fundo-superficie);
+  box-sizing: border-box;
+  overflow-y: auto;
+  font-family: var(--texto-p-family);
+  font-size: var(--texto-p-size);
+}
+
+:root[data-theme="dark"] .nav {
+  background: var(--fundo-secundario);
+}
+
+.small {
+  width: 200px;
+}
+
+.medium {
+  width: 248px;
+}
+
+.large {
+  width: 296px;
+}
+
+.header {
+  padding: var(--espaco-m);
+  flex-shrink: 0;
+}
+
+/* AJUSTADO a pedido do usuário — o botão de recolher/expandir (quando
+   presente) fica na MESMA linha do conteúdo de header, encostado à direita
+   (antes ficava numa linha própria acima do header). Com só um dos dois
+   presentes, o outro simplesmente não ocupa espaço — space-between não tem
+   efeito visual com um filho só. */
+.headerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espaco-m);
+}
+
+.body {
+  flex: 1;
+  padding: var(--espaco-m);
+  box-sizing: border-box;
+  font-family: var(--texto-p-family);
+  font-size: var(--texto-p-size);
+  color: var(--texto-primario);
+}
+
+.footer {
+  padding: var(--espaco-m);
+  flex-shrink: 0;
+}
+
+/* AJUSTADO a pedido do usuário — footerMobile fica no TOPO do Drawer mobile
+   (não embaixo, como o footer normal) — sem padding próprio (o Drawer já
+   aplica padding='small' no conteúdo inteiro, ver SideNav.tsx), só o
+   espaçamento pra separar da árvore de itens logo abaixo. */
+.footerMobile {
+  margin-bottom: var(--espaco-m);
+  flex-shrink: 0;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-xp);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--raio-p);
+}
+
+/* AJUSTADO a pedido do usuário — hover E selecionado (ativo) usam o MESMO
+   tratamento: fundo verde sólido (acao-primaria, não mais transparente) com
+   texto/ícone branco fixo (texto-invertido, não muda entre os temas — mesmo
+   token já usado em Badge/CallControlBar no modo escuro). O fundo agora vive
+   no próprio <a> (width:100%, preenche a linha toda), não mais no <li>
+   (.itemActive) — hover e aria-current="page" acionam a mesma regra, então
+   não existe mais um caso "ativo + hover" com cor diferente de "só hover".
+   `svg { fill }` sobrescreve o ícone — atributo de apresentação (fill=var(...)
+   passado pelo Icon/Phosphor) tem prioridade mais baixa que QUALQUER regra de
+   CSS normal, então nem precisa de !important pra vencer. */
+/* AJUSTADO a pedido do usuário — mais espaço entre o ícone e o texto (Link
+   usa espaco-xp/4px por padrão, gap reaplicado aqui igual foi feito com a
+   cor — Link continua intacto, só o contexto do SideNav pede mais respiro). */
+.item a {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-m);
+  width: 100%;
+  box-sizing: border-box;
+  padding: var(--espaco-p);
+  border-radius: var(--raio-p);
+  color: var(--texto-primario);
+}
+
+.item a svg {
+  fill: var(--texto-primario);
+}
+
+.item a:hover,
+.item a[aria-current="page"] {
+  background: var(--acao-primaria);
+  color: var(--texto-invertido);
+  /* AJUSTADO a pedido do usuário — sem sublinhado no hover. Link sublinha por
+     padrão no :hover (link.contract.json); aqui o item já ganha destaque de
+     fundo+cor sólidos, o sublinhado por cima ficava redundante/poluído. */
+  text-decoration: none;
+}
+
+.item a:hover svg,
+.item a[aria-current="page"] svg {
+  fill: var(--texto-invertido);
+}
+
+.groupHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espaco-m);
+  width: 100%;
+  background: none;
+  border: none;
+  border-radius: var(--raio-p);
+  padding: var(--espaco-p);
+  cursor: pointer;
+  text-align: left;
+  color: var(--texto-primario);
+  font-family: var(--texto-p-family);
+  font-size: var(--texto-p-size);
+}
+
+/* AJUSTADO a pedido do usuário — item "pai" (com submenu) também recebe o
+   hover verde+branco, mesmo tratamento dos itens-folha (ver .item a acima). */
+.groupHeader:hover {
+  background: var(--acao-primaria);
+  color: var(--texto-invertido);
+}
+
+.groupHeader:hover svg {
+  fill: var(--texto-invertido);
+}
+
+.groupHeader:focus-visible {
+  outline: var(--foco-espessura) solid var(--borda-foco);
+  outline-offset: -2px;
+}
+
+/* AJUSTADO a pedido do usuário — mesmo gap dos itens-folha (.item a), pra não
+   ficar um espaçamento ícone/texto diferente entre item simples e item "pai"
+   de submenu. */
+.groupLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espaco-m);
+  min-width: 0;
+}
+
+.caret {
+  display: inline-flex;
+  transition: transform 0.15s ease;
+}
+
+.caretOpen {
+  display: inline-flex;
+  transform: rotate(180deg);
+  transition: transform 0.15s ease;
+}
+
+/* Botão de hambúrguer — só visível abaixo de 768px, no lugar de onde o
+   consumidor posicionar o SideNav (contratos/side-nav.contract.json, anatomy). */
+.hamburger {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: var(--fundo-superficie);
+  border: none;
+  border-radius: var(--raio-pp);
+  cursor: pointer;
+}
+
+.hamburger:hover {
+  background: var(--fundo-secundario);
+}
+
+.hamburger:focus-visible {
+  outline: var(--foco-espessura) solid var(--borda-foco);
+  outline-offset: 2px;
+}
+
+.collapseToggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: none;
+  border: none;
+  border-radius: var(--raio-pp);
+  cursor: pointer;
+}
+
+.collapseToggle:hover {
+  background: var(--fundo-secundario);
+}
+
+.collapseToggle:focus-visible {
+  outline: var(--foco-espessura) solid var(--borda-foco);
+  outline-offset: 2px;
+}
+
+/* Trilho recolhido — só ícones, 64px fixo. Reserva espaço real no layout da
+   página (o consumidor só perde a largura do trilho, não a largura cheia do
+   SideNav) — o painel completo (.overlay) escapa desse espaço reservado via
+   position:absolute quando aparece (contratos/side-nav.contract.json,
+   decisions). */
+.collapsedWrapper {
+  position: relative;
+  width: 64px;
+  height: 100%;
+  flex-shrink: 0;
+}
+
+.rail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--espaco-m);
+  width: 64px;
+  height: 100%;
+  padding: var(--espaco-m) 0;
+  background: var(--fundo-superficie);
+  box-sizing: border-box;
+}
+
+:root[data-theme="dark"] .rail {
+  background: var(--fundo-secundario);
+}
+
+.railList {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--espaco-pp);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  width: 100%;
+}
+
+.railItem {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--raio-p);
+  text-decoration: none;
+  border: none;
+  padding: 0;
+  background: none;
+  cursor: pointer;
+  font: inherit;
+}
+
+.railItem:focus-visible {
+  outline: var(--foco-espessura) solid var(--borda-foco);
+}
+
+/* AJUSTADO a pedido do usuário — mesmo tratamento hover/ativo (verde sólido +
+   ícone branco) do painel expandido, aplicado também ao trilho recolhido. */
+.railItem:hover,
+.railItem[aria-current="page"] {
+  background: var(--acao-primaria);
+}
+
+.railItem:hover svg,
+.railItem[aria-current="page"] svg {
+  fill: var(--texto-invertido);
+}
+
+/* AJUSTADO a pedido do usuário — headerCollapsed (tipicamente só o ícone da
+   marca) fica no topo do trilho, mesmo espaçamento vertical do resto do
+   trilho (padding do próprio .rail já cobre isso), só centralizado
+   horizontalmente. */
+.railHeader {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+/* AJUSTADO a pedido do usuário — footerCollapsed (tipicamente só o Avatar do
+   cartão de usuário) fica fixado embaixo do trilho — margin-top:auto empurra
+   pro final do `.rail` (flex-direction:column), mesmo truque já usado em
+   header/body/footer do painel expandido pra manter o rodapé sempre embaixo. */
+.railFooter {
+  margin-top: auto;
+  padding-top: var(--espaco-m);
+  display: flex;
+  justify-content: center;
+}
+
+/* Painel completo por cima do conteúdo, ancorado na borda esquerda do
+   trilho — aparece ao passar o mouse (ou focar via teclado) em cima do
+   trilho, some quando o mouse/foco sai (contratos/side-nav.contract.json,
+   decisions). */
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 50;
+  box-shadow: var(--sombra-p);
+}
+
+@media (max-width: 768px) {
+  .nav,
+  .collapsedWrapper {
+    display: none;
+  }
+
+  .hamburger {
+    display: inline-flex;
+  }
+}

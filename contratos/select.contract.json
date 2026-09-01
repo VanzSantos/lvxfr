@@ -1,0 +1,222 @@
+{
+  "name": "Select",
+  "originalName": "CampoSelecao",
+  "oneLiner": "Campo de formulário para escolher 1 ou mais opções de uma lista, via combobox customizado (não é um <select> nativo).",
+  "category": "data-entry",
+  "status": "draft",
+  "whenToUse": "Escolher entre um conjunto de opções pré-definidas, quando TextField/Textarea não servem (valor livre) e Radio não serve (lista longa ou some do layout quando fechada).",
+  "whenNotToUse": "Só 2-6 opções sempre visíveis de uma vez (prefira Radio, sem exigir um clique a mais pra ver as alternativas); valor booleano (Checkbox); texto livre (TextField).",
+  "anatomy": [
+    "FieldLabel (em cima)",
+    "Botão-gatilho (fundo, borda, texto selecionado ou placeholder, ícone de seta indicando aberto/fechado)",
+    "Popup (listbox) — fundo, borda, raio, lista de opções, ícone de check na(s) opção(ões) selecionada(s)",
+    "HelperText (embaixo, opcional)"
+  ],
+  "dependencies": [
+    "FieldLabel",
+    "HelperText",
+    "Icon",
+    "Tooltip"
+  ],
+  "props": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "required",
+      "type": "boolean",
+      "default": false,
+      "required": false
+    },
+    {
+      "name": "withInfo",
+      "type": "boolean",
+      "default": false,
+      "required": false
+    },
+    {
+      "name": "infoText",
+      "type": "string",
+      "required": false,
+      "requiredWhen": "withInfo = true"
+    },
+    {
+      "name": "options",
+      "type": "array",
+      "required": true,
+      "description": "Array de { value: string, label: string, disabled?: boolean }. Tipo 'array' extendido no schema (v2.1) especificamente pra isso — nenhum prop anterior precisava de dado estruturado."
+    },
+    {
+      "name": "placeholder",
+      "type": "string",
+      "required": false,
+      "description": "Mostrado no botão-gatilho quando nada está selecionado."
+    },
+    {
+      "name": "multiple",
+      "type": "boolean",
+      "default": false,
+      "required": false,
+      "description": "false = seleção única, value é string e onChange manda string. true = seleção múltipla, value é string[] e onChange manda string[]. Muda o formato de value/onChange (ver decisions) — não é só um detalhe visual."
+    },
+    {
+      "name": "value",
+      "type": "string",
+      "required": true,
+      "description": "Quando multiple=false: string (vazia = nada selecionado). Quando multiple=true: string[] (o tipo real é string | string[], o schema deste harness não expressa union — ver decisions)."
+    },
+    {
+      "name": "state",
+      "type": "enum",
+      "enum": [
+        "default",
+        "error",
+        "disabled"
+      ],
+      "default": "default",
+      "required": false
+    },
+    {
+      "name": "helperText",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "onChange",
+      "type": "function",
+      "required": false,
+      "description": "Quando multiple=false: (value: string) => void. Quando multiple=true: (value: string[]) => void."
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "required": false,
+      "description": "Nome pro <input type=\"hidden\"> espelhado (ver decisions) — permite o valor viajar em submit de formulário nativo, mesmo o combobox não sendo um <select> real."
+    }
+  ],
+  "variants": [],
+  "states": [
+    "default",
+    "error",
+    "disabled"
+  ],
+  "tokensAllowed": {
+    "background": [
+      "semantic.fundo-superficie",
+      "semantic.fundo-secundario",
+      "semantic.fundo-campo"
+    ],
+    "border": [
+      "semantic.borda-base",
+      "semantic.borda-foco",
+      "semantic.borda-erro",
+      "semantic.borda-inativo"
+    ],
+    "text": [
+      "semantic.texto-primario",
+      "semantic.texto-placeholder",
+      "semantic.texto-inativo",
+      "semantic.texto-secundario"
+    ],
+    "optionHighlight": [
+      "semantic.fundo-secundario",
+      "semantic.acao-primaria-transparente"
+    ],
+    "radius": [
+      "structural.raio-pp",
+      "structural.raio-xp"
+    ],
+    "focusRing": [
+      "structural.foco-espessura"
+    ],
+    "spacing": [
+      "structural.espaco-xp",
+      "structural.espaco-pp"
+    ],
+    "iconSize": [
+      "structural.icone-medio",
+      "structural.icone-pequeno"
+    ],
+    "iconColor": [
+      "semantic.icone-secundario",
+      "semantic.icone-inativo",
+      "semantic.acao-primaria"
+    ],
+    "typography": [
+      "type-style.texto-m"
+    ]
+  },
+  "a11y": {
+    "role": "combobox no botão-gatilho (aria-haspopup='listbox', aria-expanded, aria-controls, aria-activedescendant) + listbox no popup (aria-multiselectable quando multiple=true) + option em cada item — padrão WAI-ARIA APG 'Combobox with Listbox Popup', não é um <select> nativo (decisão explícita do usuário — ver decisions).",
+    "requiredAria": [
+      "aria-required no gatilho quando required=true",
+      "aria-invalid no gatilho quando state=error",
+      "aria-describedby no gatilho apontando pro id derivado do HelperText, quando helperText existe",
+      "aria-selected em cada option refletindo se está selecionada",
+      "aria-disabled em cada option com disabled=true"
+    ],
+    "keyboard": [
+      "Enter/Espaço no gatilho fechado: abre o popup",
+      "Seta baixo/cima no gatilho fechado: abre o popup E já move pra próxima/anterior opção",
+      "Seta baixo/cima com popup aberto: move a opção ativa (sem voltar do início/fim — sem wrap, igual <select> nativo)",
+      "Home/End: pula pra primeira/última opção habilitada",
+      "Enter/Espaço com popup aberto: seleciona a opção ativa — fecha o popup se multiple=false, mantém aberto se multiple=true",
+      "Esc: fecha o popup sem alterar a seleção (nunca limpa o value)",
+      "digitar uma letra: pula/realça pra próxima opção cujo label comece com ela (typeahead), funciona com o popup aberto ou fechado",
+      "clique fora do gatilho e do popup: fecha sem alterar a seleção",
+      "opções com disabled=true são puladas pela navegação por teclado e pelo typeahead"
+    ],
+    "contrastMin": "AAA (7:1) como meta pro público 60+, mesma régua do TextField/Button.",
+    "notes": "Gatilho é um <button> nativo real (não uma <div> com tabindex) — dá foco, ativação por Enter/Espaço e associação nativa com FieldLabel (htmlFor/id) de graça, sem reimplementar nada disso. Foco nunca só cor. Foco + erro: erro vence (mesma regra do TextField, aplicada por consistência)."
+  },
+  "events": {
+    "status": "não definido no contrato original"
+  },
+  "composition": {
+    "canContain": [
+      "FieldLabel",
+      "HelperText",
+      "Icon"
+    ],
+    "canBeContainedBy": [
+      "formulários"
+    ],
+    "doNotCombine": []
+  },
+  "forbidden": [
+    "usar <select> nativo — decisão explícita do usuário foi pelo combobox customizado, apesar do custo/risco de a11y maior (ver decisions)",
+    "abrir o popup só com mouse — teclado (Enter/Espaço/seta) precisa abrir também",
+    "Esc limpando o value — Esc só fecha, nunca é destrutivo",
+    "navegação por teclado ou typeahead considerando opções com disabled=true",
+    "chips removíveis dentro do botão-gatilho — <button> não pode conter outro elemento interativo (ver decisions), resumo é só texto",
+    "comunicar obrigatoriedade só pelo asterisco do FieldLabel, sem aria-required no gatilho",
+    "comunicar erro só pela borda vermelha, sem aria-invalid + HelperText explicando",
+    "cor fora da whitelist de tokensAllowed",
+    "reimplementar FieldLabel, HelperText, Icon ou Tooltip inline — mesma regra do TextField/Textarea"
+  ],
+  "decisions": [
+    "CORRIGIDO — auditoria de contratos (2026-09-01): raio-xp adicionado a radius. O popup usa raio-pp, mas o botão-gatilho (Select.module.css) usa raio-xp — tokensAllowed estava subdeclarado, o CSS já usava o token corretamente.",
+    "Combobox customizado em vez de <select> nativo estilizado: decisão explícita do usuário, mesmo depois de eu sinalizar o custo/risco de a11y maior (a11y de um <select> nativo é de graça; aqui precisa implementar toda a navegação por teclado e ARIA manualmente). Motivo do usuário: visual 100% consistente com os tokens do harness e espaço pra evoluir (ícone por opção, etc.) — algo que o <select> nativo não permite.",
+    "multiple=true desde a v1 (não ficou pra depois): decisão explícita do usuário. value/onChange mudam de formato conforme multiple — string vs string[]. O schema de contrato deste harness (v2) não expressa union types, então o prop 'value' está documentado como string mas o texto da description explica a variação real; TypeScript na implementação usa union discriminada de verdade.",
+    "Seleção múltipla NÃO mostra chips removíveis dentro do gatilho: o gatilho é um <button> nativo (decisão abaixo), e HTML não permite elemento interativo (botão de remover) aninhado dentro de outro elemento interativo (o próprio button). Remover uma seleção é reabrir o popup e desmarcar. Revisitar só se um caso real pedir remoção sem reabrir.",
+    "DÍVIDA RESOLVIDA (estava registrada em ROADMAP.md) — typeahead não normalizava acento (digitar 'mex' não pulava pra 'México'), mesma classe de bug já corrigida em combobox.contract.json. Corrigido via findMatch customizado no useTypeahead do floating-ui (a API padrão só permite injetar essa lógica por esse prop — não dá pra sobrescrever o comparador default de outra forma). A função normalizeForSearch foi extraída pra shared/normalizeForSearch.ts e agora é reaproveitada por Select e ComboBox, em vez de duplicada — mesmo padrão de shared/multiSelectSummary.ts.",
+    "REVISADO — resumo do gatilho múltiplo usa contador '+N' medido de verdade, não reticências de CSS: quando todos os labels cabem, mostra em lista natural em português ('Brasil, Portugal e Argentina'); quando não cabem, mostra quantos labels completos couberem, separados por vírgula, seguido de ' +N' com a contagem do que ficou de fora (ex.: 'Brasil, Portugal, Argentina +2'). Medição via canvas (CanvasRenderingContext2D.measureText), recalculada num ResizeObserver do próprio gatilho — CSS text-overflow:ellipsis sozinho cortaria o texto no meio de um label, não no limite entre itens, e não teria como mostrar 'quantos ficaram de fora'. Lógica extraída pra src/components/shared/multiSelectSummary.ts e reaproveitada pelo ComboBox (combobox.contract.json), que tem o mesmo problema de resumo múltiplo truncado.",
+    "Gatilho é <button type='button'>, não uma <div role='combobox'> com tabindex: ganha foco nativo, ativação por Enter/Espaço, e principalmente associação nativa com FieldLabel via htmlFor/id (label-for funciona com qualquer elemento 'labelable', incluindo <button>) — evita reimplementar isso à mão.",
+    "Popup posicionado com @floating-ui/react (flip + shift), mesma biblioteca e mesmo padrão já usado em tooltip.contract.json — não introduz uma segunda forma de resolver 'elemento ancorado que não pode sair da viewport'.",
+    "Sem wrap na navegação por seta (chegar no fim não volta pro início) — replica o comportamento do <select> nativo na maioria dos navegadores, evita reimplementar um comportamento que o usuário talvez não espere.",
+    "Esc nunca limpa o value, só fecha o popup — evita perda de dado acidental, prioridade do público 60+ (que já é tratada como não-negociável em todos os outros contratos de data-entry deste harness).",
+    "name gera um <input type='hidden'> espelhando o value (ou múltiplos hidden inputs quando multiple=true, um por valor selecionado) — sem isso, um combobox customizado é invisível pra FormData/submit nativo de formulário, porque não é um <select> de verdade.",
+    "Erro + foco: erro vence visualmente — mesma regra já fixada em text-field.contract.json, aplicada aqui por consistência entre contratos de data-entry.",
+    "Popup sem sombra (box-shadow) — só borda (semantic.borda-base), mesma convenção 100% flat/bordered do resto do harness (mesma decisão já tomada em card.contract.json, que também não tem token de sombra disponível).",
+    "Popup renderizado via FloatingPortal (@floating-ui/react) — escapa de qualquer overflow:hidden/auto de ancestrais (ex.: o canvas da DS Playground), mesmo padrão de robustez que outras bibliotecas de overlay usam.",
+    "RESOLVIDO — cada option recebe um id real (`${fieldId}-option-${index}`), pra aria-activedescendant no botão apontar pra algo de verdade. Bug real encontrado testando com JS no navegador: o destaque visual da opção ativa funcionava (state do React), mas aria-activedescendant ficava vazio, porque nenhum elemento tinha id — leitor de tela não teria como saber qual opção está em foco virtual.",
+    "RESOLVIDO — Enter/Espaço para confirmar a seleção são tratados no onKeyDown do botão-gatilho, não da opção. Bug real encontrado testando: como o foco real nunca sai do botão (navegação virtual), um onKeyDown na <div> da opção nunca dispara — keydown só chega no elemento que de fato está focado no DOM.",
+    "RESOLVIDO — foco real de teclado nunca sai do botão-gatilho, mesmo durante navegação (padrão 'virtual' do useListNavigation: aria-activedescendant simula o foco, o DOM focus fica parado). Bug real encontrado ao testar no navegador (não só inspeção de código): clique do mouse numa opção movia o foco do DOM pro <div> dela (mesmo com tabIndex=-1) — quando o popup fechava e a opção sumia do DOM, o foco se perdia e voltava pro topo da página. onMouseDown={e => e.preventDefault()} sozinho não foi suficiente (confirmado testando — algum handler interno ainda focava a opção). Fix definitivo: guardar um ref pro próprio botão-gatilho e chamar .focus() nele explicitamente ao fim de toda seleção (única ou múltipla), independente da causa exata do desvio de foco.",
+    "AJUSTADO a pedido do usuário — fundo do campo trocado de semantic.fundo-superficie pra semantic.fundo-campo (token novo): 'o fundo dos inputs de forma geral, devem ser levemente mais escuros que a cor de fundo da página onde estão, para destacar melhor'. No modo claro fundo-campo é idêntico a fundo-superficie (sem mudança visual, branco com borda já bastava) — só no modo escuro os dois valores divergem (fundo-campo um degrau mais escuro que a página), porque era só ali que o campo ficava indistinguível da própria página por trás."
+  ],
+  "references": {
+    "tokensFile": "tokens/tokens.json — Cores Semânticas (Fundos, Bordas, Textos, Ações/Primárias), Estrutural (raio-pp, foco-espessura, espaco-xp/pp, icone-pequeno/medio), Tipografia Estilo (texto-m)"
+  }
+}

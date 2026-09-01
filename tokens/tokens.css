@@ -1,0 +1,396 @@
+/*
+ * Gerado a partir de tokens.json (coleções Cores Semânticas / modo Claro,
+ * Estrutural, Tipografia Estilo). Nome da variável = nome do token sem
+ * prefixo de camada, conforme token-notation.md.
+ */
+:root {
+  /* Ações / Primárias */
+  --acao-primaria: #006631;
+  --acao-primaria-sobreposta: #005328;
+  --acao-primaria-pressionada: #00401e;
+  --acao-primaria-transparente: #0066311a;
+  --acao-primaria-texto: #ffffff;
+
+  /* Ações / Secundárias */
+  --acao-secundaria: #95c11f;
+  --acao-secundaria-sobreposta: #759b15;
+  --acao-secundaria-pressionada: #587615;
+  --acao-secundaria-transparente: #95c11f1a;
+  --acao-secundaria-texto: #00401e;
+
+  /* Ações / Neutras */
+  --acao-neutra: #111827;
+  --acao-neutra-sobreposta: #1f2937;
+  --acao-neutra-pressionada: #374151;
+  --acao-neutra-transparente: #1118271a;
+  --acao-neutra-texto: #ffffff;
+
+  /* Ações / Sutis */
+  --acao-sutil: #f3f4f6;
+  --acao-sutil-sobreposta: #e5e7eb;
+  --acao-sutil-pressionada: #d1d5db;
+  --acao-sutil-transparente: #f3f4f61a;
+  --acao-sutil-texto: #111827;
+
+  /* Ações / Destrutivas */
+  --acao-destrutiva: #ca3434;
+  --acao-destrutiva-sobreposta: #972424;
+  --acao-destrutiva-pressionada: #6b1717;
+  --acao-destrutiva-transparente: #ca34341a;
+  --acao-destrutiva-texto: #ffffff;
+
+  /* Ações / Link */
+  --acao-link: #00000000;
+  --acao-link-texto: #006631;
+  --acao-link-texto-sobreposto: #00401e;
+
+  /* Ações / Universais */
+  --acao-inativa: #e5e7eb;
+  --acao-inativa-texto: #9ca3af;
+  --acao-carregando: #e5e7eb;
+  --acao-carregando-texto: #9ca3af;
+
+  /* Fundos e Superfícies */
+  --fundo-superficie: #ffffff;
+  --fundo-secundario: #f3f4f6;
+  /* AJUSTADO a pedido do usuário — neutralizado (era azul-ardósia, #111827);
+     não muda de valor entre temas (ver nota no bloco dark), então precisa
+     ser neutro nos dois — reaproveitado exatamente o tom mais escuro da
+     escala neutra pedida pro modo escuro (#111111), consistência entre os
+     dois "pretos" do sistema. */
+  --fundo-invertido: #111111;
+  --fundo-sobreposicao: #00000080;
+  /* Fundo de CAMPOS de formulário (TextField/Select/Checkbox/Radio/etc.) —
+     igual a fundo-superficie no modo claro (branco sobre branco com borda já
+     é o padrão estabelecido), mas fica um degrau mais escuro que a página no
+     modo escuro (ver dark override), pra criar contraste entre 'isto é um
+     campo' e 'isto é a página' sem depender só da borda. */
+  --fundo-campo: var(--fundo-superficie);
+
+  /* Fundos e Superfícies / Sinalização */
+  --fundo-erro: #fcf1f1;
+  --fundo-sucesso: #dff9ea;
+  --fundo-aviso: #fdfbe9;
+  --fundo-info: #eff8ff;
+  --fundo-apoio-1: #f4f0fa;
+  --fundo-apoio-2: #ffeed4;
+  --fundo-apoio-3: #fbfdf2;
+
+  /* Fundos e Superfícies / Sinalização — "forte", pra superfícies sólidas (Toast,
+     Badge/Chip/Timeline nas variantes success/warning/error) que precisam de mais
+     contraste-de-atenção que um fundo claro sem ficar tão escuras quanto texto-X (que
+     foi desenhado pra TEXTO pequeno sobre fundo claro, não pra fundo sólido grande).
+     Ainda não existem como token semântico no Figma — trazidos da escala primitiva
+     (Vermelho/Verde/Amarelo-600, um degrau abaixo de texto-erro/sucesso/aviso) só pra
+     viabilizar essa necessidade real; ver contratos/toast.contract.json e
+     contratos/badge.contract.json, decisions. --fundo-aviso-forte (Amarelo-600, #C2870C)
+     falha contraste AA com texto branco em cima (3.10:1, abaixo do mínimo 4.5:1 pra texto
+     normal) — em Badge/Chip/Timeline, onde o rótulo é texto pequeno, o texto/ícone em
+     cima de fundo-aviso-forte usa semantic.texto-primario (preto, ~6.6:1) em vez de
+     texto-invertido (branco) — única exceção das 3 cores nesses componentes, ver
+     decisions nos respectivos contratos. */
+  --fundo-erro-forte: #ca3434;
+  --fundo-sucesso-forte: #1e7744;
+  --fundo-aviso-forte: #c2870c;
+  --fundo-info-forte: #1c63d9;
+
+  /* Fundos e Superfícies / Apoio — "forte", mesmo racional/nomenclatura do bloco acima,
+     mas pras 3 cores de categoria (apoio-1=roxo, apoio-2=laranja, apoio-3=kiwi) do Badge
+     (accent1/2/3). Um degrau mais claro que texto-apoio-N (que Badge usava antes como
+     fundo sólido) — trazidos agora da escala primitiva (Roxo/Laranja-600) só pro Badge
+     clarear essas 2 variantes; ver contratos/badge.contract.json, decisions. apoio-3/kiwi
+     não precisou de token novo — clareou direto pra Kiwi-500, que já existe como
+     borda-apoio-3, só que ali com texto-primario (preto) em vez de texto-invertido,
+     porque kiwi-500 falha contraste AA com texto branco (2.02:1) e passa bem com preto
+     (8.38:1). apoio-1/roxo e apoio-2/laranja pararam em 600 (não desceram até o 500, como
+     kiwi) porque o pedido do usuário foi mantê-los com texto branco: laranja-500 com
+     branco cai pra 3.26:1 (abaixo do mínimo AA 4.5:1), então 600 (4.80:1) é o degrau mais
+     claro ainda seguro sem trocar a cor do texto. */
+  --fundo-apoio-1-forte: #643bb3;
+  --fundo-apoio-2-forte: #c64208;
+
+  /* Bordas */
+  --borda-base: #d1d5db;
+  --borda-foco: #0d8f4f;
+  --borda-erro: #eb5757;
+  --borda-inativo: #9ca3af;
+
+  /* Bordas / Sinalização */
+  --borda-sucesso: #219653;
+  --borda-aviso: #ebb612;
+  --borda-info: #3a97f7;
+  --borda-apoio-1: #7d50cd;
+  --borda-apoio-2: #ef5b07;
+  --borda-apoio-3: #95c11f;
+
+  /* Textos */
+  --texto-primario: #111827;
+  --texto-placeholder: #6b7280;
+  --texto-inativo: #9ca3af;
+  --texto-secundario: #4b5563;
+  --texto-obrigatorio: #ca3434;
+  --texto-erro: #972424;
+  --texto-invertido: #f9fafb;
+  /* Contraparte fixa de texto-invertido: texto SEMPRE escuro, não troca de
+     valor entre temas — pro caso de fundos sólidos/saturados que continuam
+     claros o bastante pra precisar de texto escuro em QUALQUER tema (ex.:
+     Badge/Chip/Toast variant='warning' e accent1/kiwi, cujo fundo é um
+     amarelo/lima vivo tanto no claro quanto no escuro). Ver decisions em
+     badge.contract.json/chip.contract.json/toast.contract.json. */
+  --texto-escuro-fixo: #111827;
+
+  /* Textos / Sinalização */
+  --texto-sucesso: #1c5f3a;
+  --texto-aviso: #9b610d;
+  --texto-info: #1d51b0;
+  --texto-apoio-1: #4f2694;
+  --texto-apoio-2: #9d350f;
+  --texto-apoio-3: #587615;
+
+  /* Ícones */
+  --icone-secundario: #6b7280;
+  --icone-inativo: #9ca3af;
+
+  /* Ícones / Sinalização */
+  --icone-erro: #972424;
+  --icone-sucesso: #1c5f3a;
+  --icone-aviso: #9b610d;
+  --icone-info: #1d51b0;
+  --icone-apoio-1: #4f2694;
+  --icone-apoio-2: #9d350f;
+  --icone-apoio-3: #587615;
+
+  /* Estrutural / Sombras — ainda não existe como coleção no Figma (tokens.json não
+     tem "Sombras" hoje). Criados agora pra desbloquear Card com elevação, seguindo
+     a mesma convenção de nomenclatura xp, pp, p, m, g, gg já usada em raio- e espaco-.
+     Cor base é texto-primario (#111827, cinza quase preto do próprio harness) em vez
+     de preto puro — mesma disciplina de nunca introduzir uma cor crua nova sem motivo.
+     Ver contratos/card.contract.json, decisions, pra reconciliar com o Figma depois. */
+  --sombra-pp: 0 1px 2px 0 rgba(17, 24, 39, 0.05);
+  --sombra-p: 0 1px 3px 0 rgba(17, 24, 39, 0.1), 0 1px 2px -1px rgba(17, 24, 39, 0.1);
+  --sombra-m: 0 4px 6px -1px rgba(17, 24, 39, 0.1), 0 2px 4px -2px rgba(17, 24, 39, 0.1);
+
+  /* Estrutural */
+  --raio-xp: 4px;
+  --raio-pp: 8px;
+  --raio-p: 12px;
+  --raio-circular: 9999px;
+  --foco-espessura: 3px;
+  --espaco-xp: 4px;
+  --espaco-pp: 8px;
+  --espaco-p: 12px;
+  --espaco-m: 16px;
+  --espaco-g: 24px;
+  --espaco-gg: 32px;
+  --espaco-xg: 48px;
+  --espaco-xgg: 64px;
+  --icone-medio: 20px;
+  --icone-pequeno: 16px;
+  --icone-grande: 24px;
+  --icone-extra-grande: 32px;
+
+  /* Tipografia Estilo/texto-m */
+  --texto-m-family: Roboto, sans-serif;
+  --texto-m-size: 16px;
+  --texto-m-weight: 400;
+  --texto-m-line-height: 1.5;
+
+  /* Tipografia Estilo/texto-m-forte */
+  --texto-m-forte-family: Roboto, sans-serif;
+  --texto-m-forte-size: 16px;
+  --texto-m-forte-weight: 700;
+  --texto-m-forte-line-height: 1.5;
+
+  /* Tipografia Estilo/texto-rotulo-botao */
+  --texto-rotulo-botao-family: Roboto, sans-serif;
+  --texto-rotulo-botao-size: 16px;
+  --texto-rotulo-botao-weight: 500;
+  --texto-rotulo-botao-line-height: 1.5;
+
+  /* Tipografia Estilo/texto-rotulo-campo */
+  --texto-rotulo-campo-family: Roboto, sans-serif;
+  --texto-rotulo-campo-size: 16px;
+  --texto-rotulo-campo-weight: 500;
+  --texto-rotulo-campo-line-height: 1.5;
+
+  /* Tipografia Estilo/texto-p */
+  --texto-p-family: Roboto, sans-serif;
+  --texto-p-size: 14px;
+  --texto-p-weight: 400;
+  --texto-p-line-height: 1.4;
+
+  /* Tipografia Estilo/texto-micro */
+  --texto-micro-family: Roboto, sans-serif;
+  --texto-micro-size: 12px;
+  --texto-micro-weight: 400;
+  --texto-micro-line-height: 1.4;
+
+  /* Tipografia Estilo/texto-micro-forte */
+  --texto-micro-forte-family: Roboto, sans-serif;
+  --texto-micro-forte-size: 12px;
+  --texto-micro-forte-weight: 700;
+  --texto-micro-forte-line-height: 1.4;
+
+  /* Tipografia Estilo/texto-g-forte */
+  --texto-g-forte-family: Roboto, sans-serif;
+  --texto-g-forte-size: 18px;
+  --texto-g-forte-weight: 700;
+  --texto-g-forte-line-height: 1.5;
+}
+
+/*
+ * Modo Escuro — ativado via [data-theme="dark"] no <html> (toggle manual do
+ * Playground, não prefers-color-scheme — ver ThemeToggle). Sobrescreve só as
+ * variáveis de COR (nenhuma variável estrutural/tipografia muda de valor
+ * entre temas). Não existe como coleção no Figma ainda; paleta construída
+ * agora seguindo a mesma disciplina de contraste AA do modo claro — ver
+ * decisions em cada contrato que documenta um ajuste específico de dark mode.
+ *
+ * Decisão de fundo-invertido/texto-invertido: os dois NÃO trocam de valor
+ * entre temas — fundo-invertido representa uma superfície propositalmente
+ * escura em qualquer tema (ex.: cápsula do CallControlBar, Badge
+ * variant="dark"), não "o oposto do tema atual". Mesmo racional de uma barra
+ * de chamada de vídeo continuar escura em apps com tema claro OU escuro.
+ */
+:root[data-theme="dark"] {
+  /* Ações / Primárias — brilho um degrau acima do modo claro (#006631 direto
+     sobre fundo escuro, como em acao-link-texto, cairia abaixo do contraste
+     mínimo — ver borda-foco/acao-link-texto abaixo) */
+  --acao-primaria: #16814a;
+  --acao-primaria-sobreposta: #12693b;
+  --acao-primaria-pressionada: #0d5030;
+  --acao-primaria-transparente: #16814a26;
+  --acao-primaria-texto: #ffffff;
+
+  /* Ações / Secundárias */
+  --acao-secundaria: #a8d43e;
+  --acao-secundaria-sobreposta: #8bb52e;
+  --acao-secundaria-pressionada: #6d9522;
+  --acao-secundaria-transparente: #a8d43e26;
+  --acao-secundaria-texto: #0d2b12;
+
+  /* Ações / Neutras — AJUSTADO a pedido do usuário: 'a variante neutral
+     preenchido deve ter o fundo bem mais claro e as letras escuras'. Papel
+     do botão neutral se INVERTE no escuro (era quase-preto no claro, vira
+     quase-branco aqui) — mesmo padrão de botão 'cinza claro' já visto em
+     apps com dark mode maduro; um neutral escuro ficaria indistinguível do
+     próprio fundo da página. acao-neutra também é reaproveitada DIRETO
+     (mesma variável) pra texto+borda do outlined.neutral — resolve os dois
+     pedidos (preenchido claro E outlined 'quase branco') com um valor só. */
+  --acao-neutra: #e5e4e1;
+  --acao-neutra-sobreposta: #d4d3cf;
+  --acao-neutra-pressionada: #c2c1bc;
+  --acao-neutra-transparente: #e5e4e126;
+  --acao-neutra-texto: #111827;
+
+  /* Ações / Sutis — AJUSTADO a pedido do usuário: 'precisa do fundo apenas
+     um nível mais claro' (que a página, não tão claro quanto o neutral) */
+  --acao-sutil: #3a3937;
+  --acao-sutil-sobreposta: #454340;
+  --acao-sutil-pressionada: #504e4a;
+  --acao-sutil-transparente: #3a393726;
+  --acao-sutil-texto: #f3f4f6;
+
+  /* Ações / Destrutivas */
+  --acao-destrutiva: #c93f3f;
+  --acao-destrutiva-sobreposta: #b23a3a;
+  --acao-destrutiva-pressionada: #8a2c2c;
+  --acao-destrutiva-transparente: #c93f3f26;
+  --acao-destrutiva-texto: #ffffff;
+
+  /* Ações / Link — #006631 (modo claro) direto sobre fundo escuro reprova
+     contraste AA; clareado pra um verde bem mais vivo */
+  --acao-link-texto: #3ecf82;
+  --acao-link-texto-sobreposto: #6fe0a3;
+
+  /* Ações / Universais */
+  --acao-inativa: #3a3937;
+  --acao-inativa-texto: #7a7972;
+  --acao-carregando: #3a3937;
+  --acao-carregando-texto: #7a7972;
+
+  /* Fundos e Superfícies — REVISADO a pedido do usuário, 2 rodadas: (1) a
+     primeira versão usava azul-ardósia (slate), trocada por uma escala
+     neutra; (2) 'as cores escolhidas para o fundo ainda estão muito claras'
+     — valores exatos pedidos pelo usuário pros 3 níveis: mais escuro
+     (fundo-campo) #111111, intermediário (fundo-superficie) #161616, menos
+     escuro (fundo-secundario) #20201F. fundo-campo é o fundo de CAMPOS de
+     formulário, um degrau mais escuro que a própria página (no claro os
+     dois são iguais — branco com borda já bastava). */
+  --fundo-superficie: #161616;
+  --fundo-secundario: #20201f;
+  --fundo-campo: #111111;
+  --fundo-sobreposicao: #000000b3;
+
+  /* Fundos e Superfícies / Sinalização — tints escuros (não mais quase-branco)
+     pareados com as cores de texto/ícone claras abaixo */
+  --fundo-erro: #3a1f22;
+  --fundo-sucesso: #163828;
+  --fundo-aviso: #3a3116;
+  --fundo-info: #17293f;
+  --fundo-apoio-1: #241c3a;
+  --fundo-apoio-2: #3a2414;
+  --fundo-apoio-3: #263a16;
+
+  /* Fundos e Superfícies / Sinalização — "forte" (Badge/Toast sólidos),
+     levemente mais claras que o modo claro pra manter o "pop" sobre página
+     escura; aviso continua a única que usa texto-primario por cima (ver
+     badge.contract.json) — reavaliado: #d99a1f com texto-primario escuro
+     (agora #111827) seguem passando AA */
+  --fundo-erro-forte: #e14b4b;
+  --fundo-sucesso-forte: #2f9c5c;
+  --fundo-aviso-forte: #d99a1f;
+  --fundo-info-forte: #3d7ee8;
+  --fundo-apoio-1-forte: #7c53d1;
+  --fundo-apoio-2-forte: #e0651f;
+
+  /* Bordas — AJUSTADO a pedido do usuário: neutralizadas junto dos fundos
+     (eram azul-ardósia) */
+  --borda-base: #46453f;
+  --borda-foco: #22c55e;
+  --borda-erro: #f27272;
+  --borda-inativo: #5c5b54;
+
+  /* Bordas / Sinalização */
+  --borda-sucesso: #3ecc7a;
+  --borda-aviso: #f0c94a;
+  --borda-info: #5fb0ff;
+  --borda-apoio-1: #9c7ae0;
+  --borda-apoio-2: #f2823f;
+  --borda-apoio-3: #b6da5a;
+
+  /* Textos */
+  --texto-primario: #f3f4f6;
+  --texto-placeholder: #93928c;
+  --texto-inativo: #7a7972;
+  --texto-secundario: #b5b4ad;
+  --texto-obrigatorio: #f27272;
+  --texto-erro: #f28b8b;
+
+  /* Textos / Sinalização */
+  --texto-sucesso: #6fd19a;
+  --texto-aviso: #e0b955;
+  --texto-info: #7db2f5;
+  --texto-apoio-1: #b79ce8;
+  --texto-apoio-2: #f0a373;
+  --texto-apoio-3: #b6da5a;
+
+  /* Ícones */
+  --icone-secundario: #a3a29b;
+  --icone-inativo: #63625b;
+
+  /* Ícones / Sinalização */
+  --icone-erro: #f28b8b;
+  --icone-sucesso: #6fd19a;
+  --icone-aviso: #e0b955;
+  --icone-info: #7db2f5;
+  --icone-apoio-1: #b79ce8;
+  --icone-apoio-2: #f0a373;
+  --icone-apoio-3: #b6da5a;
+
+  /* Estrutural / Sombras — mais escuras/opacas que o modo claro, senão somem
+     contra um fundo que já é escuro */
+  --sombra-pp: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+  --sombra-p: 0 1px 3px 0 rgba(0, 0, 0, 0.45), 0 1px 2px -1px rgba(0, 0, 0, 0.45);
+  --sombra-m: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -2px rgba(0, 0, 0, 0.5);
+}

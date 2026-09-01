@@ -1,0 +1,50 @@
+{
+  "name": "Skeleton",
+  "originalName": "Esqueleto de Carregamento",
+  "oneLiner": "Placeholder visual do FORMATO do conteúdo que ainda está carregando — diferente do Spinner, que indica 'algo está acontecendo' sem sugerir o formato do resultado.",
+  "category": "display",
+  "status": "draft",
+  "whenToUse": "O layout final do conteúdo já é conhecido (ex.: uma lista de cards, um parágrafo de texto, um avatar) e mostrar a silhueta reduz a sensação de espera/layout shift quando o conteúdo real chega.",
+  "whenNotToUse": "Carregamento sem forma conhecida de conteúdo, ou de uma ação pontual (isso é Spinner); operação com progresso mensurável (isso é ProgressBar); conteúdo que falhou ou está vazio depois de carregar (isso é Empty State, próximo da fila).",
+  "anatomy": [
+    "Bloco (fundo neutro, raio conforme shape, animação de pulso)"
+  ],
+  "dependencies": [],
+  "props": [
+    { "name": "shape", "type": "enum", "enum": ["text", "circle", "rect"], "default": "text", "required": false, "description": "text = linha baixa e arredondada (raio-xp). circle = raio-circular, pra placeholder de Avatar. rect = raio-pp, pra placeholder de Card/imagem." },
+    { "name": "width", "type": "string", "required": false, "description": "Valor CSS livre (ex.: '100%', '240px'). Sem padrão fixo — Skeleton não adivinha o tamanho do conteúdo real." },
+    { "name": "height", "type": "string", "required": false, "description": "Valor CSS livre. Padrão depende do shape quando omitido (ver decisions)." }
+  ],
+  "variants": ["text", "circle", "rect"],
+  "states": ["static"],
+  "tokensAllowed": {
+    "background": ["semantic.acao-inativa"],
+    "radius": ["structural.raio-xp", "structural.raio-pp", "structural.raio-circular"]
+  },
+  "a11y": {
+    "role": "nenhuma — aria-hidden=\"true\" sempre. Skeleton é puramente decorativo (uma silhueta visual); ele não representa informação, então não deve ser anunciado por leitor de tela.",
+    "requiredAria": ["aria-hidden=\"true\" sempre presente"],
+    "keyboard": [],
+    "contrastMin": "N/A — Skeleton não carrega texto nem precisa de contraste próprio, é um bloco de cor sólida.",
+    "notes": "Skeleton sozinho não anuncia 'carregando' pra leitor de tela (é aria-hidden) — se o estado de carregamento precisa ser comunicado, quem consome envolve a região com role=\"status\"/aria-busy=\"true\" por fora (ver decisions). Animação de pulso respeita prefers-reduced-motion — fica estática pra quem pediu menos movimento no sistema operacional."
+  },
+  "events": { "status": "não definido no contrato original" },
+  "composition": {
+    "canContain": [],
+    "canBeContainedBy": ["listas", "cards", "qualquer região aguardando conteúdo assíncrono"],
+    "doNotCombine": ["Skeleton dentro de Skeleton"]
+  },
+  "forbidden": [
+    "Skeleton sem aria-hidden — precisa ficar invisível pra leitor de tela sempre",
+    "usar Skeleton como estado de erro/vazio permanente — isso é Empty State, Skeleton é só transição de carregamento",
+    "cor fora da whitelist de tokensAllowed (ex.: usar fundo-secundario em vez de acao-inativa)"
+  ],
+  "decisions": [
+    "aria-hidden sempre true, sem opção de desligar — Skeleton nunca carrega informação real, decisão fechada (diferente de Icon, que tem um modo não-decorativo opcional). Se a região toda precisa anunciar 'carregando' pra leitor de tela, isso é responsabilidade de quem consome (role=status/aria-busy no container pai), não do Skeleton individual — mesmo princípio de 'Skeleton não sabe nada sobre o contexto ao redor' já usado em Divider/Badge (position exige que o pai monte o contexto).",
+    "Altura padrão por shape quando height é omitido: text=16px (aprox. 1 linha de texto-m), circle=40px (mesmo diâmetro do Avatar medium), rect=120px (altura arbitrária razoável pra um placeholder de card/imagem, ajustável via prop). Documentado explicitamente porque são valores fixos não-tokenizados (mesma disciplina já usada nas constantes de 1-2px de borda em outros contratos) — não existe token estrutural dedicado a 'altura de skeleton'.",
+    "Animação de pulso (opacity 1↔0.5, alternando) implementada via CSS @keyframes, envolvida em @media (prefers-reduced-motion: reduce) que desativa a animação — primeira vez que esse critério de acessibilidade aparece explicitamente num contrato deste harness (os outros componentes não têm animação própria pra precisar disso).",
+    "Cor única (semantic.acao-inativa) pra todos os shapes — Skeleton não tem variant de cor/intent, é sempre neutro; não faz sentido comunicar status (erro/sucesso) num placeholder de conteúdo que ainda nem chegou.",
+    "width/height sem valor padrão pra width (sempre explícito pelo consumidor) — Skeleton não tem como adivinhar a largura do texto/imagem real que vai substituí-lo; só a altura tem um padrão razoável por shape."
+  ],
+  "references": { "tokensFile": "tokens/tokens.json — Cores Semânticas (Ações/Universais/acao-inativa), Estrutural (raio-xp, raio-pp, raio-circular)" }
+}

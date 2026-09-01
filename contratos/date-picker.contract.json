@@ -1,0 +1,267 @@
+{
+  "name": "DatePicker",
+  "originalName": "SeletorDeData",
+  "oneLiner": "Campo de texto que abre o Calendar num popover ancorado — data única ou intervalo (início/fim, como dois campos independentes).",
+  "category": "data-entry",
+  "status": "draft",
+  "whenToUse": "Formulário precisa capturar uma data (ou um intervalo de datas) digitada/selecionada dentro do fluxo normal de campos, em vez de um Calendar sempre visível ocupando espaço permanente na tela.",
+  "whenNotToUse": "Calendar sempre visível é aceitável/desejável (ex.: uma página de agendamento onde a grade de dias é o conteúdo principal — use Calendar direto, sem popover); selecionar hora (isso é TimePicker); selecionar data E hora juntas (isso é DateTimePicker, que reaproveita DatePicker + TimePicker).",
+  "anatomy": [
+    "Campo único — FieldLabel opcional + trigger com Icon 'calendar' à esquerda (opcional, ver showIcon) + <input type='text'> com máscara automática 'DD/MM/AAAA' (só dígitos aceitos, separadores '/' inseridos sozinhos) + Icon 'caret-down' decorativo à direita (só quando showPicker) + HelperText opcional",
+    "Popover (via @floating-ui, FloatingPortal) ancorado no campo, contendo um Calendar — abre ao focar/clicar o campo OU ao clicar o ícone; selecionar uma data no Calendar preenche o campo de texto também",
+    "Modo range — dois campos independentes lado a lado (Início / Fim), cada um com seu próprio campo+popover; não é uma única grade com duas datas destacadas ao mesmo tempo (ver decisions)"
+  ],
+  "dependencies": [
+    "Calendar",
+    "FieldLabel",
+    "HelperText",
+    "Icon"
+  ],
+  "props": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": false,
+      "description": "Rótulo do campo (ou dos dois campos no modo range, prefixado por startLabel/endLabel)."
+    },
+    {
+      "name": "hideLabel",
+      "type": "boolean",
+      "default": false,
+      "required": false,
+      "description": "true = não renderiza o FieldLabel visível, mas o texto do label (ou startLabel/endLabel no range) ainda vira aria-label do input — nome acessível preservado mesmo sem rótulo visual. Útil quando o campo já vive num contexto que deixa o rótulo óbvio (ex.: dentro de uma FilterBar com poucos campos)."
+    },
+    {
+      "name": "required",
+      "type": "boolean",
+      "required": false,
+      "default": false,
+      "description": "Repassado pro FieldLabel (asterisco)."
+    },
+    {
+      "name": "withInfo",
+      "type": "boolean",
+      "required": false,
+      "default": false,
+      "description": "Repassado pro FieldLabel (ícone de informação com infoText)."
+    },
+    {
+      "name": "infoText",
+      "type": "string",
+      "required": false,
+      "description": "Texto do tooltip de informação, junto com withInfo."
+    },
+    {
+      "name": "state",
+      "type": "enum",
+      "enum": [
+        "default",
+        "error",
+        "disabled"
+      ],
+      "default": "default",
+      "required": false,
+      "description": "Mesmo enum de TextField/Select — error muda a borda, disabled bloqueia abrir o popover."
+    },
+    {
+      "name": "helperText",
+      "type": "string",
+      "required": false,
+      "description": "Texto de apoio/erro abaixo do campo."
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "required": false,
+      "description": "Nome pra integração com formulários nativos."
+    },
+    {
+      "name": "minDate",
+      "type": "string",
+      "required": false,
+      "description": "Repassado direto pro Calendar interno."
+    },
+    {
+      "name": "maxDate",
+      "type": "string",
+      "required": false,
+      "description": "Repassado direto pro Calendar interno."
+    },
+    {
+      "name": "disabledDate",
+      "type": "function",
+      "required": false,
+      "description": "Repassado direto pro Calendar interno."
+    },
+    {
+      "name": "placeholder",
+      "type": "string",
+      "required": false,
+      "default": "DD/MM/AAAA",
+      "description": "Texto do campo quando vazio — mudou de 'Selecione uma data' pra 'DD/MM/AAAA' junto com a digitação mascarada, pra já comunicar o formato esperado."
+    },
+    {
+      "name": "range",
+      "type": "boolean",
+      "required": false,
+      "default": false,
+      "description": "false (padrão) = campo único, value é uma data ISO ou null. true = dois campos (início/fim), value é { start: string|null, end: string|null }. Muda o formato de value/onChange (ver decisions, mesmo padrão de Select multiple)."
+    },
+    {
+      "name": "showPicker",
+      "type": "boolean",
+      "required": false,
+      "default": true,
+      "description": "true (padrão) = campo abre o popover com o Calendar ao focar/clicar, além de aceitar digitação — os dois caminhos convivem. false = campo vira só-digitação: nunca abre popover (nem por clique nem por foco), sem o ícone caret-down decorativo, sem aria-haspopup/aria-expanded. Útil quando o formulário quer um campo de data mais compacto/rápido de preencher via teclado, sem o overhead visual de um Calendar completo."
+    },
+    {
+      "name": "showIcon",
+      "type": "boolean",
+      "required": false,
+      "default": true,
+      "description": "true (padrão) = mostra o Icon 'calendar' fixo à esquerda do campo. false = campo sem esse ícone (a máscara/formato DD/MM/AAAA já comunica que é um campo de data, então o ícone vira dispensável em contextos mais compactos/densos)."
+    },
+    {
+      "name": "value",
+      "type": "string",
+      "required": true,
+      "description": "Modo único: data ISO 'AAAA-MM-DD' ou null. Modo range: { start, end } (cada um ISO ou null). 100% controlado."
+    },
+    {
+      "name": "onChange",
+      "type": "function",
+      "required": true,
+      "description": "Modo único: (value: string) => void. Modo range: (value: { start: string|null, end: string|null }) => void."
+    },
+    {
+      "name": "startLabel",
+      "type": "string",
+      "required": false,
+      "default": "Início",
+      "description": "Só no modo range — rótulo do primeiro campo."
+    },
+    {
+      "name": "endLabel",
+      "type": "string",
+      "required": false,
+      "default": "Fim",
+      "description": "Só no modo range — rótulo do segundo campo."
+    }
+  ],
+  "variants": [
+    "single",
+    "range"
+  ],
+  "states": [
+    "default",
+    "error",
+    "disabled",
+    "open"
+  ],
+  "tokensAllowed": {
+    "background": [
+      "semantic.fundo-superficie",
+      "semantic.fundo-secundario",
+      "semantic.fundo-campo"
+    ],
+    "border": [
+      "semantic.borda-base",
+      "semantic.borda-erro",
+      "semantic.borda-inativo",
+      "semantic.borda-foco"
+    ],
+    "text": [
+      "semantic.texto-primario",
+      "semantic.texto-placeholder",
+      "semantic.texto-inativo"
+    ],
+    "iconColor": [
+      "semantic.icone-secundario",
+      "semantic.icone-inativo"
+    ],
+    "radius": [
+      "structural.raio-pp"
+    ],
+    "focusRing": [
+      "structural.foco-espessura"
+    ],
+    "spacing": [
+      "structural.espaco-xp",
+      "structural.espaco-pp",
+      "structural.espaco-m"
+    ],
+    "typography": [
+      "type-style.texto-m"
+    ],
+    "shadow": [
+      "structural.sombra-p"
+    ]
+  },
+  "a11y": {
+    "role": "campo é um <input type='text'> normal (não mais um <button>) com aria-haspopup=\"dialog\" e aria-expanded refletindo o popover; o popover em si tem role=\"dialog\" com aria-label igual ao label do campo (ou startLabel/endLabel no modo range).",
+    "requiredAria": [
+      "aria-haspopup=\"dialog\" e aria-expanded no campo",
+      "aria-describedby do campo apontando pro id do HelperText quando presente (mesmo padrão de TextField/Select)",
+      "role=\"dialog\" no popover com aria-label",
+      "inputMode=\"numeric\" no campo — sinaliza teclado numérico em telas touch",
+      "aria-label no input igual ao texto do label quando hideLabel=true — nome acessível nunca depende só da presença visual do FieldLabel"
+    ],
+    "keyboard": [
+      "digitar no campo aplica a máscara automaticamente; focar o campo já abre o popover (useFocus do floating-ui, além de useClick)",
+      "Esc fecha o popover sem alterar value (useDismiss do floating-ui, mesmo padrão de Select/ComboBox/Breadcrumb)",
+      "dentro do popover aberto, a navegação segue as regras do próprio Calendar (Tab entre os dias, sem roving/setas nesta v1 — ver calendar.contract.json)"
+    ],
+    "contrastMin": "AA pro texto do campo, mesma régua de TextField/Select.",
+    "notes": "Selecionar uma data no modo único fecha o popover automaticamente e devolve o foco pro campo (mesmo padrão de Select fechar ao confirmar). No modo range, selecionar a data de um campo fecha só o popover daquele campo — o outro campo continua independente. Digitar uma data incompleta ou inválida e sair do campo (blur) reverte o texto pro último value válido — nunca fica um texto 'quebrado' visível."
+  },
+  "events": {
+    "status": "não definido no contrato original"
+  },
+  "composition": {
+    "canContain": [
+      "Calendar",
+      "FieldLabel",
+      "HelperText",
+      "Icon"
+    ],
+    "canBeContainedBy": [
+      "formulários",
+      "páginas",
+      "cards"
+    ],
+    "doNotCombine": [
+      "DatePicker dentro de DatePicker",
+      "usar range=true só pra manter uma única data — nesse caso é mais simples usar range=false"
+    ]
+  },
+  "forbidden": [
+    "abrir o popover quando state='disabled'",
+    "no modo range, permitir escolher fim antes de início (o campo 'Fim' aplica minDate = value.start automaticamente quando start já existe)",
+    "reimplementar o Calendar inline em vez de reaproveitar o componente",
+    "cor fora da whitelist de tokensAllowed",
+    "formatar a data exibida em formato diferente de DD/MM/AAAA (padrão pt-BR do harness, mesmo racional do locale fixo do Calendar)",
+    "aceitar caractere não-numérico digitado no campo — a máscara filtra tudo que não for dígito antes de reformatar",
+    "hideLabel=true sem preservar aria-label no input — o campo NUNCA pode ficar sem nome acessível só porque o rótulo visual sumiu"
+  ],
+  "decisions": [
+    "Modo range é resolvido como DOIS gatilhos/popovers independentes (Início/Fim), cada um com seu próprio Calendar de data única — não uma única grade com duas datas destacadas simultaneamente. Motivo prático: Calendar (ver calendar.contract.json, decisions) documentou explicitamente que ainda não suporta destacar um intervalo dentro da própria grade; construir isso agora seria antecipar uma necessidade sem um caso de uso real que dependa da grade única. A restrição de 'fim não pode ser antes de início' é aplicada de fora, setando minDate do segundo Calendar como value.start.",
+    "value/onChange mudam de formato conforme range (string|null vs {start,end}), mesmo padrão de discriminated union já usado em Select (multiple: false=string, true=string[]) — o tipo muda com uma prop booleana em vez de dois componentes/nomes diferentes.",
+    "Gatilho reaproveita exatamente o estilo visual do trigger de Select (mesma altura, borda, radius, tipografia) — o usuário já reconhece esse padrão como 'campo com popover' no harness, não faz sentido inventar uma segunda aparência pro mesmo conceito de interação.",
+    "Selecionar uma data fecha o popover automaticamente (modo único) — mesma escolha já feita em Select de fechar ao confirmar uma opção única (mantém aberto só no caso multiple, que não existe aqui).",
+    "Formato de exibição fixo em DD/MM/AAAA (nunca o ISO cru) — value interno continua ISO (mesmo formato do Calendar, fácil de comparar/ordenar como string), só a apresentação ao usuário é convertida.",
+    "AJUSTADO a pedido do usuário — campo passou de <button> (só seleção via Calendar) pra <input type='text'> com máscara automática: usuário digita só dígitos (0-9), a máscara insere as barras '/' sozinha nas posições certas (DD/MM/AAAA), sem depender de o usuário digitar separador nenhum. Resolve a ambiguidade de formato livre (ex.: '03/04/26' vs '3-4-2026') que motivava a decisão anterior de não permitir digitação — a máscara elimina a ambiguidade ao fixar a ordem e o formato de antemão, o usuário só entra com números.",
+    "Validação/parsing só considera a data completa (8 dígitos): dia dentro do intervalo do mês (considerando ano bissexto via Date nativo), mês 1-12. Data incompleta ou inválida nunca dispara onChange — o campo mostra a máscara parcial digitada até então, mas value só muda quando os 8 dígitos formam uma data real dentro de minDate/maxDate/disabledDate.",
+    "Ao perder o foco (blur) com uma data incompleta/inválida/fora do intervalo permitido, o campo reverte pro texto do último value confirmado (ou vazio, se nunca houve um) — nunca deixa um texto parcial ou inválido visível depois que o usuário sai do campo.",
+    "useFocus adicionado ao floating-ui (além de useClick) — abrir o popover também ao focar o campo via Tab, não só ao clicar; contribui pra digitação e seleção pelo Calendar se sentirem como o mesmo campo, não dois modos desconectados.",
+    "Selecionar uma data no Calendar continua preenchendo o campo de texto (via useEffect sincronizando o texto exibido com o value externo) — os dois caminhos (digitar ou clicar no Calendar) sempre convergem pro mesmo estado visual.",
+    "BUG REAL corrigido em teste no navegador — onChange/onBlur do input eram passados como props JSX soltas ANTES do spread de getReferenceProps() do floating-ui, que por sua vez também define onChange/onBlur próprios; o spread posterior SOBRESCREVIA silenciosamente os handlers customizados em vez de compor os dois (nenhum erro, a máscara funcionava mas a reversão em blur pra um valor inválido nunca disparava — um texto de data quebrada tipo '32/13/2026' ficava visível permanentemente). Corrigido passando onChange/onBlur como argumento de getReferenceProps({ onChange, onBlur }), que é a forma correta de compor handlers customizados com os internos do floating-ui — confirmado no navegador que digitar uma data inválida e sair do campo agora reverte pro último value confirmado.",
+    "AJUSTADO a pedido do usuário — nova prop 'showPicker' (default true). Implementada desabilitando os hooks useClick/useFocus/useDismiss do floating-ui via { enabled: showPicker } em vez de simplesmente não renderizar o popover — assim o campo nunca entra em estado 'open' quando showPicker=false (não é só uma questão visual, o popover realmente nunca monta). O ícone caret-down decorativo também some nesse modo (não faz sentido mostrar um indicador de 'isso abre algo' quando nada abre) e aria-haspopup/aria-expanded ficam undefined em vez de false, porque semanticamente o campo deixou de ser um combobox com popup. Digitação com máscara continua funcionando normalmente nos dois modos — showPicker só controla a existência do popover, nunca a validação/máscara do texto.",
+    "AJUSTADO a pedido do usuário — popover do Calendar ganhou box-shadow (structural.sombra-p, mesmo token já usado no Popover genérico) além da borda que já existia, pra ter elevação visual consistente com o resto dos popovers do harness em vez de parecer 'colado' no fundo da página.",
+    "AJUSTADO a pedido do usuário (uso no DashboardTemplate, item 5.3) — dois reforços: (1) Icon 'calendar' fixo à esquerda do trigger, sempre presente (não configurável, diferente do leftIcon opcional do TextField) — todo DatePicker se beneficia dessa pista visual universal de 'isso é um campo de data', não é um caso específico de um consumidor só; (2) nova prop hideLabel pra permitir omitir o FieldLabel visível (ex.: 'Início'/'Fim' de um range dentro de uma FilterBar, onde os rótulos já eram redundantes) SEM perder o nome acessível — o texto do label continua sendo aplicado como aria-label no input quando hideLabel=true, escape explícito documentado em forbidden pra nunca deixar o campo sem nome acessível.",
+    "REVISADO a pedido do usuário — a decisão acima ('Icon calendar sempre presente, não configurável') foi revertida: nova prop showIcon (default true, preserva o comportamento visual de antes pra quem já usa o componente) permite esconder o ícone. Motivo: mesmo pedido feito de uma vez pros três pickers de data/hora do harness (DatePicker/TimePicker/DateTimePicker) — não é mais tratado como 'pista visual universal inegociável', vira uma preferência de densidade visual do consumidor.",
+    "AJUSTADO a pedido do usuário — fundo do campo trocado de semantic.fundo-superficie pra semantic.fundo-campo (token novo): 'o fundo dos inputs de forma geral, devem ser levemente mais escuros que a cor de fundo da página onde estão, para destacar melhor'. No modo claro fundo-campo é idêntico a fundo-superficie (sem mudança visual, branco com borda já bastava) — só no modo escuro os dois valores divergem (fundo-campo um degrau mais escuro que a página), porque era só ali que o campo ficava indistinguível da própria página por trás."
+  ],
+  "references": {
+    "tokensFile": "tokens/tokens.json — Cores Semânticas (Fundos, Bordas, Textos, Ícones), Estrutural (raio-pp, foco-espessura, espaco-xp/pp/m, sombra-p), Tipografia Estilo (texto-m)"
+  }
+}

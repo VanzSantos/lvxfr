@@ -1,0 +1,24 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: none;
+  border: none;
+  border-radius: var(--raio-pp);
+  cursor: pointer;
+}
+
+.button:hover:not(:disabled) {
+  background: var(--fundo-secundario);
+}
+
+.button:focus-visible {
+  outline: var(--foco-espessura) solid var(--borda-foco);
+  outline-offset: 1px;
+}
+
+.button:disabled {
+  cursor: not-allowed;
+}

@@ -1,0 +1,58 @@
+{
+  "name": "EmptyState",
+  "originalName": "Estado Vazio",
+  "oneLiner": "Comunica que uma lista/seção não tem conteúdo (ainda, ou depois de um filtro) e, opcionalmente, oferece uma ação pra sair desse estado — diferente do Skeleton (carregando) e do erro de um campo (HelperText).",
+  "category": "display",
+  "status": "draft",
+  "whenToUse": "Uma lista/tabela/busca terminou de carregar e não tem nenhum item pra mostrar (ex.: 'Nenhum resultado encontrado', 'Você ainda não criou nenhum projeto').",
+  "whenNotToUse": "Conteúdo ainda está carregando (isso é Skeleton/Spinner); erro de carregamento real, tipo falha de rede (isso é Alert intent=error, o problema não é 'vazio', é 'falhou'); campo de formulário vazio (não existe um 'empty state' de campo, isso é só o placeholder).",
+  "anatomy": [
+    "Ícone (opcional, centralizado, tamanho grande, decorativo)",
+    "Título (texto curto, em negrito)",
+    "Descrição (opcional, texto de apoio)",
+    "Botão de ação (opcional, ex.: 'Criar novo', 'Limpar filtros' — reaproveita o átomo Button)"
+  ],
+  "dependencies": ["Icon", "Button"],
+  "props": [
+    { "name": "icon", "type": "string", "required": false, "description": "Nome de um IconName. Sempre decorativo (aria-hidden) — o título já comunica o que está vazio em texto." },
+    { "name": "title", "type": "string", "required": true },
+    { "name": "description", "type": "string", "required": false },
+    { "name": "actionLabel", "type": "string", "required": false, "requiredWhen": "onAction é fornecido" },
+    { "name": "onAction", "type": "function", "required": false, "requiredWhen": "actionLabel é fornecido", "description": "Assinatura () => void. Renderiza um Button variant='primary' — reaproveita o átomo inteiro, não reimplementa um botão." }
+  ],
+  "variants": [],
+  "states": ["static"],
+  "tokensAllowed": {
+    "icon": ["semantic.icone-secundario"],
+    "title": ["semantic.texto-primario"],
+    "description": ["semantic.texto-secundario"],
+    "spacing": ["structural.espaco-pp", "structural.espaco-m", "structural.espaco-g"],
+    "iconSize": ["structural.icone-extra-grande"],
+    "typography": ["type-style.texto-m-forte", "type-style.texto-p"]
+  },
+  "a11y": {
+    "role": "nenhuma role própria — <div> genérico, mesmo padrão do Card. Título NÃO é uma tag de heading nativa (h1-h6) — ver decisions.",
+    "requiredAria": ["aria-hidden no ícone, sempre"],
+    "keyboard": ["nenhuma própria — a única parte interativa é o Button de ação, que já é focável/ativável nativamente"],
+    "contrastMin": "AAA já validado pros pares texto-primario/texto-secundario sobre fundo-superficie em outros contratos deste harness.",
+    "notes": "Conteúdo inteiro centralizado horizontalmente — é um estado de destaque isolado numa área vazia, não texto corrido."
+  },
+  "events": { "status": "não definido no contrato original" },
+  "composition": {
+    "canContain": ["Icon", "Button"],
+    "canBeContainedBy": ["listas", "tabelas", "resultados de busca", "cards"],
+    "doNotCombine": ["EmptyState dentro de EmptyState"]
+  },
+  "forbidden": [
+    "actionLabel sem onAction ou onAction sem actionLabel — mutuamente dependentes",
+    "usar EmptyState pra erro de carregamento real (falha de rede/API) — isso é Alert, ver whenNotToUse",
+    "cor fora da whitelist de tokensAllowed"
+  ],
+  "decisions": [
+    "Título NÃO usa uma tag de heading nativa (h1-h6) — decisão do agente: EmptyState pode aparecer em qualquer profundidade de uma página real, e forçar um nível de heading fixo (ex.: sempre h3) quebraria a hierarquia semântica real da página ao redor, que só quem consome sabe qual é. Renderiza como texto em negrito (texto-m-forte) visualmente destacado, sem carregar semântica de heading — mesmo princípio do Card não ter opinião sobre a estrutura de heading do conteúdo que recebe.",
+    "actionLabel/onAction renderizam um Button real (variant='primary'), não um <button> customizado — reaproveita 100% do átomo já validado (foco, disabled, loading nunca são necessários aqui, mas o componente inteiro vem de graça).",
+    "Ícone é opcional e sempre decorativo — o título em texto já é suficiente pra comunicar o estado vazio sozinho; o ícone é reforço visual, nunca a única fonte de informação (mesma filosofia não-negociável de Alert/Checkbox sobre cor/ícone nunca serem a única pista).",
+    "Sem 'ilustração' (SVG maior/customizado) neste contrato — só Icon em tamanho grande (icone-extra-grande). Um sistema de ilustrações é um investimento de design maior, fora do escopo deste harness por ora; se surgir, é decisão nova."
+  ],
+  "references": { "tokensFile": "tokens/tokens.json — Cores Semânticas (Textos, Ícones), Estrutural (espaco-pp/m/g, icone-extra-grande), Tipografia Estilo (texto-m-forte, texto-p)" }
+}

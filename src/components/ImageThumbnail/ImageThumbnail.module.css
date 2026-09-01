@@ -1,0 +1,65 @@
+.wrapper {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+  overflow: hidden;
+  border: 1px solid var(--borda-base);
+  border-radius: var(--raio-pp);
+  background: var(--fundo-secundario);
+  padding: 0;
+}
+
+.small {
+  width: var(--icone-extra-grande);
+  height: var(--icone-extra-grande);
+}
+
+.medium {
+  width: var(--espaco-xg);
+  height: var(--espaco-xg);
+}
+
+.large {
+  width: var(--espaco-xgg);
+  height: var(--espaco-xgg);
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.trigger {
+  cursor: pointer;
+}
+
+.trigger:focus-visible {
+  outline: var(--foco-espessura) solid var(--borda-foco);
+  outline-offset: 2px;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--fundo-invertido) 45%, transparent);
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+
+.trigger:hover .overlay,
+.trigger:focus-visible .overlay {
+  opacity: 1;
+}
+
+.expandedImage {
+  display: block;
+  max-width: 100%;
+  max-height: 70vh;
+  margin: 0 auto;
+  border-radius: var(--raio-pp);
+}

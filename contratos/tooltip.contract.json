@@ -1,0 +1,49 @@
+{
+  "name": "Tooltip",
+  "originalName": "BalaoDica",
+  "oneLiner": "Sobreposição simples: exibe uma dica curta de texto ancorada a um gatilho externo.",
+  "category": "overlay",
+  "status": "draft",
+  "whenToUse": "Elemento precisa de explicação curta e contextual sob demanda (ícone de info de um FieldLabel, botão só-ícone que precisa esclarecer sua função).",
+  "whenNotToUse": "Conteúdo longo, interativo, ou que precise ficar aberto pro usuário agir dentro dele — isso é popover, outro componente. Também não serve a informação essencial que não pode ser perdida.",
+  "anatomy": ["Balão (fundo escuro, cantos arredondados)", "Texto da dica", "Seta apontando para o gatilho"],
+  "dependencies": [],
+  "props": [
+    { "name": "text", "type": "string", "required": true, "description": "Conteúdo da dica. Curto." },
+    { "name": "placement", "type": "enum", "enum": ["top", "bottom", "left", "right"], "default": "top", "required": false, "description": "Preferência de lado — nunca uma imposição. Ver autoAdjust." },
+    { "name": "autoAdjust", "type": "boolean", "default": true, "required": false, "description": "Reposiciona automaticamente se a direção preferida não couber na viewport; a seta acompanha. Balão nunca aparece cortado/fora da tela." },
+    { "name": "triggerId", "type": "string", "required": false, "description": "Associa o balão ao gatilho para acessibilidade (aria-describedby)." },
+    { "name": "children", "type": "node", "required": true, "description": "O elemento gatilho (único), clonado internamente para receber os handlers de hover/foco/toque/Esc + aria-describedby. Não estava no contrato original — necessário porque 'gatilho é externo' não pode significar 'sem nenhuma conexão de eventos'." }
+  ],
+  "variants": ["top", "bottom", "left", "right"],
+  "states": ["closed", "open"],
+  "tokensAllowed": {
+    "background": ["semantic.fundo-invertido"],
+    "text": ["semantic.texto-invertido"],
+    "radius": ["structural.raio-pp"],
+    "shadow": ["structural.sombra-p"],
+    "typography": ["type-style.texto-p"]
+  },
+  "a11y": {
+    "role": "tooltip",
+    "requiredAria": ["aria-describedby no gatilho apontando pro id do balão"],
+    "keyboard": ["Esc fecha o balão quando aberto"],
+    "contrastMin": "WCAG AA — texto-invertido sobre fundo-invertido já dá contraste alto",
+    "notes": "Os TRÊS gatilhos de abertura são obrigatórios, não opcionais: hover (mouse), foco (teclado) e toque. Hover não existe em telas de toque; foco é o que torna a dica acessível via teclado. Requisito central do componente, especialmente crítico para o público 60+."
+  },
+  "events": { "status": "não definido no contrato original" },
+  "composition": { "canContain": [], "canBeContainedBy": ["FieldLabel"], "doNotCombine": ["não aninhar Tooltip dentro de Tooltip"] },
+  "forbidden": [
+    "abrir só por hover (exclui toque e teclado)",
+    "conteúdo interativo dentro do balão — isso é popover, componente diferente",
+    "usar para informação essencial que não pode ser perdida",
+    "recalcular a seta quando o balão é deslocado por 'shift' em viewports muito pequenas — aceito como leve desalinhamento nesta versão, não introduzir mais complexidade que o caso real pede"
+  ],
+  "decisions": [
+    "Motor de posicionamento: @floating-ui/react — resolve auto-ajuste (flip), manter na viewport (shift) e a seta (arrow), funciona em web e não antecipa a decisão em aberto de base de componentes.",
+    "role='tooltip' adicionado (padrão WAI-ARIA) mesmo sem estar explícito no contrato original.",
+    "children clonado via cloneElement (não getElementById, que não existe em React Native) — funciona nas duas plataformas.",
+    "AJUSTADO a pedido do usuário — fundo-invertido (usado como bg do balão) foi neutralizado no token (era azul-ardósia). Como fundo-invertido não muda de valor entre temas por design, no modo escuro ele fica próximo do tom da própria página — adicionado box-shadow (structural.sombra-p) só pra manter o tooltip lendo como algo flutuando por cima, já que a diferença de cor sozinha deixou de bastar pra separação visual nesse tema."
+  ],
+  "references": { "tokensFile": "tokens/tokens.json — Cores Semânticas (fundo-invertido, texto-invertido), Estrutural (raio-pp, sombra-p), Tipografia Estilo (texto-p)" }
+}

@@ -1,0 +1,133 @@
+/* AJUSTADO a pedido do usuário: sem cartão flutuante nem margem nenhuma — a
+   tela É a própria página, encostando nas 4 bordas reais da tela (viewport
+   ou contêiner embutido). Volta ao padrão estrutural original (anexos 1 e 2:
+   imagem em tela cheia à esquerda, formulário em tela cheia à direita). */
+.page {
+  height: 100vh;
+  display: flex;
+  overflow: hidden;
+  background: var(--fundo-superficie);
+  font-family: var(--texto-m-family);
+}
+
+/* Usado quando a página é embutida num contêiner de tamanho próprio (ex.: canvas
+   da interface de teste) — 100vh é relativo à viewport do navegador, não ao
+   contêiner pai, então dentro de uma caixa menor ele sempre forçava scroll. */
+.pageEmbedded {
+  height: 100%;
+  display: flex;
+  overflow: hidden;
+  background: var(--fundo-superficie);
+  font-family: var(--texto-m-family);
+}
+
+/* Painel esquerdo — só a imagem/gradiente, sem texto nem logo por cima:
+   qualquer informação necessária já vem embutida na imagem inserida aqui.
+   Ocupa 60% da tela real (sem teto de largura do "cartão" — a própria
+   página é o cartão agora). */
+/* AJUSTADO a pedido do usuário — mesma foto (casal de idosos sorrindo juntos
+   olhando pro laptop) em TODAS as 8 páginas de auth/status, pra consistência
+   visual entre elas. Indicada pelo usuário via link do Unsplash — gratuita,
+   Licença Unsplash padrão (confirmado antes de usar; a indicação anterior
+   era Unsplash+ paga, ver decisions abaixo). Ver ROADMAP.md. */
+.imagePanel {
+  flex: 1 1 60%;
+  min-width: 0;
+  background: url("https://images.unsplash.com/photo-1758686254493-7b3e49a8f325?w=1200&q=80&fm=jpg&fit=crop&auto=format") center/cover no-repeat;
+}
+
+/* Painel direito — formulário, sempre presente (some a imagem, nunca o
+   formulário). Nunca passa de 50% da tela (flex-basis 40% + max-width 40%
+   trava mesmo se o painel de imagem encolher); em monitores grandes cai pra
+   37% via media query abaixo. Padding generoso pra dar aquela sensação
+   vazia/clean, mas SEM margem entre o painel e a borda real da tela. */
+.formPanel {
+  flex: 1 1 40%;
+  max-width: 40%;
+  min-width: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--fundo-superficie);
+  padding: var(--espaco-xgg);
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-m);
+  width: 100%;
+  max-width: 360px;
+  box-sizing: border-box;
+}
+
+.brandMarkForm {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-pp);
+  margin-bottom: var(--espaco-p);
+}
+
+.brandIconSolid {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--raio-pp);
+  background: var(--acao-primaria);
+}
+
+.brandWordmark {
+  color: var(--texto-primario);
+  font-family: var(--texto-m-forte-family);
+  font-size: 20px;
+  font-weight: var(--texto-m-forte-weight);
+}
+
+.title {
+  margin: 0 0 var(--espaco-xp);
+  color: var(--texto-primario);
+  font-family: var(--texto-m-forte-family);
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.subtitle {
+  margin: 0;
+  color: var(--texto-secundario);
+  font-family: var(--texto-p-family);
+  font-size: var(--texto-p-size);
+  line-height: var(--texto-p-line-height);
+}
+
+.forgotPassword {
+  align-self: flex-end;
+  margin-top: calc(var(--espaco-m) * -1);
+}
+
+/* Monitores grandes (>=1440px): painel de formulário estreita pra 37% da
+   tela, deixando a imagem dominar mais o layout. */
+@media (min-width: 1440px) {
+  .formPanel {
+    flex-basis: 37%;
+    max-width: 37%;
+  }
+}
+
+/* Painel de imagem esconde abaixo de 768px — no celular só o formulário
+   fica, ocupando 100% da largura/altura (mesmo comportamento do produto
+   real que motivou este redesenho). */
+@media (max-width: 768px) {
+  .imagePanel {
+    display: none;
+  }
+
+  .formPanel {
+    max-width: none;
+    padding: var(--espaco-g);
+  }
+}

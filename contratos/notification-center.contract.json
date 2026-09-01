@@ -1,0 +1,84 @@
+{
+  "name": "NotificationCenter",
+  "originalName": "CentralDeNotificacoes",
+  "oneLiner": "Botão-gatilho (ícone de sino, Badge de contagem de não lidas sobreposto ao ícone) que abre um Drawer na direita com a lista completa de notificações — filtro 'apenas não lidas', marcar como lidas (todas ou só as selecionadas) e exclusão em lote, sempre com confirmação antes de excluir.",
+  "category": "overlay",
+  "status": "draft",
+  "whenToUse": "Ponto central de notificações/mensagens do usuário, tipicamente no header/topbar de um backoffice — quando é preciso mais que um Popover simples porque a lista pode crescer, precisa de filtro (só não lidas) e ações em lote (selecionar + excluir várias de uma vez).",
+  "whenNotToUse": "Alerta pontual de uma ação que acabou de acontecer (isso é Toast); lista genérica de itens sem o conceito de lido/não lido (isso é só uma lista comum, ou Datatable se tiver colunas/ordenação).",
+  "anatomy": [
+    "Gatilho — Button variant='link' iconOnly leftIcon='bell' dentro de um wrapper com área de clique fixa (40x40); o Badge (variant='error', count=quantidade de não lidas, position='top-right') fica ancorado num segundo wrapper do TAMANHO DO ÍCONE (não do wrapper de clique inteiro), pra sobrepor o sino de verdade em vez de flutuar solto num canto; Badge só aparece quando há pelo menos 1 não lida",
+    "Drawer (componente já existente, reaproveitado — nunca reimplementado) ancorado na borda direita da tela, title='Notificações', size='medium'",
+    "Linha 1 — Switch pequeno (size='small') 'Exibir apenas não lidas' (filtra a lista, não afeta os dados) — SEMPRE visível, independente de haver seleção ou não",
+    "Linha 2, SEM seleção ativa — só 'Marcar todas como lidas' (Button variant='link'), e só quando há pelo menos 1 não lida",
+    "Linha 2, COM 1+ notificações selecionadas — troca pra 'Selecionar todos'/'Desmarcar todos' (toggle, conforme todos os itens VISÍVEIS já estarem selecionados ou não) + 'Marcar como lidas' (aplica só às selecionadas)",
+    "Barra de seleção — aparece só quando 1+ notificações estão selecionadas: UM botão destrutivo só, 'Apagar N selecionada(s)' (N = quantidade selecionada, embutido no próprio label)",
+    "Lista de notificações — cada item: Checkbox de seleção (rótulo oculto visualmente, ainda lido por leitor de tela) + título (negrito se não lida, peso normal se lida, único indicador visual de status) + descrição/timestamp opcionais — SEM nenhum ícone, SEM nenhum botão de ação por item",
+    "Lista vazia (sem notificações, ou filtro 'apenas não lidas' sem nenhum resultado) — EmptyState (ícone 'bell', título/descrição variam conforme o motivo de estar vazia)",
+    "ConfirmDialog (componente já existente, reaproveitado) — sempre aparece antes de excluir as selecionadas, confirmVariant='destructive', descrição sempre deixa claro que a ação não pode ser desfeita"
+  ],
+  "dependencies": ["Button", "Badge", "Drawer", "Switch", "Checkbox", "EmptyState", "ConfirmDialog"],
+  "props": [
+    { "name": "notifications", "type": "array", "required": true, "description": "Array de { id: string, title: string, description?: string, timestamp?: string, read: boolean }. Fonte da verdade fica 100% com o consumidor — NotificationCenter nunca muta esse array diretamente, só chama os callbacks abaixo." },
+    { "name": "onMarkAsRead", "type": "function", "required": true, "description": "Assinatura (id: string) => void. Chamado uma vez por item, em loop, quando 'Marcar como lidas' (linha 2, com seleção ativa) é clicado — cobre marcar 1 ou várias selecionadas como lidas (o loop roda dentro de um único handler, React já agrupa as atualizações num só re-render)." },
+    { "name": "onMarkAllAsRead", "type": "function", "required": true, "description": "Assinatura () => void. Chamado ao clicar em 'Marcar todas como lidas' (linha 2, sem seleção ativa, só quando há pelo menos 1 não lida) — marca TODAS as notificações como lidas de uma vez, independente de seleção ou do filtro 'apenas não lidas' estar ativo." },
+    { "name": "onDeleteMany", "type": "function", "required": true, "description": "Assinatura (ids: string[]) => void. Chamado depois da confirmação, pro botão 'Apagar N selecionada(s)' — cobre exclusão de 1 item (selecionar 1 só) ou de vários; 'excluir todas' também é alcançável por essa mesma via, usando 'Selecionar todos' antes." },
+    { "name": "accessibleLabel", "type": "string", "default": "Notificações", "required": false, "description": "aria-label do botão-gatilho E título acessível do Drawer (repassado pros dois — são a mesma funcionalidade, não faz sentido nomes diferentes)." }
+  ],
+  "variants": [],
+  "states": ["default", "empty", "filtered-empty", "selection"],
+  "tokensAllowed": {
+    "background": ["semantic.fundo-secundario", "semantic.fundo-superficie"],
+    "text": ["semantic.texto-primario", "semantic.texto-secundario"],
+    "focusRing": ["structural.foco-espessura"],
+    "radius": ["structural.raio-pp"],
+    "spacing": ["structural.espaco-xp", "structural.espaco-pp", "structural.espaco-p", "structural.espaco-m"],
+    "typography": ["type-style.texto-p", "type-style.texto-micro"]
+  },
+  "a11y": {
+    "role": "nenhuma role própria além das já definidas em Button (gatilho) e Drawer (painel, role='dialog') — reaproveitados sem alteração. O wrapper que aumenta a área de clique do gatilho é um <span> puramente visual (sem role/tabIndex próprio) — o controle acessível de verdade continua sendo o <button> nativo por dentro.",
+    "requiredAria": [
+      "aria-label no botão-gatilho, via accessibleLabel (obrigatório em qualquer Button iconOnly, ver button.contract.json)",
+      "Checkbox de seleção usa label (não aria-label solto) com hideLabel=true — reaproveita o próprio suporte de rótulo oculto do átomo Checkbox, em vez de um aria-label paralelo"
+    ],
+    "keyboard": [
+      "Tab percorre: gatilho → (dentro do Drawer aberto) Switch → linha 2 (conforme seleção) → por item: Checkbox → (se selecionado, botão 'Apagar N selecionada(s)')",
+      "Drawer já trata Esc/foco-preso/devolução de foco sozinho (drawer.contract.json) — NotificationCenter não duplica nada disso",
+      "ConfirmDialog já trata Esc/foco sozinho (confirm-dialog.contract.json) — mesma lógica, reaproveitada sem alteração"
+    ],
+    "contrastMin": "Mesma régua já validada em Badge (contador), Switch, Checkbox e EmptyState — nenhuma cor nova introduzida por este contrato."
+  },
+  "events": { "status": "não definido no contrato original" },
+  "composition": {
+    "canContain": ["Button", "Badge", "Drawer", "Switch", "Checkbox", "EmptyState", "ConfirmDialog"],
+    "canBeContainedBy": ["header/topbar de qualquer template de backoffice (ex.: BackofficeTemplate)"],
+    "doNotCombine": ["NotificationCenter dentro de NotificationCenter", "um segundo Drawer/Popover próprio pro mesmo propósito — o Drawer já é o painel completo, não precisa de outro nível de overlay por cima"]
+  },
+  "forbidden": [
+    "excluir notificações selecionadas sem passar pelo ConfirmDialog primeiro — pedido explícito do usuário: 'sempre antes de apagar é necessário uma confirmação, lembrando que esta ação não poderá ser desfeita'",
+    "reimplementar Drawer, ConfirmDialog, Checkbox, Switch, Badge ou Button inline em vez de reaproveitar os componentes existentes",
+    "NotificationCenter mutando notifications diretamente (ex.: filter/splice no próprio array recebido) — toda mutação passa pelos callbacks (onMarkAsRead/onMarkAllAsRead/onDeleteMany), a fonte da verdade é sempre do consumidor",
+    "Badge aparecendo com count=0 — só renderiza quando unreadCount > 0",
+    "Badge posicionado relativo à área de clique inteira (40x40) em vez de relativo ao tamanho do próprio ícone — precisa sobrepor o sino, não flutuar solto no canto da hit-box (pedido explícito do usuário)",
+    "ícone em qualquer item da lista — pedido explícito do usuário: 'as mensagens não precisam de ícone de envelope'; status é só peso de fonte (negrito=não lida)",
+    "botão de ação (marcar lida/não lida, excluir) em cada item da lista — pedido explícito do usuário: 'na listagem de mensagens, não devem aparecer os botões link Marcar como lida e Marcar como não lida', e 'não precisa do botão/ícone de apagar individual'; toda ação passa pela seleção (Checkbox) + barra/linha de ações",
+    "'Apagar N selecionada(s)' aparecendo sem nenhuma notificação selecionada — só existe com selected.size > 0 (pedido explícito do usuário: 'o botão apagar só deve aparecer quando algum item estiver selecionado')",
+    "contador de seleção isolado ao lado do botão de exclusão — o número já vem embutido no label do próprio botão",
+    "Checkbox no lugar do Switch pro filtro 'apenas não lidas' — REVERTIDO a pedido do usuário ('o checkbox ficou ruim'), volta a ser Switch, tamanho pequeno",
+    "cor fora da whitelist de tokensAllowed"
+  ],
+  "decisions": [
+    "Criado a pedido do usuário — 'um elemento na direita [do header], que precisa funcionar como um alerta para mensagens... botão do tipo link, apenas com ícone (sino)... contador de mensagens não lidas... popover ou drawer na direita... apenas não lidas... marcar como não lida... apagar uma a uma, em lote, todas... sempre confirmação antes de apagar'. Pedido explícito: 'Isso deve ser criado como um componente à parte, com contrato específico'.",
+    "Drawer, não Popover — decisão do agente diante da escolha explícita deixada em aberto pelo usuário. Drawer já abre ancorado na borda DIREITA por padrão.",
+    "100% AUTO-CONTIDO quanto a estado de UI (drawer aberto/fechado, filtro, seleção, confirmação pendente) — nada disso é exposto como prop controlada. Só DADOS e MUTAÇÕES são responsabilidade do consumidor.",
+    "AJUSTADO a pedido do usuário — Badge precisa SOBREPOR o sino, não flutuar no canto de uma área de clique maior. Antes o Badge era posicionado relativo ao MESMO wrapper de 40x40 usado como hit-box do clique, deixando um vão visível entre o ícone e o número. Corrigido com um segundo wrapper interno (.iconBox), do tamanho exato do ícone (24px), que vira o contexto de posicionamento do Badge — a hit-box de clique (.trigger, 40x40) continua existindo por fora, só não é mais o que ancora o Badge.",
+    "BUG REAL corrigido (reportado pelo usuário: 'o drawer não está ocupando toda a altura da tela') — investigado e confirmado como bug do Drawer COMO UM TODO (não específico do NotificationCenter): o stylesheet nativo do <dialog> (`dialog:modal`, UA stylesheet) define um max-height próprio que vencia sobre o `height:100vh` já declarado em `.drawer` (ver drawer.contract.json, decisions, pro detalhe completo do fix). Corrigido em `Drawer.module.css`, beneficia todos os consumidores do Drawer.",
+    "REVISADO a pedido do usuário — filtro 'apenas não lidas' volta a ser Switch (era Checkbox, trocado na rodada anterior). Motivo explícito: 'o checkbox ficou ruim'. Switch agora com size='small' ('um switch pequeno mesmo').",
+    "REVISADO a pedido do usuário — conteúdo do Drawer reduzido ao que foi explicitamente pedido: SEM seleção ativa, mostra só Switch + 'Marcar todas como lidas' (quando há não lidas) + a lista. O botão 'Apagar todas' (existia numa rodada anterior) foi REMOVIDO da vista padrão — excluir tudo continua possível via 'Selecionar todos' + 'Apagar N selecionada(s)', sem precisar de um atalho dedicado redundante. onDeleteAll saiu do contrato (só onDeleteMany permanece, cobrindo 1/vários/todos via seleção).",
+    "EXTENSÃO — 'Selecionar todos' (toggle pra 'Desmarcar todos' quando todos os itens VISÍVEIS já estão selecionados) e 'Marcar como lidas' (aplica só à seleção atual) aparecem na linha 2 assim que 1+ item é selecionado, no lugar de 'Marcar todas como lidas'. 'Selecionar todos' seleciona só os itens VISÍVEIS no momento (respeita o filtro 'apenas não lidas' ativo) — selecionar um item escondido pelo filtro não é possível pela própria interface.",
+    "onMarkAsUnread e onDelete (1 id só) saíram do contrato nesta rodada — sem nenhum gatilho de UI que os chamasse mais (per-item actions foram todas removidas), mantê-los como props obrigatórias sem nenhum caminho de uso seria uma API morta/confusa. 'Marcar como lidas' (seleção) reaproveita onMarkAsRead em loop, um call por id — React já agrupa (batch) atualizações de estado disparadas dentro do mesmo handler síncrono, então não há problema de performance/múltiplos re-renders.",
+    "'O botão apagar só deve aparecer quando algum item estiver selecionado' — confirmado: `selected.size > 0` é a única condição que renderiza a barra de exclusão, sem nenhum estado alternativo que a mostre fora disso.",
+    "Confirmação sempre com confirmVariant='destructive' e a frase-base 'Esta ação não pode ser desfeita' — reaproveita 100% o ConfirmDialog já existente no harness."
+  ],
+  "references": { "tokensFile": "tokens/tokens.json — Cores Semânticas (Fundos, Textos), Estrutural (raio-pp, foco-espessura, espaco-xp/pp/p/m), Tipografia Estilo (texto-p, texto-micro)" }
+}

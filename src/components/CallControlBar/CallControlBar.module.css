@@ -1,0 +1,130 @@
+.bar {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espaco-p);
+  padding: var(--espaco-pp);
+  background: var(--fundo-invertido);
+  border-radius: var(--raio-circular);
+}
+
+.control {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  background: color-mix(in srgb, var(--texto-invertido) 15%, transparent);
+  border: none;
+  border-radius: var(--raio-circular);
+  cursor: pointer;
+  transition: background-color 0.12s ease;
+}
+
+.control:hover {
+  background: color-mix(in srgb, var(--texto-invertido) 25%, transparent);
+}
+
+.control:focus-visible {
+  outline: var(--foco-espessura) solid var(--borda-foco);
+  outline-offset: 2px;
+}
+
+.hangUp {
+  background: var(--acao-destrutiva);
+}
+
+.hangUp:hover {
+  background: var(--acao-destrutiva-sobreposta);
+}
+
+.cluster {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.clustered {
+  border-radius: var(--raio-circular) 0 0 var(--raio-circular);
+}
+
+.chevron {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 28px;
+  height: 44px;
+  background: color-mix(in srgb, var(--texto-invertido) 15%, transparent);
+  border: none;
+  border-radius: 0 var(--raio-circular) var(--raio-circular) 0;
+  cursor: pointer;
+  transition: background-color 0.12s ease;
+}
+
+.chevron:hover {
+  background: color-mix(in srgb, var(--texto-invertido) 25%, transparent);
+}
+
+.chevron:focus-visible {
+  outline: var(--foco-espessura) solid var(--borda-foco);
+  outline-offset: 2px;
+}
+
+.deviceMenu {
+  display: flex;
+  flex-direction: column;
+  min-width: 200px;
+}
+
+.deviceItem {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-xp);
+  padding: var(--espaco-pp) var(--espaco-p);
+  border: none;
+  background: none;
+  border-radius: var(--raio-xp);
+  color: var(--texto-invertido);
+  font-family: var(--texto-p-family);
+  font-size: var(--texto-p-size);
+  line-height: var(--texto-p-line-height);
+  text-align: left;
+  cursor: pointer;
+}
+
+.deviceItem:hover {
+  background: color-mix(in srgb, var(--texto-invertido) 15%, transparent);
+}
+
+.deviceItem:focus-visible {
+  outline: var(--foco-espessura) solid var(--borda-foco);
+  outline-offset: -2px;
+}
+
+.settingsPanel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-p);
+  min-width: 220px;
+}
+
+.settingsField {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-xp);
+}
+
+.settingsRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espaco-p);
+}
+
+.settingsLabel {
+  color: color-mix(in srgb, var(--texto-invertido) 70%, transparent);
+  font-family: var(--texto-p-family);
+  font-size: var(--texto-p-size);
+  font-weight: 700;
+}

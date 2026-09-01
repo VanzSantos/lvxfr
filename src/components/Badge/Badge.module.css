@@ -1,0 +1,176 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--espaco-xp);
+  box-sizing: border-box;
+  min-width: calc(var(--icone-pequeno) + var(--espaco-xp));
+  padding: var(--espaco-xp) var(--espaco-pp);
+  border: 1px solid transparent;
+  border-radius: var(--raio-circular);
+  white-space: nowrap;
+  font-family: var(--texto-micro-forte-family);
+  font-size: var(--texto-micro-forte-size);
+  font-weight: var(--texto-micro-forte-weight);
+  line-height: var(--texto-micro-forte-line-height);
+}
+
+/* Status (fundo sólido = tom que antes era só o texto, tom 700; ver
+   contratos/badge.contract.json decisions pro porquê) */
+.info {
+  background: var(--fundo-info-forte);
+  border-color: var(--fundo-info-forte);
+  color: var(--texto-invertido);
+}
+
+.success {
+  background: var(--fundo-sucesso-forte);
+  border-color: var(--fundo-sucesso-forte);
+  color: var(--texto-invertido);
+}
+
+.warning {
+  background: var(--borda-aviso);
+  border-color: var(--borda-aviso);
+  color: var(--texto-escuro-fixo);
+}
+
+.error {
+  background: var(--fundo-erro-forte);
+  border-color: var(--fundo-erro-forte);
+  color: var(--texto-invertido);
+}
+
+/* Mais grave que error — ex.: item atrasado/vencido, um degrau acima de "erro" comum.
+   Reaproveita acao-destrutiva-pressionada (Vermelho-800), já existente em tokens.css,
+   em vez de criar um token novo só pra esse variant. */
+.critical {
+  background: var(--acao-destrutiva-pressionada);
+  border-color: var(--acao-destrutiva-pressionada);
+  color: var(--texto-invertido);
+}
+
+/* Accent (sem status) — accent1=kiwi, accent2=roxo, accent3=laranja */
+.accent1 {
+  background: var(--borda-apoio-3);
+  border-color: var(--borda-apoio-3);
+  color: var(--texto-escuro-fixo);
+}
+
+.accent2 {
+  background: var(--fundo-apoio-1-forte);
+  border-color: var(--fundo-apoio-1-forte);
+  color: var(--texto-invertido);
+}
+
+.accent3 {
+  background: var(--fundo-apoio-2-forte);
+  border-color: var(--fundo-apoio-2-forte);
+  color: var(--texto-invertido);
+}
+
+/* Sem cor — contexto de superfície (clara/neutra/escura), nunca fundo sólido colorido */
+.neutral {
+  background: var(--fundo-secundario);
+  border-color: var(--borda-base);
+  color: var(--texto-secundario);
+}
+
+.white {
+  background: var(--fundo-superficie);
+  border-color: var(--borda-base);
+  color: var(--texto-secundario);
+}
+
+.dark {
+  background: var(--fundo-invertido);
+  border-color: var(--fundo-invertido);
+  color: var(--texto-invertido);
+}
+
+/* inverted — fundo claro + texto colorido, o "modelo antigo" do Badge (pré fundo-sólido),
+   reaproveitado agora como opt-in explícito por instância (nunca o default de um variant)
+   pro caso de o Badge precisar contrastar contra um fundo já da MESMA cor sólida ao redor
+   (ex.: SelectableCard selecionado com selectedTone igual ao badgeVariant). Ver
+   contratos/badge.contract.json, decisions. */
+.inverted.info {
+  background: var(--fundo-info);
+  border-color: var(--fundo-info);
+  color: var(--texto-info);
+}
+
+.inverted.success {
+  background: var(--fundo-sucesso);
+  border-color: var(--fundo-sucesso);
+  color: var(--texto-sucesso);
+}
+
+.inverted.warning {
+  background: var(--fundo-aviso);
+  border-color: var(--fundo-aviso);
+  color: var(--texto-aviso);
+}
+
+.inverted.error {
+  background: var(--fundo-erro);
+  border-color: var(--fundo-erro);
+  color: var(--texto-erro);
+}
+
+.inverted.critical {
+  background: var(--fundo-erro);
+  border-color: var(--fundo-erro);
+  color: var(--acao-destrutiva-pressionada);
+}
+
+.inverted.accent1 {
+  background: var(--fundo-apoio-3);
+  border-color: var(--fundo-apoio-3);
+  color: var(--texto-apoio-3);
+}
+
+.inverted.accent2 {
+  background: var(--fundo-apoio-1);
+  border-color: var(--fundo-apoio-1);
+  color: var(--texto-apoio-1);
+}
+
+.inverted.accent3 {
+  background: var(--fundo-apoio-2);
+  border-color: var(--fundo-apoio-2);
+  color: var(--texto-apoio-2);
+}
+
+.inverted.dark {
+  background: var(--fundo-secundario);
+  border-color: var(--fundo-secundario);
+  color: var(--texto-primario);
+}
+
+.topRight {
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translate(50%, -50%);
+}
+
+.topLeft {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: translate(-50%, -50%);
+}
+
+.bottomRight {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  transform: translate(50%, 50%);
+}
+
+.bottomLeft {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  transform: translate(-50%, 50%);
+}

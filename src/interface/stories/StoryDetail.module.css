@@ -1,0 +1,199 @@
+.wrapper {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: calc(var(--espaco-m) * 2) calc(var(--espaco-m) * 1.5);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-pp);
+  margin-bottom: var(--espaco-xp);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--texto-m-family);
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--texto-primario);
+}
+
+.status {
+  font-family: var(--texto-p-family);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px var(--espaco-pp);
+  border-radius: var(--raio-pp);
+}
+
+.draft {
+  background: var(--fundo-secundario);
+  color: var(--texto-secundario);
+}
+
+.stable {
+  background: var(--acao-primaria-transparente);
+  color: var(--acao-primaria);
+}
+
+.deprecated {
+  background: var(--acao-destrutiva-transparente);
+  color: var(--acao-destrutiva);
+}
+
+.description {
+  font-family: var(--texto-p-family);
+  font-size: var(--texto-m-size);
+  color: var(--texto-secundario);
+  margin: 0 0 calc(var(--espaco-m) * 1.5);
+  max-width: 640px;
+}
+
+.canvasToolbar {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--espaco-pp);
+  margin-bottom: var(--espaco-pp);
+}
+
+.toolbarButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espaco-xp);
+  height: 32px;
+  padding: 0 var(--espaco-p);
+  border: 1px solid var(--borda-base);
+  border-radius: var(--raio-xp);
+  background: var(--fundo-superficie);
+  color: var(--texto-secundario);
+  font-family: var(--texto-p-family);
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.toolbarButton:hover {
+  background: var(--fundo-secundario);
+  color: var(--texto-primario);
+}
+
+.toolbarButton:focus-visible {
+  outline: var(--foco-espessura) solid var(--borda-foco);
+  outline-offset: 1px;
+}
+
+/* "Device frame" simulando um smartphone — largura fixa dentro de um iframe
+   (viewport própria, então @media reage de verdade), altura de referência de
+   um aparelho comum, com borda arredondada só pra dar a moldura visual. */
+.deviceFrame {
+  width: 390px;
+  height: 700px;
+  max-height: 70vh;
+  border: 1px solid var(--borda-base);
+  border-radius: var(--raio-p);
+  background: var(--fundo-superficie);
+}
+
+/* Templates/Páginas já trazem sua própria moldura (LoginScreenDemo.module.css
+   `.frame`, ou a página em si) — zera o padding do canvas pra ela encostar na
+   borda da área de exemplo em vez de sobrar um respiro + borda duplicada. */
+.canvasFlush {
+  padding: 0;
+  overflow: hidden;
+}
+
+.canvas {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  padding: calc(var(--espaco-m) * 1.5);
+  background: var(--fundo-superficie);
+  border: 1px solid var(--borda-base);
+  border-radius: var(--raio-pp);
+  margin-bottom: calc(var(--espaco-m) * 1.5);
+  /* fonte base do design system por padrão em toda demo — componentes sem
+     tipografia própria (ex.: Link, que herda do contexto de propósito) só
+     mostram a fonte certa se o contexto ao redor já a definir. Sem isso,
+     ficavam na fonte padrão do navegador dentro do canvas. */
+  font-family: var(--texto-m-family);
+  color: var(--texto-primario);
+}
+
+.section {
+  margin-bottom: calc(var(--espaco-m) * 1.5);
+}
+
+.sectionTitle {
+  font-family: var(--texto-p-family);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--texto-secundario);
+  margin: 0 0 var(--espaco-pp);
+}
+
+.code {
+  margin: 0;
+  padding: var(--espaco-m);
+  background: var(--fundo-secundario);
+  border: 1px solid var(--borda-base);
+  border-radius: var(--raio-pp);
+  overflow-x: auto;
+  font-family: "SF Mono", Menlo, Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--texto-primario);
+}
+
+.meta {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: var(--espaco-xp) var(--espaco-m);
+  margin: 0;
+  font-family: var(--texto-p-family);
+  font-size: var(--texto-p-size);
+}
+
+.meta dt {
+  color: var(--texto-secundario);
+}
+
+.meta dd {
+  margin: 0;
+  color: var(--texto-primario);
+}
+
+.contractFileRow {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-pp);
+}
+
+.contractFileRow code {
+  font-family: "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.9em;
+}
+
+.viewContractButton {
+  background: none;
+  border: 1px solid var(--borda-base);
+  border-radius: var(--raio-xp);
+  padding: 2px var(--espaco-pp);
+  font-family: var(--texto-p-family);
+  font-size: 12px;
+  color: var(--acao-primaria);
+  cursor: pointer;
+}
+
+.viewContractButton:hover {
+  background: var(--fundo-secundario);
+}
+
+.viewContractButton:focus-visible {
+  outline: var(--foco-espessura) solid var(--borda-foco);
+  outline-offset: 1px;
+}

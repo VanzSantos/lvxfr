@@ -1,0 +1,68 @@
+{
+  "name": "Switch",
+  "originalName": "Switch",
+  "oneLiner": "Controle de liga/desliga que aplica o efeito na hora, sem precisar de submit.",
+  "category": "data-entry",
+  "status": "draft",
+  "whenToUse": "Alternar uma configuração binária que tem efeito imediato assim que o usuário interage (ex.: 'notificações por e-mail', 'modo escuro') — diferente de um formulário que só aplica no submit.",
+  "whenNotToUse": "O valor só é aplicado depois de um submit explícito (use Checkbox); escolher 1 entre N opções mutuamente exclusivas (use Radio); a ação precisa de confirmação/validação antes de valer (Switch neste contrato não tem state=error — ver decisions).",
+  "anatomy": [
+    "<label> envolvendo a linha inteira quando label está presente (clicar em qualquer parte — trilho ou texto — alterna o estado, associação nativa via htmlFor/id)",
+    "Trilho (pill) — fundo, borda, raio-circular",
+    "Thumb (bolinha) — círculo branco que desliza entre as duas posições",
+    "Texto do rótulo (opcional — ver decisions)"
+  ],
+  "dependencies": [],
+  "props": [
+    { "name": "checked", "type": "boolean", "required": true, "description": "Campo controlado, mesmo padrão de checked em Checkbox/Radio." },
+    { "name": "label", "type": "string", "required": false, "description": "Texto visível ao lado do trilho. Quando omitido, accessibleLabel passa a ser obrigatório (ver forbidden) — caso de uso: linha de uma lista de configurações onde o rótulo já existe fora do componente." },
+    { "name": "accessibleLabel", "type": "string", "required": false, "requiredWhen": "label não é fornecido", "description": "Vira aria-label do input. Nunca usado quando label já existe (label visível já é o nome acessível — duplicar seria redundante)." },
+    { "name": "state", "type": "enum", "enum": ["default", "disabled"], "default": "default", "required": false, "description": "Sem state=error neste contrato — ver decisions." },
+    { "name": "size", "type": "enum", "enum": ["medium", "small"], "default": "medium", "required": false, "description": "small = trilho/thumb reduzidos, pra contextos densos (ex.: coluna de ações de uma Datatable). A área clicável mínima de 44×44px é preservada nos dois tamanhos via padding invisível no <label> — só o desenho visual do trilho encolhe, não o alvo de toque real (ver decisions)." },
+    { "name": "onChange", "type": "function", "required": false, "description": "Assinatura (checked: boolean) => void, mesmo padrão de Checkbox." },
+    { "name": "name", "type": "string", "required": false }
+  ],
+  "variants": [],
+  "states": ["default", "disabled"],
+  "tokensAllowed": {
+    "trackBackground": ["semantic.acao-primaria", "semantic.fundo-secundario", "semantic.acao-inativa"],
+    "trackBorder": ["semantic.borda-base", "semantic.borda-foco", "semantic.borda-inativo"],
+    "thumbBackground": ["semantic.fundo-superficie"],
+    "text": ["semantic.texto-primario", "semantic.texto-inativo"],
+    "radius": ["structural.raio-circular"],
+    "focusRing": ["structural.foco-espessura"],
+    "spacing": ["structural.espaco-pp", "structural.espaco-xp"],
+    "thumbSize": ["structural.icone-medio", "structural.icone-pequeno"],
+    "typography": ["type-style.texto-m"]
+  },
+  "a11y": {
+    "role": "switch — <input type=\"checkbox\" role=\"switch\">, mesmo padrão de checkbox nativo estilizado usado pela ARIA Authoring Practices como alternativa a role=switch num elemento não-nativo",
+    "requiredAria": ["aria-label quando label não é fornecido (obrigatório via accessibleLabel)"],
+    "keyboard": ["Espaço alterna o estado (comportamento nativo de checkbox, herdado por role=switch)", "Tab move o foco", "disabled sai da ordem de tabulação"],
+    "contrastMin": "AAA (7:1) como meta pro público 60+, mesma régua do Checkbox/Radio/Button.",
+    "notes": "Alvo de toque mínimo 44×44px (igual Checkbox/Radio) mesmo com o trilho visual menor — a área clicável real é o <label> inteiro quando label existe; quando não existe (uso 'nu' com accessibleLabel), o próprio trilho precisa ter no mínimo 44×44px de área clicável via padding invisível, não só o tamanho visual do trilho. Foco nunca só cor — anel visível combinando cor + espessura, no trilho (não no thumb)."
+  },
+  "events": { "status": "não definido no contrato original" },
+  "composition": { "canContain": [], "canBeContainedBy": ["formulários", "listas de configurações", "linhas de settings"], "doNotCombine": [] },
+  "forbidden": [
+    "Switch sem label E sem accessibleLabel — precisa de pelo menos um dos dois, senão o controle não tem nome acessível",
+    "usar Switch para um valor que só aplica depois de um submit — isso é Checkbox, não Switch (ver whenNotToUse)",
+    "state=error ou qualquer variação de mensagem de erro embutida no próprio Switch — não faz parte deste contrato (ver decisions)",
+    "onChange com assinatura diferente de (checked: boolean) => void",
+    "cor crua fora da whitelist de tokensAllowed",
+    "reimplementar o trilho/thumb com um SVG ou ícone do Phosphor — são formas geométricas simples (div com border-radius), não um ícone"
+  ],
+  "decisions": [
+    "RESOLVIDO — bug real encontrado numa Datatable com Switch 'nu' (sem label, via accessibleLabel) na coluna de ações: a linha da tabela não encolhia em densidade condensed. Causa raiz: .row tinha min-height:44px em content-box (padrão do CSS), e .bare somava seu padding vertical (espaco-pp em cima + embaixo) POR CIMA desse valor, resultando em 60px reais em vez dos 44px pretendidos — o comentário original de .bare já dizia 'garante os 44×44px', mas o box model errado deixava passar pra 60. Corrigido com box-sizing:border-box em .row, fazendo o padding de .bare contar DENTRO do orçamento de 44px, não somar em cima. Acontecia em qualquer Switch sem label (medium ou small), não é específico de size='small' — só ficou visível ao medir pixel a pixel numa tabela tentando encolher.",
+    "RESOLVIDO com o usuário — label é opcional (diferente de Checkbox/Radio, onde é sempre obrigatório): Switch é comumente usado 'nu' dentro de uma linha de lista de configurações onde o texto já existe fora do componente (ex.: uma linha com 'Notificações por e-mail' + o Switch alinhado à direita, onde o texto da linha inteira já é o rótulo). Quando label é omitido, accessibleLabel é obrigatório — impede um Switch sem nome acessível.",
+    "RESOLVIDO com o usuário — sem state=error/HelperText (diferente de Checkbox): Switch representa uma ação instantânea que já aplicou o efeito assim que o usuário interagiu, não um valor pendente de validação/submit. Se a ação falhar (ex.: erro de rede ao salvar a preferência), a comunicação é responsabilidade de um Toast/mensagem externa ao componente, não de um estado embutido no Switch — mesmo raciocínio já usado para não dar RadioGroup especulativo ao Radio.",
+    "RESOLVIDO com o usuário — dimensões derivadas dos tokens estruturais existentes, já que não há token dedicado de trilho/thumb no tokens.json (diferente do Checkbox, que reaproveita icone-medio direto pra caixa): thumb = structural.icone-medio (20px, mesmo valor usado no círculo do Radio). Trilho: altura = icone-medio + 2×espaco-xp (20 + 8 = 28px), largura = 2× a altura (56px). Deriva inteiramente de tokens já existentes, não introduz nenhum valor cru novo — mesma disciplina já registrada nas decisions do Checkbox/Radio.",
+    "role=switch em cima de <input type=\"checkbox\"> nativo, não um <button role=\"switch\"> customizado — mantém a mesma base de Checkbox/Radio (input nativo escondido + span decorativo aria-hidden), reaproveita o comportamento de teclado/toggle do checkbox nativo em vez de reimplementar aria-checked manualmente num button.",
+    "Cor do trilho ligado reaproveita semantic.acao-primaria, mesmo token que Checkbox usa pro fundo marcado — não cria uma família nova de cor 'ligado' separada da família de seleção já estabelecida.",
+    "Cor do trilho desligado (habilitado) usa semantic.fundo-secundario + borda semantic.borda-base — deliberadamente diferente de semantic.acao-inativa (reservada para o estado disabled, mesmo padrão do Checkbox/Radio) pra não confundir visualmente 'desligado, mas ainda usável' com 'desabilitado'.",
+    "Thumb é sempre semantic.fundo-superficie (branco), em todos os estados (ligado/desligado/disabled) — a posição do thumb (esquerda/direita) já comunica o estado por si só, diferente do Checkbox que precisa trocar a cor do glifo porque o ícone de check é a única pista visual.",
+    "Borda do trilho fixa em 2px — não é token, mesma constante não-tokenizada já usada na caixa do Checkbox/círculo do Radio.",
+    "REVISADO — size='small' adicionado a pedido do usuário pra caber na coluna de ações de datatable.contract.json (trilho medium ficava desproporcional numa célula de tabela densa). Dimensões seguem a mesma fórmula do medium, só trocando o token do thumb: thumb=structural.icone-pequeno (16px em vez de 20px), trilho altura=thumb+2×espaco-xp (24px), largura=2×altura (48px) — nenhum valor cru novo, mesma disciplina de derivação do medium. O alvo de toque de 44×44px continua garantido via padding invisível no <label>, não relaxado — só o desenho visual muda de tamanho."
+  ],
+  "references": { "tokensFile": "tokens/tokens.json — Cores Semânticas (Ações/Primárias, Bordas, Fundos), Estrutural (raio-circular, foco-espessura, espaco-pp, espaco-xp, icone-medio), Tipografia Estilo (texto-m)" }
+}

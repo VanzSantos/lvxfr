@@ -1,0 +1,508 @@
+{
+  "name": "Datatable",
+  "originalName": "TabelaDeDados",
+  "oneLiner": "Tabela de dados tabulares — um único componente que cobre a listagem simples (colunas + linhas) e o caso avançado (toolbar com título/densidade/colunas/exportação, ordenação, filtro por coluna, seleção, paginação, edição de linha, habilitar/desabilitar registro, coluna fixa), via recursos opt-in por prop/coluna.",
+  "category": "display",
+  "status": "draft",
+  "whenToUse": "Exibir uma coleção de registros com a mesma forma (mesmas colunas) em linhas, quando o usuário precisa comparar valores entre registros lado a lado. Recursos avançados (sort/filtro/seleção/paginação/edição/habilitar-desabilitar) entram só quando o volume ou a necessidade real de manipular os dados justificar — a versão simples é só usar Datatable sem ativar nenhum deles.",
+  "whenNotToUse": "Menos de 2 colunas ou dado que não é tabular por natureza (isso é uma lista, considerar outro padrão de layout); um único registro com muitos campos (isso é um formulário ou Card, não uma tabela); cartões visuais ricos por item (imagem grande, layout livre) — isso é um grid de Card, não Datatable; edição com muitos campos por registro ou validação complexa (um formulário/Modal de edição dedicado serve melhor que transformar a linha inteira em inputs).",
+  "anatomy": [
+    "Toolbar principal (só quando há title, toolbarActions, bulkActions ativo, ou algum recurso embutido ligado — ver decisions) — título da tabela à esquerda (substituído pela área de ações em lote quando 2+ linhas selecionadas e bulkActions existe, ver decisions); à direita, nessa ordem: toolbarActions (slot livre do consumidor), botão de densidade (só allowDensityToggle=true), botão de colunas visíveis + indicador de colunas ocultas (só columnVisibilityEnabled=true), botão de exportação (só onExport fornecido)",
+    "Área de ações em lote — contador 'N selecionados' + o node retornado por bulkActions(selectedRowKeys), no lugar do título, só quando selectable=true, bulkActions existe e há 2+ linhas selecionadas",
+    "Alert de colunas ocultas (átomo Alert, intent='warning') — entre a toolbar e a tabela, só quando hiddenColumnKeys não está vazio; texto 'Atenção: você tem N coluna(s) com visualização oculta.' + ação 'Restaurar' (alinhada à direita, mesma linha do texto) que marca todas as colunas de volta como visíveis (ver decisions)",
+    "Linha de filtros ativos (átomo Chip, um por filtro com valor não vazio) — entre o Alert de colunas ocultas (ou a toolbar, se não houver colunas ocultas) e a tabela, só quando existe pelo menos 1 filtro aplicado; cada Chip é removable (remove só aquele filtro) + um Button variant='link' 'Limpar todos' ao final (ver decisions)",
+    "Wrapper com scroll horizontal (a tabela nunca quebra layout da página, rola dentro de si mesma em telas estreitas)",
+    "<table> nativo com accessibleLabel via aria-label",
+    "<thead> com uma linha de cabeçalho, sticky no topo do wrapper",
+    "Célula de cabeçalho de seleção (só quando selectable=true) — átomo Checkbox com hideLabel=true, 'selecionar todos' da página atual",
+    "Célula de cabeçalho por coluna — nome da coluna (vira um botão-gatilho de filtro quando column.filterable=true — único gatilho, sem ícone de funil separado, ver decisions), ícone de lupa decorativo reservado à direita do texto do título (só visível no hover/focus, mesmo espaço sempre ocupado) e ícone de ordenação sempre pinado na borda direita da célula (Icon caret-up/caret-down, só quando column.sortable=true), nunca encostando no texto do título",
+    "Input de filtro por coluna — OCULTO por padrão, substitui o texto do título no mesmo espaço/mesma altura quando aberto (clicando no título); <input> de texto simples, sem popover, sem alterar a altura do cabeçalho",
+    "<tbody> com uma linha por registro de data",
+    "Célula de seleção por linha (só quando selectable=true) — átomo Checkbox com hideLabel=true",
+    "Célula por coluna — valor da linha (via column.accessor ou row[column.key]) ou node customizado (via column.render), substituída por um input/Select de edição quando a linha está em edição E a coluna é column.editable=true; todo conteúdo de célula centralizado verticalmente",
+    "Coluna fixa (column.sticky='right') — gruda na borda direita durante o scroll horizontal, com fundo opaco próprio, borda esquerda na MESMA cor das outras bordas da tabela (semantic.borda-base) + sombra sutil separando do conteúdo que rola por baixo (ver decisions)",
+    "Linha vazia (colSpan cobrindo todas as colunas) quando data filtrada resulta em zero linhas — reaproveita o texto de EmptyState, não o componente EmptyState inteiro (ver decisions)",
+    "Linhas de esqueleto (reaproveitando Skeleton) substituindo o <tbody> inteiro quando loading=true",
+    "Rodapé de paginação (só quando paginationEnabled=true) — resumo 'X–Y de Z', seletor nativo de itens por página, botões anterior/próxima do tipo link (Button variant='link', iconOnly, sem contorno)",
+    "Modal de confirmação (átomo Modal, interno ao Datatable) — abre ao salvar uma edição de linha ou ao habilitar/desabilitar um registro, nunca aplica a mudança sem essa confirmação (ver decisions)"
+  ],
+  "dependencies": [
+    "Icon",
+    "Skeleton",
+    "Button",
+    "Checkbox",
+    "Modal",
+    "Select",
+    "Alert",
+    "Chip"
+  ],
+  "props": [
+    {
+      "name": "columns",
+      "type": "array",
+      "required": true,
+      "description": "Array de { key: string, header: string, accessor?: (row) => valor, render?: (valor, row, helpers) => ReactNode, sortable?: boolean, filterable?: boolean, align?: 'left'|'center'|'right', width?: string, editable?: boolean, editControl?: { type: 'text' | 'select'; options?: { label: string; value: string }[] }, hideable?: boolean, sticky?: 'right' }. Fonte única das colunas, mesmo padrão de 'array de dados em vez de children livre' já usado em Select (options) e Tabs (items). Coluna de ações é só uma column comum com render retornando botões/ícones, sem conceito novo — recebe helpers (ver DatatableRowHelpers) pra disparar edição/salvar/cancelar/habilitar-desabilitar daquela linha. editControl só é lido quando editable=true. hideable (default true) controla se a coluna aparece no dropdown de colunas visíveis — false pra colunas que nunca podem sumir (ex.: identificador principal). sticky='right' gruda a coluna na borda direita durante o scroll horizontal — pensado pra coluna de ações em tabelas largas (ver decisions)."
+    },
+    {
+      "name": "data",
+      "type": "array",
+      "required": true,
+      "description": "Array de registros (objetos). Em paginationMode='server', já vem só com os registros da página atual; em 'client', vem completo e o Datatable pagina internamente."
+    },
+    {
+      "name": "rowKey",
+      "type": "string",
+      "required": true,
+      "description": "Nome do campo em cada registro de data usado como identificador único de linha (React key, seleção, edição, habilitar/desabilitar). Precisa ser único em todo o dataset, não só na página atual."
+    },
+    {
+      "name": "accessibleLabel",
+      "type": "string",
+      "required": true,
+      "description": "Nome acessível da tabela — vira aria-label no <table>. Ex.: 'Lista de pedidos'."
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": false,
+      "description": "Título visível da tabela, mostrado na toolbar principal (acima do cabeçalho de colunas). Quando presente, ativa a toolbar mesmo sem nenhum outro recurso dela ligado. Some da toolbar quando 2+ linhas estão selecionadas e bulkActions existe — vira a área de ações em lote (ver decisions)."
+    },
+    {
+      "name": "toolbarActions",
+      "type": "node",
+      "required": false,
+      "description": "Slot livre pra botões de ação customizados do consumidor (ex.: 'Novo pedido'), renderizados na toolbar principal, à esquerda dos controles embutidos (densidade/colunas/exportação)."
+    },
+    {
+      "name": "bulkActions",
+      "type": "function",
+      "required": false,
+      "description": "Assinatura (selectedRowKeys: string[]) => ReactNode. Slot livre (mesmo espírito de toolbarActions e de column.render — sem conceito novo embutido) que aparece na toolbar SÓ quando selectable=true e 2+ linhas estão selecionadas. O consumidor decide o que mostrar (ex.: ícones de excluir/habilitar-desabilitar/editar em lote) e como confirmar/aplicar — Datatable não sabe o que é 'excluir' ou 'editar em lote', só abre o espaço (ver decisions)."
+    },
+    {
+      "name": "density",
+      "type": "enum",
+      "enum": [
+        "comfortable",
+        "compact",
+        "condensed"
+      ],
+      "default": "compact",
+      "required": false,
+      "description": "Controla o padding vertical das células — espaco-p (comfortable), espaco-xp (compact, padrão do harness) ou 0 (condensed, a mais estreita possível — praticamente sem respiro vertical, pra caber o máximo de registros na tela). O padding HORIZONTAL é sempre o mesmo (espaco-pp) nas 3 densidades — só o vertical muda (ver decisions). Quando allowDensityToggle=true, é só o valor INICIAL — depois disso o usuário controla via o botão da toolbar, que alterna somente entre compact e condensed (estado interno, ver decisions)."
+    },
+    {
+      "name": "allowDensityToggle",
+      "type": "boolean",
+      "default": false,
+      "required": false,
+      "description": "Mostra um botão de ícone na toolbar principal que deixa o usuário alternar compact/condensed em tempo real (comfortable só é alcançável via prop, fora do ciclo do botão — ver decisions)."
+    },
+    {
+      "name": "columnVisibilityEnabled",
+      "type": "boolean",
+      "default": false,
+      "required": false,
+      "description": "Mostra um botão de ícone na toolbar principal que abre um dropdown com checkbox por coluna (hideable≠false) pra ocultar/exibir. Sempre que houver colunas ocultas, um Alert (intent='warning', com ação 'Restaurar') aparece entre a toolbar e a tabela (ver decisions) — nunca fica implícito."
+    },
+    {
+      "name": "selectable",
+      "type": "boolean",
+      "default": false,
+      "required": false,
+      "description": "Ativa a coluna de seleção (átomo Checkbox) à esquerda."
+    },
+    {
+      "name": "selectedRowKeys",
+      "type": "array",
+      "required": false,
+      "requiredWhen": "selectable = true",
+      "description": "Array de rowKey (string) das linhas selecionadas. Controlado, mesmo padrão de value em TextField/Select."
+    },
+    {
+      "name": "onSelectionChange",
+      "type": "function",
+      "required": false,
+      "requiredWhen": "selectable = true",
+      "description": "Assinatura (selectedRowKeys: string[]) => void, disparado ao marcar/desmarcar uma linha ou 'selecionar todos'."
+    },
+    {
+      "name": "sortMode",
+      "type": "enum",
+      "enum": [
+        "client",
+        "server"
+      ],
+      "default": "client",
+      "required": false,
+      "description": "client = Datatable ordena o array data internamente. server = Datatable só dispara onSortChange com a ordenação desejada; quem consome busca os dados já ordenados e os passa de volta em data."
+    },
+    {
+      "name": "sortColumnKey",
+      "type": "string",
+      "required": false,
+      "requiredWhen": "existe pelo menos 1 column com sortable=true",
+      "description": "key da coluna atualmente ordenada, ou null/ausente quando nenhuma está ordenada. Controlado."
+    },
+    {
+      "name": "sortDirection",
+      "type": "enum",
+      "enum": [
+        "asc",
+        "desc"
+      ],
+      "default": "asc",
+      "required": false,
+      "requiredWhen": "existe pelo menos 1 column com sortable=true"
+    },
+    {
+      "name": "onSortChange",
+      "type": "function",
+      "required": false,
+      "requiredWhen": "existe pelo menos 1 column com sortable=true",
+      "description": "Assinatura (columnKey: string | null, direction: 'asc' | 'desc') => void. columnKey null quando o ciclo de 3 estados volta pra 'sem ordenação' (ver decisions)."
+    },
+    {
+      "name": "filterMode",
+      "type": "enum",
+      "enum": [
+        "client",
+        "server"
+      ],
+      "default": "client",
+      "required": false,
+      "description": "client = Datatable filtra data internamente (substring, normalizado por acento, via shared/normalizeForSearch). server = só dispara onFilterChange; quem consome busca os dados já filtrados."
+    },
+    {
+      "name": "filterValues",
+      "type": "array",
+      "required": false,
+      "requiredWhen": "existe pelo menos 1 column com filterable=true",
+      "description": "Array de { columnKey: string, value: string }, uma entrada por coluna filtrável com valor não vazio. Controlado — independente de qual filtro está com o input ABERTO no momento (isso é estado de UI interno, ver decisions)."
+    },
+    {
+      "name": "onFilterChange",
+      "type": "function",
+      "required": false,
+      "requiredWhen": "existe pelo menos 1 column com filterable=true",
+      "description": "Assinatura (columnKey: string, value: string) => void, disparado a cada mudança no input de filtro daquela coluna."
+    },
+    {
+      "name": "paginationEnabled",
+      "type": "boolean",
+      "default": false,
+      "required": false
+    },
+    {
+      "name": "paginationMode",
+      "type": "enum",
+      "enum": [
+        "client",
+        "server"
+      ],
+      "default": "client",
+      "required": false,
+      "description": "client = Datatable recebe data completo (já filtrado/ordenado) e fatia a página internamente. server = data já vem só com os registros da página atual."
+    },
+    {
+      "name": "page",
+      "type": "number",
+      "required": false,
+      "requiredWhen": "paginationEnabled = true",
+      "description": "Página atual, 1-indexada. Controlado."
+    },
+    {
+      "name": "pageSize",
+      "type": "number",
+      "required": false,
+      "requiredWhen": "paginationEnabled = true",
+      "description": "Quantidade de registros por página. Controlado."
+    },
+    {
+      "name": "pageSizeOptions",
+      "type": "array",
+      "default": [
+        5,
+        10,
+        25,
+        50,
+        100
+      ],
+      "required": false,
+      "description": "Array de number — opções do seletor de itens por página. Default padronizado do harness: 5/10/25/50/100."
+    },
+    {
+      "name": "totalRows",
+      "type": "number",
+      "required": false,
+      "requiredWhen": "paginationEnabled = true E paginationMode = 'server'",
+      "description": "Total de registros em todo o dataset (não só a página atual) — necessário em modo server porque o Datatable não tem como saber o total só pelo tamanho de data. Em modo client é derivado de data.length internamente, não precisa ser passado."
+    },
+    {
+      "name": "onPageChange",
+      "type": "function",
+      "required": false,
+      "requiredWhen": "paginationEnabled = true",
+      "description": "Assinatura (page: number) => void."
+    },
+    {
+      "name": "onPageSizeChange",
+      "type": "function",
+      "required": false,
+      "requiredWhen": "paginationEnabled = true",
+      "description": "Assinatura (pageSize: number) => void. Troca de pageSize sempre reseta page pra 1 (ver decisions)."
+    },
+    {
+      "name": "onRowSave",
+      "type": "function",
+      "required": false,
+      "requiredWhen": "algum consumidor de column.render chama helpers.startEdit (ou seja, existe pelo menos 1 column editable=true e um gatilho real de edição)",
+      "description": "Assinatura (rowKey: string, values: Record<string, unknown>, row: T) => void. Chamado só DEPOIS que o usuário confirma no Modal interno de 'salvar alterações' (ver decisions) — nunca antes."
+    },
+    {
+      "name": "disabledRowKeys",
+      "type": "array",
+      "required": false,
+      "description": "Array de rowKey (string) das linhas atualmente desabilitadas. Controlado, mesmo padrão de selectedRowKeys — só tem efeito visual/de estado se o consumidor também usar helpers.requestToggleDisabled em algum column.render (Datatable não desenha esse controle sozinho, ver decisions)."
+    },
+    {
+      "name": "onDisabledRowKeysChange",
+      "type": "function",
+      "required": false,
+      "description": "Assinatura (disabledRowKeys: string[]) => void. Chamado só DEPOIS que o usuário confirma no Modal interno de habilitar/desabilitar (ver decisions) — nunca antes."
+    },
+    {
+      "name": "onExport",
+      "type": "function",
+      "required": false,
+      "description": "Assinatura (format: 'csv' | 'pdf' | 'xlsx', rows: T[]) => void. Presença deste callback ativa o botão de exportação na toolbar (dropdown com as 3 opções); ausência = sem botão. Datatable NÃO gera o arquivo — só desenha a UI e entrega o formato escolhido + as linhas atualmente filtradas/ordenadas (todas as páginas, não só a atual). Geração real do CSV/PDF/XLSX é responsabilidade do consumidor (ver decisions)."
+    },
+    {
+      "name": "loading",
+      "type": "boolean",
+      "default": false,
+      "required": false,
+      "description": "Substitui o conteúdo do tbody por linhas de Skeleton. Cabeçalho e paginação continuam visíveis (paginação fica desabilitada durante loading)."
+    },
+    {
+      "name": "skeletonRowCount",
+      "type": "number",
+      "default": 5,
+      "required": false
+    },
+    {
+      "name": "emptyStateTitle",
+      "type": "string",
+      "default": "Nenhum registro encontrado.",
+      "required": false
+    },
+    {
+      "name": "emptyStateDescription",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "variants": [
+    "comfortable",
+    "compact",
+    "condensed"
+  ],
+  "states": [
+    "default",
+    "loading",
+    "empty",
+    "row-hover",
+    "row-selected",
+    "row-editing",
+    "row-disabled",
+    "column-sorted-ascending",
+    "column-sorted-descending",
+    "column-filter-open",
+    "columns-hidden",
+    "filters-active"
+  ],
+  "tokensAllowed": {
+    "background": [
+      "semantic.fundo-superficie",
+      "semantic.fundo-secundario",
+      "semantic.acao-primaria-transparente"
+    ],
+    "border": [
+      "semantic.borda-base",
+      "semantic.borda-foco"
+    ],
+    "text": [
+      "semantic.texto-primario",
+      "semantic.texto-secundario",
+      "semantic.texto-placeholder",
+      "semantic.texto-inativo"
+    ],
+    "focusRing": [
+      "structural.foco-espessura",
+      "semantic.borda-foco"
+    ],
+    "radius": [
+      "structural.raio-pp",
+      "structural.raio-xp"
+    ],
+    "spacing": [
+      "structural.espaco-xp",
+      "structural.espaco-pp",
+      "structural.espaco-p",
+      "structural.espaco-m",
+      "structural.espaco-g"
+    ],
+    "iconSize": [
+      "structural.icone-pequeno",
+      "structural.icone-medio"
+    ],
+    "iconColor": [
+      "semantic.icone-secundario",
+      "semantic.icone-inativo",
+      "semantic.acao-primaria"
+    ],
+    "typography": [
+      "type-style.texto-p",
+      "type-style.texto-micro-forte",
+      "type-style.texto-g-forte"
+    ]
+  },
+  "a11y": {
+    "role": "table nativo (<table>/<thead>/<tbody>/<tr>/<th scope=\"col\">/<td>) — sem role=grid, semântica nativa de tabela basta pro conjunto de interações deste contrato (ver decisions).",
+    "requiredAria": [
+      "aria-label no <table> com o valor de accessibleLabel",
+      "aria-sort em cada <th> de coluna sortable (ascending/descending/none), refletindo sortColumnKey/sortDirection",
+      "aria-label no botão de ordenação de cada coluna sortable, anunciando a coluna e a direção que vai aplicar ao clicar (ex.: 'Ordenar por Nome, crescente')",
+      "aria-expanded no botão-gatilho de filtro (o próprio título da coluna) refletindo se o input está aberto, aria-controls apontando pro id do input",
+      "aria-label no <input> de filtro de coluna (ex.: 'Filtrar Nome')",
+      "aria-label 'Editar linha' / 'Salvar alterações' / 'Cancelar edição' nos ícones da coluna de ações quando o consumidor usa helpers (documentado como recomendação, não pode ser garantido pelo contrato já que o conteúdo é column.render livre)",
+      "aria-busy=\"true\" no wrapper da tabela enquanto loading=true",
+      "aria-label nos botões de paginação anterior/próxima ('Página anterior' / 'Próxima página') e no seletor de itens por página",
+      "aria-label 'Aumentar densidade'/'Diminuir densidade' no botão de densidade da toolbar",
+      "aria-expanded + aria-haspopup='true' no botão de colunas visíveis e no de exportação (os dois abrem um popover), aria-label indicando quantas colunas estão ocultas quando houver alguma (redundante de propósito com o indicador visual, ver decisions)",
+      "cada <th> de coluna oculta simplesmente não existe no DOM (display:none quebraria leitura por célula em alguns leitores de tela; remover do DOM é mais correto que ocultar visualmente aqui, ver decisions)"
+    ],
+    "keyboard": [
+      "Tab percorre, na ordem do DOM: toolbar (toolbarActions → densidade → colunas → exportação) → checkbox de cabeçalho (se selectable) → título/filtro + botão de sort de cada coluna → checkbox de cada linha (se selectable) → elementos interativos dentro de células com render customizado / inputs de edição → controles de paginação",
+      "Enter/Espaço no botão de ordenação avança o ciclo de ordenação (ver decisions)",
+      "Enter/Espaço no título da coluna abre/fecha o filtro daquela coluna",
+      "Esc com o input de filtro focado fecha o filtro e devolve o foco pro título — não limpa o valor já digitado (mesma regra de Esc não-destrutivo já usada em Select/ComboBox); perder o foco (Tab/clique fora) com o input VAZIO também fecha, evitando um input aberto sem gatilho visível de fechamento nele mesmo (ver decisions)",
+      "Espaço no checkbox de cabeçalho ou de linha alterna a seleção (comportamento nativo do átomo Checkbox)",
+      "digitar no input de filtro não navega nem ordena — só filtra, Enter não faz submit de nada (não existe <form> envolvendo a tabela)",
+      "dropdown de colunas visíveis e de exportação seguem o mesmo padrão de teclado do popup do Select (Esc fecha, foco volta pro botão-gatilho)"
+    ],
+    "contrastMin": "AAA (7:1) como meta pro texto de célula/cabeçalho sobre fundo-superficie/fundo-secundario, mesma régua dos outros contratos deste harness.",
+    "notes": "Linha vazia (zero resultados) é uma <tr> real com um único <td colSpan={total de colunas}>, não um bloco fora da estrutura de tabela — leitor de tela navegando célula a célula continua encontrando algo coerente. Durante loading, as linhas de Skeleton preenchem o mesmo número de colunas. Os Modals de confirmação (salvar edição / habilitar-desabilitar) herdam toda a a11y já definida em modal.contract.json (focus trap, Esc, role=dialog) — não redefinida aqui. Coluna sticky continua acessível por Tab normalmente — position:sticky não afeta a ordem do DOM/tabulação, só a posição visual durante o scroll. O Alert de colunas ocultas e os Chips de filtro ativo herdam toda a a11y já definida em alert.contract.json/chip.contract.json (role=alert, botão de ação com nome acessível via texto visível, botão de remover do Chip com aria-label 'Remover {label}') — não redefinida aqui."
+  },
+  "events": {
+    "status": "não definido no contrato original"
+  },
+  "composition": {
+    "canContain": [
+      "Icon",
+      "Button",
+      "Skeleton",
+      "Checkbox",
+      "Modal",
+      "Select",
+      "Alert",
+      "Chip",
+      "StackedText (em column.render, pra células de texto principal+secundário)",
+      "QuantitySelector (em column.render, pra células de quantidade editável)",
+      "ImageThumbnail (em column.render, pra células de imagem)"
+    ],
+    "canBeContainedBy": [
+      "páginas",
+      "cards"
+    ],
+    "doNotCombine": [
+      "Datatable dentro de outro Datatable (linha expansível com sub-tabela não é um caso coberto por este contrato)"
+    ]
+  },
+  "forbidden": [
+    "menos de 2 colunas — abaixo disso não é uma tabela real, considerar outro layout",
+    "mutar o array data recebido via prop para ordenar/filtrar — sort/filtro em modo client sempre produzem uma cópia nova",
+    "inventar um segundo tipo de filtro (dropdown/select/faixa de valores) fora do texto substring — não fazia parte do pedido; se surgir caso real, é uma prop nova (ex.: column.filterType), não uma adivinhação",
+    "filtro de coluna sem normalizeForSearch (shared/normalizeForSearch.ts) — mesma regra de acento já corrigida em Select/ComboBox, não reabrir esse bug aqui",
+    "selecionar 'todos' incluindo linhas fora da página atual quando paginationEnabled=true — 'selecionar todos' seleciona só o que está visível na página corrente (ver decisions)",
+    "reimplementar Icon, Button, Skeleton, Checkbox, Modal ou Select inline em vez de reaproveitar os átomos já existentes — nenhum controle interativo deste componente pode ser um elemento nativo puro fora de um átomo do harness (ver decisions)",
+    "coluna de ações fora do mecanismo de column.render — não introduzir um prop 'actions' paralelo",
+    "cor fora da whitelist de tokensAllowed",
+    "usar o componente Select pro seletor de itens por página ou pro input de filtro — ver decisions, esses continuam nativos por peso visual, só o edit control tipo 'select' usa o átomo Select",
+    "abrir o filtro de uma coluna sozinho fechar automaticamente o filtro de outra coluna já aberta — múltiplos filtros podem ficar abertos ao mesmo tempo, cada um independente",
+    "aplicar onRowSave ou onDisabledRowKeysChange sem passar pelo Modal de confirmação interno — nenhuma das duas mudanças de estado pode pular a confirmação, mesmo se o consumidor tentar chamar os callbacks diretamente por fora do helpers",
+    "transformar em input uma coluna sem editable=true durante a edição de linha — só colunas explicitamente marcadas viram input, não 'todas as colunas' ao pé da letra (ver decisions)",
+    "column.accessor de uma coluna editable=true retornar um valor FORMATADO pra exibição (ex.: label 'Pago') em vez do valor bruto que bate com editControl.options[].value (ex.: 'pago') — o draft de edição é seedado a partir de accessor/row[key], então um accessor 'bonito' pra exibição faz o Select/input de edição abrir com um valor que não corresponde a nenhuma opção real. Formatação pra exibição é responsabilidade de render (que recebe o valor bruto), não de accessor, em colunas editáveis.",
+    "gerar o arquivo de exportação (CSV/PDF/XLSX) dentro da Datatable — ela só desenha o botão/dropdown e dispara onExport(formato, rows); nenhuma lib de PDF/planilha é dependência deste componente (ver decisions)",
+    "esconder uma coluna com hideable=false — o dropdown de colunas visíveis nem mostra um checkbox pra ela",
+    "column.sticky com valor diferente de 'right' — só coluna fixa à direita é suportada nesta versão (ver decisions)",
+    "ocultar colunas sem mostrar em algum lugar visível que existem colunas ocultas — o Alert de aviso (com a contagem e a ação de restaurar) é obrigatório sempre que hiddenColumnKeys não estiver vazio, nunca opcional",
+    "aplicar um filtro de coluna sem refletir isso na linha de filtros ativos (Chips) — os dois ficam sempre sincronizados, nunca um filtro 'invisível' que só existe no estado interno do input do cabeçalho",
+    "botões de paginação (anterior/próxima) com variant diferente de 'link' — ver decisions, pedido explícito do usuário de remover o contorno",
+    "conteúdo de célula (de qualquer coluna, não só ações) quebrando em múltiplas linhas por falta de espaço — a coluna sempre cresce pra caber o conteúdo lado a lado, nunca o contrário",
+    "mostrar bulkActions com 0 ou 1 linha selecionada — só a partir de 2",
+    "Datatable aplicando qualquer mudança de dado 'em lote' sozinha — bulkActions é só um slot de UI, toda lógica de excluir/habilitar/editar em massa é do consumidor",
+    "botão de densidade alternando pra 'comfortable' — o ciclo do botão é só compact ↔ condensed (ver decisions)"
+  ],
+  "decisions": [
+    "CORRIGIDO — auditoria de A11y (2026-09-01): BUG REAL, os menus de coluna visível e exportação (useDropdown interno) usavam floating-ui cru sem FloatingFocusManager — mesmo gap já documentado em popover.contract.json/navbar.contract.json. Corrigido envolvendo os dois painéis em <FloatingFocusManager context={...} modal={false}>, useDropdown agora também expõe context no retorno.",
+    "Um componente só (Datatable), features opt-in por prop/coluna — decisão explícita do usuário em vez de dois componentes separados (Table simples + DataTable avançado). A versão 'simples' é literalmente usar Datatable sem selectable/sort/filtro/paginação/edição ativados.",
+    "sortMode e filterMode existem separados, cada um 'client' | 'server' — decisão explícita do usuário. Em 'client' o Datatable faz o trabalho de ordenar/filtrar sozinho sobre o array data recebido; em 'server' ele só notifica (onSortChange/onFilterChange) e espera receber data já processado de volta. paginationMode segue o mesmo racional para consistência entre os 3 mecanismos.",
+    "Ciclo de ordenação de 3 estados por coluna: nenhum → ascendente → descendente → nenhum. Decisão do agente: permite ao usuário sempre voltar pra ordem original de data sem precisar recarregar a página.",
+    "REVISADO — filtro por coluna agora é OCULTO por padrão (mudança pedida pelo usuário; a v1 tinha o input sempre visível). Dois gatilhos abrem/fecham o MESMO input: clicar no nome da coluna, ou clicar num ícone de funil dedicado ao lado do ícone de ordenação. Quando aberto, o input substitui visualmente o nome da coluna (mesmo espaço). Motivo de ter dois gatilhos em vez de só o funil: pedido explícito do usuário; motivo de o funil existir além do nome: o nome sozinho não é obviamente clicável (sem affordance visual de que abre algo) — o ícone de funil sinaliza a função pra quem não tentar clicar no texto.",
+    "Decisão de resolução de conflito (perguntada ao usuário): quando uma coluna é sortable E filterable ao mesmo tempo, clicar no NOME sempre abre/fecha o filtro, nunca ordena. Ordenar passa a ser EXCLUSIVAMENTE pelo ícone de seta (caret), que agora é um botão separado do nome, não mais o nome inteiro como na v1. Colunas sortable-mas-não-filterable: nome fica estático (não clicável), só o caret ordena. Colunas filterable-mas-não-sortable: nome abre/fecha filtro, sem ícone de caret.",
+    "Filtro é sempre substring case-insensitive normalizado por acento (reaproveita shared/normalizeForSearch.ts, já usado por Select/ComboBox) — não existe filterType configurável nesta versão.",
+    "'Selecionar todos' no cabeçalho seleciona só as linhas da página atual (quando paginationEnabled=true), não o dataset inteiro — evita o Datatable precisar conhecer todos os rowKey de páginas que talvez nunca tenham sido carregadas em modo server.",
+    "totalRows só é obrigatório em paginationMode='server' — em 'client' o Datatable já tem o array data completo e deriva o total de data.length.",
+    "Troca de pageSize sempre reseta page para 1 — evita ficar numa página que não existe mais depois de aumentar o tamanho da página.",
+    "structural.icone-medio (20px) em tokensAllowed.iconSize — tamanho do átomo Checkbox (definido no próprio checkbox.contract.json, não redefinido aqui). structural.espaco-g — padding generoso da célula de linha vazia (mesma escala usada em Card/Modal).",
+    "RESOLVIDO (era um conflito real documentado na v1) — checkbox.contract.json agora tem uma prop hideLabel (rótulo continua no DOM como nome acessível, só fica visualmente oculto via técnica sr-only) em vez de proibir Checkbox sem rótulo visível. Isso substituiu o <input type=\"checkbox\"> nativo que a v1 usava na coluna de seleção — agora é <Checkbox hideLabel label=\"Selecionar linha X\" .../> de verdade, seguindo a regra de que nenhum controle interativo deste componente pode existir fora de um átomo do harness.",
+    "Seletor de itens por página e input de filtro continuam nativos (<select>/<input>), não usam os átomos Select/TextField — decisão preservada da v1 (peso visual desproporcional: Select é um combobox completo com popup via floating-ui, TextField carrega FieldLabel/HelperText; nenhum dos dois cabe numa célula de cabeçalho ou num controle secundário de paginação). A regra 'nada fora de um componente' pedida pelo usuário nesta revisão foi interpretada como valendo pra CONTROLES COM ESTADO VISUAL PRÓPRIO (como o Checkbox, que tem cor/ícone/borda variando por estado) — inputs de texto simples e o <select> nativo do navegador não têm essa lacuna de estilização (o CSS do harness já os estiliza igual), então continuam nativos. Se o usuário quiser estender a regra literalmente a esses dois também, é uma decisão nova a pedir.",
+    "Edit control tipo 'select' (column.editControl.type='select') usa o átomo Select, não um <select> nativo — diferente do pageSize/filtro, aqui é uma escolha de valor real durante uma ação de edição (mais parecido com um campo de formulário do que com um controle secundário de UI). Select já suporta uso sem label visível (label é required:false no próprio contrato dele), então não precisa de exceção nova.",
+    "Edit control tipo 'text' (column.editControl.type='text') usa um <input> de texto simples, mesmo padrão do input de filtro — não o átomo TextField completo (FieldLabel/HelperText não cabem numa célula de tabela em edição inline, mesmo racional do filtro).",
+    "Estado de 'qual linha está em edição' e os valores temporários dos inputs (draft) ficam INTERNOS ao Datatable, não controlados por props — decisão explícita do usuário (perguntada, ver conversa). Motivo do usuário/agente: edição inline é um estado transiente e local (não precisa sobreviver a um refresh nem ser mockado em outro lugar), diferente de sort/filtro/seleção que fazem sentido restaurar/compartilhar externamente. Datatable expõe só onRowSave(rowKey, values, row), chamado depois da confirmação.",
+    "Coluna de ações não é um conceito especial — continua sendo column.render comum. O que mudou: render agora recebe um 3º argumento, helpers (DatatableRowHelpers: isEditing, isDisabled, startEdit, cancelEdit, requestSave, requestToggleDisabled), pra qualquer coluna (normalmente só a de ações usa) disparar edição/salvar/cancelar/habilitar-desabilitar daquela linha específica. Evita introduzir um prop 'actions' paralelo (proibido desde a v1) mesmo com a feature de edição/habilitar crescendo.",
+    "RESOLVIDO — bug real encontrado testando no navegador: a primeira versão do exemplo completo usava column.accessor pra formatar o Status ('Pago' em vez de 'pago') e reaproveitava esse valor formatado tanto pra exibição/filtro quanto pra seedar o draft de edição — o Select de edição abria vazio porque 'Pago' não batia com nenhum editControl.options[].value ('pago'). Regra fixada: em colunas editable=true, accessor sempre retorna o valor BRUTO (o mesmo que bate com editControl.options), e é render (que recebe esse valor bruto como 1º argumento) quem formata pra exibição — não accessor. Corrigido no exemplo removendo o accessor da coluna Status e formatando dentro de render.",
+    "Apenas colunas com editable=true viram input quando a linha entra em modo de edição — não 'todas as colunas' ao pé da letra do pedido original. Colunas computadas (ex.: 'Ações', valores derivados via accessor/render que não mapeiam 1:1 pra um campo editável) não têm como virar um input genérico sem um editControl declarado; forçar isso quebraria colunas com render customizado. Decisão do agente, documentada por não ter sido perguntada.",
+    "requestSave() SEMPRE abre um Modal de confirmação interno (reaproveita o átomo Modal) antes de chamar onRowSave — pedido explícito do usuário. cancelEdit() NÃO abre modal — descarta o draft e sai do modo de edição imediatamente, porque nada foi persistido ainda (não há risco de perda de dado salvo, só de um formulário preenchido, mesmo racional de Esc não-destrutivo usado em outros contratos).",
+    "requestToggleDisabled() SEMPRE abre um Modal de confirmação interno antes de chamar onDisabledRowKeysChange — pedido explícito do usuário, tanto pra habilitar quanto pra desabilitar (o pedido não distinguiu as duas direções). disabledRowKeys é controlado (mesmo padrão de selectedRowKeys) porque é um estado que faz sentido restaurar/persistir fora do Datatable (diferente da edição, que é transiente) — só o GATILHO passa pelo modal interno, a fonte da verdade do valor continua de fora.",
+    "Linha desabilitada (rowKey em disabledRowKeys) fica visualmente esmaecida — opacidade reduzida na linha inteira, texto usando semantic.texto-inativo. Não usa uma cor de fundo diferente (evita confundir com row-selected, que já usa acao-primaria-transparente).",
+    "Densidade (comfortable/compact) já cobria o pedido de 'linhas mais altas' vs 'linhas mais estreitas' desde a v1 — nenhuma prop nova precisou ser criada, só confirmado que compact (espaco-pp, 8px) é suficientemente mais estreito que comfortable (espaco-p, 12px) pro caso de 'muitos registros' citado.",
+    "role=grid não foi usado — semântica nativa de <table> com elementos interativos dentro das células já cobre os requisitos deste contrato sem o custo de reimplementar navegação por seta entre células.",
+    "Linha vazia usa só o texto de emptyStateTitle/emptyStateDescription dentro de uma <td colSpan>, não o componente EmptyState inteiro.",
+    "Header sticky no topo do wrapper de scroll não é configurável por prop.",
+    "Cabeçalho usa type-style.texto-micro-forte (12px/bold) em vez de type-style.texto-p — mesmo par já usado em Badge pra texto pequeno com peso forte.",
+    "REVISADO — toolbar principal (title/toolbarActions/densidade/colunas/exportação) só é renderizada quando existe pelo menos 1 desses recursos ativo. Uma Datatable simples sem nenhum deles continua idêntica à v2 (sem barra vazia acima do cabeçalho) — pedido explícito do usuário, mas sem quebrar o caso de uso mais simples que já funcionava.",
+    "REVISADO — funil de filtro removido: o próprio título da coluna (já era clicável desde a v2) é o único gatilho de abrir/fechar o filtro. Um ícone de lupa decorativo (aria-hidden, não é um segundo botão) aparece à direita do texto do título só no hover/focus, com o espaço dele sempre reservado no layout — não desloca nada quando aparece/some. Pedido explícito do usuário: reduzir de dois gatilhos pra um.",
+    "REVISADO — ícone de ordenação (caret) sempre pinado na borda direita da célula de cabeçalho via `justify-content: space-between` no container flex (título+lupa de um lado, caret do outro), nunca encostando no texto do título mesmo em títulos curtos. Título tem `flex:1 / min-width:0` com `text-overflow: ellipsis` pra nunca espremer o caret quando o texto é longo.",
+    "REVISADO — abrir o filtro de uma coluna NUNCA muda a altura da linha de cabeçalho: o <input> e o botão-título compartilham exatamente a mesma caixa (mesmo padding/borda/altura, só a cor da borda muda de transparente pra borda-base), então trocar um pelo outro não desloca o layout. Bug real reportado pelo usuário — a v2 tinha um input com padding/borda diferentes do botão, o que fazia a linha 'pular' de altura ao abrir um filtro.",
+    "REVISADO — vertical-align da célula de cabeçalho trocado de 'top' pra 'middle' (bug real reportado: rótulos/ícones do cabeçalho pareciam desalinhados pra cima) — como agora o cabeçalho é sempre uma única linha (título OU input, nunca as duas), não há mais razão pra alinhar pelo topo.",
+    "REVISADO — bug real reportado: célula de cabeçalho de seleção (thSelect) não tinha a classe que aplica o padding padrão das outras células de cabeçalho, então o Checkbox 'selecionar todos' ficava colado na borda esquerda. Corrigido reaproveitando a mesma classe de padding das demais células — bug de composição de classes CSS, não uma decisão de design.",
+    "Todo conteúdo de célula (cabeçalho e corpo) centralizado verticalmente (vertical-align: middle no <td>/<th>) — pedido explícito do usuário, útil principalmente pra células com controles de altura variável (QuantitySelector, Switch, ImageThumbnail, StackedText de duas linhas) ficarem alinhadas com células de texto simples de uma linha na mesma linha da tabela.",
+    "Densidade com toggle pelo usuário (allowDensityToggle=true) usa estado INTERNO, inicializado a partir da prop density — mesmo racional já usado pra editingRowKey (estado transiente de UI, não faz sentido o consumidor sincronizar de fora). Quando allowDensityToggle=false (default), density continua 100% controlada pela prop, comportamento idêntico à v2.",
+    "REVISADO (pedido do usuário, confirmado por pergunta) — densidade ganhou um 3º nível. compact (que antes era só 'mais estreita que comfortable') encolheu ainda mais (de espaco-pp/8px pra espaco-xp/4px de padding vertical) e virou o DEFAULT do componente (era comfortable). condensed é novo, mais estreito que o novo compact. O botão de densidade da toolbar (allowDensityToggle) alterna só entre compact ↔ condensed — comfortable continua existindo no enum e pode ser setado via prop (density='comfortable'), mas fica fora do ciclo do botão, porque o pedido do usuário especificamente definiu o ícone do botão como uma alternância de 2 estados (ver próxima decision). Caso de borda documentado: se um consumidor setar density='comfortable' E allowDensityToggle=true, o primeiro clique já pula direto pra condensed (a lógica de toggle trata qualquer estado que não seja 'condensed' como o lado 'compact' do ciclo) — combinação incomum, não otimizada, mas não quebra nada.",
+    "REVISADO — bug real reportado: (1) os ícones do botão de densidade não formavam um par visualmente coerente ('equals' vs 'rows' eram de famílias visuais diferentes — um sinal de igual simples, outro um bloco de retângulos arredondados). Trocado 'rows' por 'list' (o hambúrguer clássico de 3 traços) — agora os dois ícones são da mesma família visual (traços horizontais simples), só variando a contagem (2 vs 3). (2) a diferença de padding vertical entre compact e a condensed original (4px vs 2px, depois 4px vs 1px) era pequena demais pra perceber, principalmente em linhas com controles altos (Switch/QuantitySelector/Button, que dominam a altura da linha independente do padding da célula) — condensed foi pra 0 (sem exceção de token nenhuma precisar, é ausência de padding vertical mesmo) pra maximizar a diferença perceptível e caber o máximo de registros na tela, pedido explícito do usuário.",
+    "REVISADO — bug real reportado: o padding HORIZONTAL (esquerda/direita) também encolhia com a densidade (era igual ao vertical nas 3), deixando o conteúdo colado na borda da tabela em compact/condensed. Corrigido: horizontal agora é FIXO em espaco-pp (8px) nas 3 densidades — maior que o espaco-xp (4px) que o compact usava antes — só o padding vertical (top/bottom) muda entre comfortable/compact/condensed. Mesma régua horizontal em toda densidade evita que o texto pareça 'grudado' na coluna vizinha mesmo na densidade mais compacta.",
+    "REVISADO — mapeamento ícone↔estado estava invertido (bug real reportado). Correto: 'equals' (2 traços horizontais) aparece quando a densidade atual é condensed (a mais estreita, mais registros cabem na tela — 2 traços simboliza 'poucas linhas de espaço por registro'); 'list' (3 traços, hambúrguer) aparece quando a densidade atual é compact (o padrão, menos registros visíveis por vez — 3 traços simboliza 'mais linhas de espaço por registro'). O ícone reflete o ESTADO ATUAL (não a ação que o clique vai fazer) — mesma convenção de ícones de tema claro/escuro (mostra o que está ativo agora).",
+    "Colunas ocultas (columnVisibilityEnabled=true) também usam estado interno (hiddenColumnKeys), mesmo racional de densidade — é preferência de visualização da sessão atual, não dado de negócio que precise ser controlado/persistido de fora nesta versão. Se surgir necessidade real de lembrar a preferência entre sessões, isso é responsabilidade do consumidor observar via um futuro onVisibleColumnsChange (não implementado agora, decisão nova se pedida).",
+    "AJUSTADO a pedido do usuário — indicador de colunas ocultas trocado de Badge (variant='neutral', ex.: '3 ocultas', ao lado do botão de colunas) pra um Alert (intent='warning') entre a toolbar e a tabela, com texto 'Atenção: você tem N coluna(s) com visualização oculta.' + ação embutida 'Restaurar' (usa a nova prop action do Alert, ver contratos/alert.contract.json). Clicar na ação chama a mesma função que zeraria hiddenColumnKeys, equivalente a marcar de volta todos os checkboxes do dropdown de colunas — não abre o dropdown pra fazer isso manualmente, restaura direto. Motivo do usuário: um Badge pequeno ao lado de um botão de ícone é fácil de não notar; um Alert entre o header e a tabela é impossível de não ver, e já embute a ação de corrigir no mesmo lugar que avisa do problema.",
+    "Popover de colunas visíveis e de exportação usam @floating-ui/react (mesma lib/padrão já usado em Select/Tooltip/ComboBox) — não introduz uma segunda forma de resolver 'elemento ancorado que não pode sair da viewport'. Sem sombra (box-shadow), só borda — mesma convenção flat já usada no popup do Select.",
+    "REVISADO — popover de exportação encolhido (largura menor, sem min-width de 200px como o de colunas) e os labels dos itens mudaram de 'CSV'/'PDF'/'XLSX' pra 'Exportar CSV'/'Exportar PDF'/'Exportar XLSX' — pedido explícito do usuário, deixa a ação de cada item explícita em vez de só o nome do formato.",
+    "bulkActions é um slot livre (assinatura (selectedRowKeys) => ReactNode), mesmo padrão de toolbarActions e de column.render — Datatable não sabe o que é 'excluir em lote' ou 'editar em lote', só decide QUANDO mostrar o slot (selectable=true + 2+ selecionados) e ONDE (toolbar, no lugar do título). Evita repetir o erro que já foi evitado na coluna de ações (não virar um conceito especial tipo 'bulkDeleteEnabled'/'bulkActionsList' com formato fixo) — o consumidor monta os ícones que fizerem sentido pro caso dele (excluir, habilitar/desabilitar, editar em lote etc.), reaproveitando Button/Icon/Modal como em qualquer outro render customizado.",
+    "Limiar de 2+ linhas selecionadas (não 1+) pra mostrar bulkActions — pedido explícito do usuário ('quando estiverem selecionadas 2 ou mais colunas'). Com exatamente 1 linha selecionada, a ação em lote não aparece; se o consumidor quiser uma ação de 1 linha só, isso já existe via a coluna de ações normal (helpers por linha).",
+    "column.sticky só suporta 'right' nesta versão (pensado especificamente pro caso pedido: coluna de ações fixa em tabela larga) — sticky='left' fora de escopo até um caso de uso real pedir.",
+    "Coluna sticky precisa de fundo opaco próprio (não herda do <tr>) porque position:sticky pinta por cima do conteúdo que rola por baixo — se a célula fosse transparente, o texto de outras colunas apareceria atrás dela durante o scroll. Implementado com uma cor de fundo explícita por estado de linha (normal/hover/selecionada/desabilitada), sincronizada com o fundo do resto da linha.",
+    "Exportação é só UI + callback (onExport), decisão explícita do usuário — Datatable nunca importa lib de PDF/planilha (jspdf, sheetjs etc.), mantém o bundle do harness leve pra quem não usa a feature. CSV também passa pelo callback, mesmo sendo tecnicamente gerável sem dependência nenhuma — manter os 3 formatos no mesmo caminho evita um comportamento 'CSV mágico, PDF/XLSX manuais' inconsistente.",
+    "Botões de paginação (anterior/próxima) trocados de variant='neutral' outlined pra variant='link' iconOnly — pedido explícito do usuário de remover o contorno visível, mesmo padrão de 'clean' já usado nos botões da coluna de ações.",
+    "RESOLVIDO — bug real reportado: a coluna de ações podia ficar mais estreita que o conjunto de ícones lado a lado, empilhando-os em duas linhas. Causa raiz: o exemplo do Playground reaproveitava uma classe utilitária genérica (Demo.module.css .row) que tem flex-wrap:wrap por padrão, sem sobrescrever pra nowrap. Corrigido no exemplo (flexWrap:'nowrap' explícito) e reforçado no próprio Datatable com `.td { white-space: nowrap }` — nenhuma célula (não só a de ações) quebra texto/conteúdo em múltiplas linhas por conta própria; o layout de tabela auto (table-layout:auto, já em uso) sempre cresce a coluna pra caber o conteúdo em vez de cortar. Trade-off aceito: colunas com texto muito longo ficam largas em vez de quebrar linha — mitigado pelo scroll horizontal que a Datatable já tem.",
+    "structural.raio-xp entrou em tokensAllowed.radius — raio menor (4px) usado na caixa compartilhada título/input de filtro (headerControl), mais discreto que o raio-pp (8px) já usado no resto da tabela, apropriado pro tamanho pequeno desse controle.",
+    "REVISADO — borda superior do rodapé de paginação removida, a pedido do usuário. O `.wrapper` externo já tem borda própria contornando a tabela inteira; a linha extra entre corpo e rodapé era redundante/poluição visual, o espaçamento (padding do rodapé + borda-base entre linhas do tbody) já separa visualmente as duas áreas o bastante.",
+    "AJUSTADO a pedido do usuário — filtros ativos (aplicados via input do cabeçalho de coluna) agora ficam visíveis numa linha própria de Chips (removable) entre o Alert de colunas ocultas (ou a toolbar, se não houver) e a tabela, uma por coluna com valor de filtro não vazio, label 'Nome da coluna: valor digitado'. Remover um Chip individual chama onFilterChange(columnKey, '') só daquela coluna (o mesmo callback que já existia, sem API nova pro consumidor). Um Button variant='link' 'Limpar todos' ao final chama onFilterChange('', '') pra cada filtro ativo em sequência. Motivo do usuário: antes, um filtro aplicado só ficava visível voltando a abrir o input daquele cabeçalho especificamente — não havia visão geral de 'quais filtros estão ativos agora' nem forma rápida de remover um sem reabrir a coluna certa.",
+    "AJUSTADO a pedido do usuário (histórico) — borda esquerda da coluna sticky (column.sticky='right') trocada de semantic.borda-base (cinza claro, quase invisível durante o scroll) pra semantic.borda-inativo (cinza mais escuro) + uma sombra sutil (box-shadow horizontal, mesma técnica usada em outros lugares do harness pra simular elevação sem introduzir um token de sombra novo pro caso). Motivo: com conteúdo rolando por baixo da coluna fixa, a borda-base original não destacava o suficiente onde a coluna fixa termina e o conteúdo rolável começa.",
+    "REVISADO a pedido do usuário — a decisão anterior foi revertida: 'o border esquerdo da coluna de ação, quando estiver fixada, deve ser cinza, na mesma cor das bordas da tabela'. borda-inativo (#9ca3af, mais escura) trocada de volta por borda-base (#d1d5db), a mesma cor usada em todas as outras bordas da tabela (linhas, wrapper externo). A sombra sutil (box-shadow) que já existia foi MANTIDA — ela sozinha já cumpre o papel de separar visualmente a coluna fixa do conteúdo que rola por baixo, sem precisar de uma cor de borda destoante do resto da tabela. Confirmado no navegador via getComputedStyle (borderLeft: '1px solid rgb(209, 213, 219)', exatamente borda-base).",
+    "AJUSTADO a pedido do usuário — no exemplo completo do Playground (não uma mudança no componente Datatable em si, já que a coluna de ações é sempre column.render livre), o controle de habilitar/desabilitar via helpers.requestToggleDisabled trocou de Switch pra um Button variant='link' iconOnly com ícone 'eye'/'eye-slash' (visível/oculto), a mesma dupla de ícones já usada nos botões de ativar/desativar em lote (bulkActions). Motivo: os dois controles (linha individual e lote) faziam a mesma ação com linguagens visuais diferentes (Switch vs Icon) — agora usam o mesmo par de ícones, reforçando visualmente que é a mesma operação em escalas diferentes."
+  ],
+  "references": {
+    "tokensFile": "tokens/tokens.json — Cores Semânticas (Fundos, Bordas, Textos, Ações/Primárias), Estrutural (raio-pp, foco-espessura, espaco-xp/pp/p/m/g, icone-pequeno/medio), Tipografia Estilo (texto-p, texto-micro-forte, texto-g-forte)"
+  }
+}

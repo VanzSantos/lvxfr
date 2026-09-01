@@ -1,0 +1,67 @@
+{
+  "name": "Slider",
+  "originalName": "ControleDeslizante",
+  "oneLiner": "Seleção numérica por arraste sobre um <input type='range'> nativo — valor único ou intervalo (dois cabos/thumbs, min e max).",
+  "category": "data-entry",
+  "status": "draft",
+  "whenToUse": "Escolher um número (ou um intervalo de dois números) dentro de um intervalo conhecido, onde a posição relativa importa mais que digitar o valor exato (ex.: faixa de preço num filtro, volume, brilho).",
+  "whenNotToUse": "Precisão exata é obrigatória e o usuário provavelmente sabe o número de cabeça (isso é TextField type numérico); a escala tem só um punhado de opções nomeadas (isso é SegmentedControl/RadioGroup); progresso não-editável (isso é Progress Bar).",
+  "anatomy": [
+    "Valor único — um <input type='range'> nativo estilizado, trilha preenchida de min até value",
+    "Intervalo — DOIS <input type='range'> nativos empilhados (mesmo min/max/step), cada um controla uma ponta; trilha preenchida só entre os dois valores. Técnica padrão de mercado pra 'dual thumb slider' sem abrir mão da acessibilidade nativa de cada input.",
+    "Rótulo do(s) valor(es) atual(is) acima/ao lado da trilha, quando showValue=true"
+  ],
+  "dependencies": [],
+  "props": [
+    { "name": "range", "type": "boolean", "required": false, "default": false, "description": "false = valor único (value é number). true = intervalo (value é [number, number], mínimo e máximo)." },
+    { "name": "value", "type": "number", "required": true, "description": "Modo único: number entre min e max. Modo range: tupla [min, max] (ambos entre min/max do slider, primeiro <= segundo). 100% controlado." },
+    { "name": "onChange", "type": "function", "required": true, "description": "Modo único: (value: number) => void. Modo range: (value: [number, number]) => void, sempre com o primeiro <= segundo (a própria interação impede cruzar os dois cabos — ver decisions)." },
+    { "name": "min", "type": "number", "required": false, "default": 0, "description": "Valor mínimo selecionável." },
+    { "name": "max", "type": "number", "required": false, "default": 100, "description": "Valor máximo selecionável." },
+    { "name": "step", "type": "number", "required": false, "default": 1, "description": "Incremento por passo de teclado/arraste." },
+    { "name": "label", "type": "string", "required": false, "description": "Rótulo visível acima do slider." },
+    { "name": "helperText", "type": "string", "required": false, "description": "Texto de apoio abaixo do slider." },
+    { "name": "state", "type": "enum", "enum": ["default", "disabled"], "default": "default", "required": false, "description": "Sem 'error' nesta v1 — um slider sempre produz um valor válido dentro de [min, max] por construção, não existe um estado de 'valor inválido' possível de alcançar pela própria interação." },
+    { "name": "showValue", "type": "boolean", "required": false, "default": true, "description": "Mostra o(s) valor(es) atual(is) como texto (ex.: '42' ou '20 – 80')." },
+    { "name": "accessibleLabel", "type": "string", "required": false, "description": "Nome acessível do(s) input(s) nativo(s) quando não há label visível. Modo range usa '{accessibleLabel} (mínimo)'/'(máximo)' pra diferenciar os dois cabos." }
+  ],
+  "variants": ["single", "range"],
+  "states": ["default", "disabled"],
+  "tokensAllowed": {
+    "background": ["semantic.borda-base", "semantic.acao-primaria", "semantic.fundo-secundario", "semantic.fundo-superficie"],
+    "text": ["semantic.texto-primario", "semantic.texto-secundario", "semantic.texto-inativo"],
+    "border": ["semantic.acao-primaria", "semantic.texto-inativo"],
+    "radius": ["structural.raio-circular", "structural.raio-pp"],
+    "focusRing": ["structural.foco-espessura", "semantic.borda-foco"],
+    "spacing": ["structural.espaco-xp", "structural.espaco-pp"],
+    "typography": ["type-style.texto-p"]
+  },
+  "a11y": {
+    "role": "nenhum role customizado — usa o <input type='range'> nativo (role=slider implícito, com aria-valuenow/min/max automáticos do próprio navegador). Modo range usa dois inputs nativos, cada um com seu próprio nome acessível.",
+    "requiredAria": ["aria-label (ou label associada) em cada input — no modo range, os dois precisam de nomes diferentes ('(mínimo)'/'(máximo)') pra um leitor de tela distinguir qual cabo está focado", "aria-describedby apontando pro helperText quando presente"],
+    "keyboard": ["seta esquerda/direita ou cima/baixo altera o valor em 1 step (comportamento nativo de input range, sem reimplementação)", "Home/End vão pro min/max (nativo)", "Page Up/Down pulam em incrementos maiores (nativo do input range)", "Tab alcança cada cabo separadamente no modo range, na ordem do DOM (mínimo antes de máximo)"],
+    "contrastMin": "AA pro texto do valor/label, mesma régua do resto do harness.",
+    "notes": "Modo range usa DOIS inputs nativos empilhados via CSS (mesma técnica consolidada de mercado pra 'dual range slider') em vez de um widget customizado do zero — isso preserva de graça toda a semântica/teclado/leitor de tela que o navegador já resolve pra um <input type='range'>, sem reimplementar nada disso manualmente."
+  },
+  "events": { "status": "não definido no contrato original" },
+  "composition": {
+    "canContain": [],
+    "canBeContainedBy": ["formulários", "filtros", "páginas"],
+    "doNotCombine": ["Slider dentro de Slider", "usar range=true quando só um valor é necessário — nesse caso range=false é mais simples e não força o consumidor a lidar com uma tupla"]
+  },
+  "forbidden": [
+    "value fora de [min, max]",
+    "no modo range, o primeiro elemento da tupla maior que o segundo chegando via onChange — a interação nunca deve permitir um cabo ultrapassar o outro (ver decisions)",
+    "reimplementar o thumb/trilha do zero com onMouseDown/onTouchStart em vez de usar <input type='range'> nativo — perderia toda a acessibilidade de teclado/leitor de tela de graça",
+    "cor fora da whitelist de tokensAllowed"
+  ],
+  "decisions": [
+    "Baseado em <input type='range'> NATIVO (um no modo único, dois empilhados no modo range) em vez de um thumb customizado arrastável via mouse/touch handlers manuais — decisão de acessibilidade: o navegador já resolve teclado (setas, Home/End, Page Up/Down), foco e leitura de tela pra esse elemento de graça; reimplementar do zero só pra ter controle visual total reintroduziria bugs que o próprio browser já não tem.",
+    "Modo range usa dois inputs nativos EMPILHADOS (mesma técnica de mercado consolidada pra dual-range slider: os dois cobrem a mesma área, cada um com pointer-events só no próprio thumb via CSS, o restante da trilha é 'furado' pra clique) — a alternativa de um único input controlando dois valores não existe nativamente em HTML, então dois inputs reais é o caminho que preserva acessibilidade nativa nos dois cabos.",
+    "onChange no modo range sempre entrega a tupla já ordenada e sem cruzamento — ao mover o cabo 'mínimo' além do valor atual do 'máximo' (ou vice-versa), o componente clampa o valor no lugar do outro cabo em vez de deixar cruzar, evitando um estado visualmente ambíguo (dois cabos na mesma posição sinaliza 'intervalo de largura zero', nunca 'trocado').",
+    "Sem state='error' — diferente de TextField/Select, um slider não tem como o usuário produzir um valor 'inválido' através da própria interação (arrastar sempre resulta num número dentro de [min,max]); se um valor inicial inválido vier de fora, isso é um erro de quem consome, não um estado visual do componente.",
+    "showValue (texto do valor atual) é true por padrão — sliders sem indicação numérica visível são mais difíceis de usar com precisão; false é o opt-out pra quando o próprio contexto já mostra o valor de outra forma (ex.: preview ao vivo em outro lugar da tela).",
+    "AJUSTADO a pedido do usuário — thumb passou de contorno (fundo branco + borda verde) pra PREENCHIDO (fundo semantic.acao-primaria + anel branco de 2px + contorno verde de 1px por fora, via box-shadow). Motivo: o contorno sozinho tinha pouco destaque visual sobre a trilha; o preenchimento sólido deixa o alvo de arraste mais evidente. Estado disabled preenche com semantic.texto-inativo em vez de acao-primaria, mantendo a mesma forma (preenchido + anel), só trocando a cor."
+  ],
+  "references": { "tokensFile": "tokens/tokens.json — Cores Semânticas (Bordas, Ação Primária, Fundos, Textos), Estrutural (raio-circular/pp, foco-espessura, espaco-xp/pp), Tipografia Estilo (texto-p)" }
+}

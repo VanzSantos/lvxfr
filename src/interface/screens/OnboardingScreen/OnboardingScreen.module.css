@@ -1,0 +1,107 @@
+/* Mesma estrutura/lógica do LoginScreen (ver ROADMAP.md) — split-screen
+   edge-to-edge, sem cartão flutuante, sem margem entre a página e a borda
+   real da tela. */
+.page {
+  height: 100vh;
+  display: flex;
+  overflow: hidden;
+  background: var(--fundo-superficie);
+  font-family: var(--texto-m-family);
+}
+
+.pageEmbedded {
+  height: 100%;
+  display: flex;
+  overflow: hidden;
+  background: var(--fundo-superficie);
+  font-family: var(--texto-m-family);
+}
+
+/* AJUSTADO a pedido do usuário — mesma foto do LoginScreen (casal de idosos
+   sorrindo juntos olhando pro laptop) em todas as 8 páginas de auth/status —
+   ver decisions do LoginScreen e ROADMAP.md. */
+.imagePanel {
+  flex: 1 1 60%;
+  min-width: 0;
+  background: url("https://images.unsplash.com/photo-1758686254493-7b3e49a8f325?w=1200&q=80&fm=jpg&fit=crop&auto=format") center/cover no-repeat;
+}
+
+.formPanel {
+  flex: 1 1 40%;
+  max-width: 40%;
+  min-width: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--fundo-superficie);
+  padding: var(--espaco-xgg);
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+.content {
+  width: 100%;
+  max-width: 480px;
+  box-sizing: border-box;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--espaco-pp);
+  padding: var(--espaco-g) 0;
+}
+
+.iconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  border-radius: var(--raio-circular);
+  background: var(--fundo-secundario);
+}
+
+.stepTitle {
+  margin: 0;
+  color: var(--texto-primario);
+  font-family: var(--texto-m-family);
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.stepDescription {
+  margin: 0;
+  color: var(--texto-secundario);
+  font-family: var(--texto-p-family);
+  font-size: var(--texto-p-size);
+  line-height: var(--texto-p-line-height);
+  max-width: 320px;
+}
+
+.done {
+  text-align: center;
+  color: var(--texto-primario);
+  font-family: var(--texto-m-family);
+  font-size: var(--texto-m-size);
+}
+
+@media (min-width: 1440px) {
+  .formPanel {
+    flex-basis: 37%;
+    max-width: 37%;
+  }
+}
+
+@media (max-width: 768px) {
+  .imagePanel {
+    display: none;
+  }
+
+  .formPanel {
+    max-width: none;
+    padding: var(--espaco-g);
+  }
+}

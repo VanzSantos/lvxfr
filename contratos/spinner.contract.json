@@ -1,0 +1,54 @@
+{
+  "name": "Spinner",
+  "originalName": "Carregando",
+  "oneLiner": "Indicador visual de carregamento em andamento — um anel girando.",
+  "category": "display",
+  "status": "draft",
+  "whenToUse": "Uma ação ou carregamento está em progresso e não tem duração previsível (senão, prefira uma barra de progresso, fora deste harness). Caso mais comum: dentro do Button quando state=loading.",
+  "whenNotToUse": "Duração é previsível/mensurável (usar progress bar, fora deste harness). Carregamento instantâneo (<300ms, aprox.) não precisa de indicador — evita 'flash' de spinner.",
+  "anatomy": ["Anel (borda circular com um segmento transparente, girando)"],
+  "dependencies": [],
+  "props": [
+    { "name": "size", "type": "enum", "enum": ["small", "medium", "large", "extraLarge"], "default": "medium", "required": false, "description": "Mesma escala do Icon (structural.icone-*), pra alinhar visualmente quando Spinner substitui um Icon (ex.: dentro do Button)." },
+    { "name": "color", "type": "string", "required": true, "description": "Token semântico de cor, já resolvido para um valor CSS (ex.: 'var(--acao-carregando-texto)'). Sempre explícito — mesma decisão do Icon, nunca herdado via currentColor implícito." },
+    { "name": "decorative", "type": "boolean", "default": true, "required": false, "description": "true = decorativo, escondido do leitor de tela (uso típico: dentro do Button, que já expõe aria-busy no próprio elemento). false = anuncia progresso via role='status'." },
+    { "name": "accessibleLabel", "type": "string", "required": false, "requiredWhen": "decorative = false", "description": "Texto para leitor de tela (ex.: 'Carregando'). Ausência quando decorative=false é erro em tempo de execução, não falha silenciosa — mesmo padrão do Icon." }
+  ],
+  "variants": [],
+  "states": ["default"],
+  "tokensAllowed": {
+    "color": [
+      "semantic.acao-carregando-texto", "semantic.acao-primaria-texto", "semantic.acao-secundaria-texto", "semantic.acao-neutra-texto", "semantic.acao-sutil-texto", "semantic.acao-destrutiva-texto",
+      "semantic.icone-secundario", "semantic.texto-invertido"
+    ],
+    "size": ["structural.icone-pequeno", "structural.icone-medio", "structural.icone-grande", "structural.icone-extra-grande"]
+  },
+  "a11y": {
+    "role": "status quando decorative=false; nenhuma role quando decorative=true (padrão)",
+    "requiredAria": ["aria-hidden quando decorative=true", "aria-label quando decorative=false"],
+    "keyboard": [],
+    "contrastMin": "N/A diretamente — Spinner não carrega texto; o token de cor escolhido deve ter contraste adequado (AA/AAA) contra o fundo onde for usado, mesma régua do Icon.",
+    "notes": "Quando usado dentro do Button (state=loading), fica decorative=true porque o próprio <button> já expõe aria-busy — duplicar com role='status' no Spinner geraria dois anúncios pro mesmo evento. Em uso standalone (fora de um elemento que já sinaliza o carregamento), decorative=false é obrigatório pra não deixar o carregamento silencioso pra quem usa leitor de tela."
+  },
+  "events": { "status": "não definido — componente só visual, não dispara eventos" },
+  "composition": {
+    "canContain": [],
+    "canBeContainedBy": ["Button (state=loading)", "qualquer área em carregamento"],
+    "doNotCombine": []
+  },
+  "forbidden": [
+    "cor herdada do contexto (CSS currentColor implícito) — sempre explícita via prop, mesma regra do Icon",
+    "decorative=false sem accessibleLabel",
+    "usar Spinner pra durações previsíveis/mensuráveis — isso é progress bar, componente diferente, fora de escopo",
+    "novo tamanho fora da escala do Icon sem atualizar este contrato primeiro"
+  ],
+  "decisions": [
+    "Extraído do Button: state=loading usava um <span> com CSS inline, sem contrato — essa dívida estava sinalizada em contratos/button.contract.json desde a auditoria de contraste. Agora Button consome este átomo.",
+    "Reaproveita a escala de tamanho do Icon (structural.icone-*) em vez de criar uma nova — Spinner substitui visualmente um Icon (ou o par leftIcon+label+rightIcon) na maioria dos usos, então faz sentido casar o tamanho.",
+    "Tamanho dentro do Button corrigido de 16px fixo (não documentado, não batia com nenhum token) para size='medium' (structural.icone-medio, 20px) — mesmo tamanho que leftIcon/rightIcon já usam no Button, resolvendo uma inconsistência visual que existia na implementação ad hoc.",
+    "Espessura do traço fixa em 2px e duração da animação fixa em 0.6s linear — não são tokens. Não existe coleção de tokens de movimento/duração no tokens.json hoje (settado 'Estrutural' só cobre raio/espaço/ícone/foco). Se o design system adotar tokens de motion no futuro (ex.: 'estrutural.duracao-*'), migrar este valor pra lá.",
+    "Sem 'trilho' de fundo (ring de segunda cor por trás do arco) — mantido no mesmo desenho simples de um único tom com um segmento transparente, que já era o padrão usado (e aprovado) dentro do Button. Reavaliar se surgir um caso de uso onde isso não seja legível o bastante (ex.: fundo com pouco contraste).",
+    "REVISADO — auditoria de contratos (2026-08-28) encontrou 2 tokens fantasma na whitelist de cor (semantic.icone-primario, semantic.icone-invertido): nenhum dos 2 existe em tokens.css nem é usado em nenhum consumidor real do Spinner (grep confirma que só acao-carregando-texto é usado, dentro do Button). Removidos; semantic.texto-invertido entrou no lugar (cor real e existente pra um spinner sobre fundo escuro, ex.: dentro de um Button variant='destructive'/'primary' ou de uma superfície fundo-invertido), icone-secundario mantido como opção genérica válida."
+  ],
+  "references": { "tokensFile": "tokens/tokens.json — Cores Semânticas (Ações/*-texto, Ícones), Estrutural (icone-pequeno/medio/grande/extra-grande)" }
+}

@@ -1,0 +1,70 @@
+{
+  "name": "CommentComposer",
+  "originalName": "CompositorDeComentario",
+  "oneLiner": "Campo de texto multi-linha (reaproveita Textarea) + barra de utilitários opcionais + botão de publicar, desabilitado até haver texto. Pensado pra notas/observações/comentários em painéis operacionais.",
+  "category": "data-entry",
+  "status": "draft",
+  "whenToUse": "Coletar uma nota/observação/comentário curto de um usuário operacional dentro de um painel (ex.: notas de atendimento numa videochamada, observações de auditoria, comentário num ticket) — sempre com um botão de confirmação explícito (nunca salva a cada tecla). Padrão identificado na análise de sistemas legados (analise-sistemas-legados.md, item 1.8).",
+  "whenNotToUse": "Campo de texto de formulário comum sem o padrão 'digitar + publicar' (isso é só Textarea/TextField direto); chat em tempo real com envio por Enter (fora de escopo — este componente sempre exige clicar Publicar, nunca submete no Enter); comentário que precisa de formatação rica (negrito, links, listas) — isso é um editor rich-text, fora deste harness nesta v1.",
+  "anatomy": [
+    "Textarea (átomo já existente, sem label — rows=3, resizable=false; helperText/contador/estado de erro acionados automaticamente quando maxLength+limitMode='warn' e o texto ultrapassa o limite, ver decisions)",
+    "Barra inferior — utilitários opcionais à esquerda (anexar imagem, marcar como importante — só aparecem se a função correspondente for fornecida) + botão 'Publicar' à direita (desabilitado enquanto o texto estiver vazio OU acima do limite em limitMode='warn')"
+  ],
+  "dependencies": ["Textarea", "Button", "Icon"],
+  "props": [
+    { "name": "value", "type": "string", "required": true, "description": "Texto atual do campo. Controlado, mesmo padrão do Textarea." },
+    { "name": "onChange", "type": "function", "required": true, "description": "Assinatura (value: string) => void." },
+    { "name": "onSubmit", "type": "function", "required": true, "description": "Assinatura (value: string) => void, chamado ao clicar 'Publicar'. CommentComposer NÃO limpa o campo sozinho depois — value continua sendo responsabilidade de quem consome (ex.: limpar após a chamada de API confirmar o envio, ver decisions)." },
+    { "name": "placeholder", "type": "string", "default": "Insira sua nota aqui...", "required": false },
+    { "name": "submitLabel", "type": "string", "default": "Publicar", "required": false, "description": "Texto do botão de envio — customizável pra outros contextos (ex.: 'Comentar', 'Enviar')." },
+    { "name": "onAttachImage", "type": "function", "required": false, "description": "Assinatura () => void. Presença ativa o ícone de anexar imagem na barra de utilitários — ausência = ícone não renderiza. CommentComposer só expõe o gatilho, não implementa upload/seleção de arquivo (isso é responsabilidade de quem consome, possivelmente reaproveitando FileUpload por fora)." },
+    { "name": "onMarkImportant", "type": "function", "required": false, "description": "Assinatura () => void. Mesmo racional de onAttachImage, pro ícone de marcar a nota como importante/alerta." },
+    { "name": "disabled", "type": "boolean", "default": false, "required": false, "description": "Desabilita o campo inteiro (Textarea + todos os botões) — pensado pro estado 'enviando', enquanto onSubmit ainda não resolveu." },
+    { "name": "maxLength", "type": "number", "required": false, "description": "Limite de caracteres, repassado direto pro Textarea interno. Ausente = sem limite (comportamento original). Junto de showCharacterCount e limitMode, controla como o limite é comunicado/aplicado — ver decisions." },
+    { "name": "showCharacterCount", "type": "boolean", "default": false, "required": false, "description": "Mostra o contador 'N/max' no rodapé do Textarea interno. Só tem efeito quando maxLength também está definido (mesma regra do Textarea)." },
+    { "name": "limitMode", "type": "enum", "enum": ["block", "warn"], "default": "block", "required": false, "description": "Só tem efeito quando maxLength está definido. 'block' (padrão) = bloqueia a digitação fisicamente além do limite (Textarea com enforceMaxLength=true) — nunca é possível ultrapassar. 'warn' = permite digitar livremente além do limite; ao ultrapassar, o Textarea interno vira state='error' com uma mensagem ('Limite de {maxLength} caracteres excedido.') e o botão Publicar fica desabilitado até o texto voltar a caber no limite (ver decisions)." }
+  ],
+  "variants": [],
+  "states": ["default", "disabled"],
+  "tokensAllowed": {
+    "iconColor": ["semantic.icone-secundario"],
+    "iconSize": ["structural.icone-pequeno"],
+    "focusRing": ["structural.foco-espessura"],
+    "radius": ["structural.raio-xp"],
+    "spacing": ["structural.espaco-xp", "structural.espaco-pp", "structural.espaco-p"]
+  },
+  "a11y": {
+    "role": "nenhuma role própria — Textarea e Button internos já carregam toda a a11y definida em seus próprios contratos (textarea.contract.json, button.contract.json), não redefinida aqui.",
+    "requiredAria": ["aria-label nos botões utilitários ('Anexar imagem'/'Marcar como importante'), já que são ícone-only sem texto visível"],
+    "keyboard": ["Tab percorre: textarea → utilitários (se presentes) → botão Publicar", "Enter dentro da textarea insere quebra de linha (comportamento nativo de <textarea>) — NUNCA publica, mesmo racional de Textarea multi-linha não ter atalho de submit por teclado (ver forbidden)", "botão Publicar fica fora da ordem de tabulação ativa (aria-disabled via Button) enquanto o texto estiver vazio"],
+    "contrastMin": "Herda os números já validados em textarea.contract.json e button.contract.json — nenhum par de cor novo introduzido aqui.",
+    "notes": "Botão Publicar nunca fica escondido/removido quando desabilitado (só com o estado visual disabled do Button) — o usuário sempre vê que existe uma ação de publicar, mesmo antes de digitar algo. Em limitMode='warn', a mensagem de excesso ('Limite de N caracteres excedido.') usa o próprio HelperText do Textarea (intent=error), e o contador (showCharacterCount) fica na cor de erro junto — duas pistas visuais redundantes com o texto, mesmo racional de nunca depender só de cor. aria-live='polite' do contador (herdado do Textarea) já anuncia a mudança de contagem pra quem usa leitor de tela conforme digita."
+  },
+  "events": { "status": "não definido no contrato original" },
+  "composition": {
+    "canContain": ["Textarea", "Button", "Icon"],
+    "canBeContainedBy": ["painéis de notas/observações", "telas de videochamada/atendimento", "detalhe de ticket/protocolo"],
+    "doNotCombine": ["CommentComposer dentro de CommentComposer", "usar CommentComposer pra um campo de formulário comum sem o padrão publicar — isso é Textarea direto"]
+  },
+  "forbidden": [
+    "publicar a nota sem clicar em Publicar (ex.: atalho de teclado tipo Ctrl+Enter ou submit no Enter simples) — Enter dentro do campo é sempre quebra de linha, nunca envio, pra não conflitar com o uso natural de um campo multi-linha",
+    "limpar value internamente após onSubmit — CommentComposer é 100% controlado, quem decide quando/se limpar é o consumidor (ex.: só depois da API confirmar)",
+    "permitir Publicar com o campo vazio ou só espaços em branco (value.trim() vazio) — botão permanece desabilitado nesse caso",
+    "permitir Publicar quando o texto ultrapassa maxLength em limitMode='warn' — botão permanece desabilitado até o texto voltar a caber no limite, mesmo que não esteja vazio",
+    "aplicar limitMode='warn' sem uma mensagem visível explicando o motivo do bloqueio — sempre acompanhado do helperText de erro no Textarea, nunca só o botão desabilitado sem explicação (mesmo racional de nunca comunicar erro só pela cor, já usado em TextField/Textarea)",
+    "reimplementar Textarea, Button ou Icon inline em vez de reaproveitar os átomos",
+    "cor fora da whitelist de tokensAllowed"
+  ],
+  "decisions": [
+    "Nasceu da análise de sistemas legados (analise-sistemas-legados.md, item 1.8) — painel de 'Notas & Observações' de uma tela de videochamada/atendimento: textarea + ícones utilitários (anexar imagem, marcar importante, emoji) + botão Publicar desabilitado até haver texto.",
+    "Reaproveita o átomo Textarea SEM label/helperText (os dois já são opcionais no contrato dele) — CommentComposer não precisa de rótulo formal de campo, é claramente um compositor de mensagem pelo contexto visual (textarea + botão de envio logo abaixo), mesmo padrão de qualquer caixa de comentário/chat.",
+    "onSubmit NÃO limpa o value sozinho — CommentComposer é 100% controlado (mesmo padrão de todo o harness: TextField/value, Checkbox/checked). Se limpasse sozinho, haveria um estado interno escondido (o componente 'lembraria' que acabou de publicar) que o consumidor não controla; deixar explícito significa que uma nota que falhou ao salvar continua visível no campo pro usuário tentar de novo, em vez de sumir e o usuário perder o texto digitado.",
+    "Emoji picker NÃO foi incluído nesta v1, apesar de aparecer no print legado — adicionar um seletor de emoji é uma funcionalidade própria (picker com grade de emojis, busca, categorias), não um ícone simples como anexar/marcar-importante; construir isso agora sem um caso de uso que justifique o investimento seria especular. Se aparecer necessidade real, é um componente novo (EmojiPicker) composto por fora, não um prop a mais aqui.",
+    "onAttachImage/onMarkImportant só expõem o GATILHO (onClick), não implementam a funcionalidade em si (seleção de arquivo, marcação de estado) — mesmo racional de onInfo/onSettings no ActionCard: o CommentComposer não sabe o que 'anexar imagem' significa pro consumidor (abrir um FileUpload? um input file nativo?), só avisa que o ícone foi clicado.",
+    "rows=3/resizable=false fixos (não expostos como prop) — a análise mostrou um campo compacto de poucas linhas, sem redimensionamento manual; se surgir um caso real precisando de mais altura/redimensionável, é decisão nova, não antecipada.",
+    "Botão Publicar é sempre variant='primary' (não exposto como prop) — diferente do ActionCard (que expõe primaryVariant porque os prints legados mostravam cores variadas), aqui o print legado mostrava sempre o mesmo botão sólido de ação principal; não há padrão real pedindo variação de cor pra esse botão específico.",
+    "AJUSTADO a pedido do usuário — novo trio de props maxLength/showCharacterCount/limitMode, pra 'adicionar ou remover o contador de caracteres... e também a possibilidade de limitar o campo, com mensagem de alerta quando chegar ao limite (bloqueando a digitação ou permitido digitar e alertando e bloqueando o botão)'. maxLength/showCharacterCount são só repasse direto pro Textarea interno (ver textarea.contract.json, que ganhou essas props na mesma leva de mudanças) — CommentComposer não duplica a lógica do contador, só expõe as mesmas props um nível acima. limitMode é a peça nova específica do CommentComposer (Textarea sozinho não tem noção de 'botão de publicar' pra bloquear): 'block' passa enforceMaxLength=true pro Textarea (bloqueio nativo, replica o comportamento já existente antes deste ajuste); 'warn' passa enforceMaxLength=false (digitação livre) e adiciona a lógica de calcular overLimit = value.length > maxLength, que vira: (1) state='error' + helperText de aviso no Textarea, (2) canSubmit=false até o texto voltar a caber.",
+    "limitMode default 'block' (não 'warn') — consistente com o default de enforceMaxLength=true no Textarea (ver textarea.contract.json): bloqueio físico é o comportamento mais 'seguro por padrão' (impossível ultrapassar o limite por acidente), então é o que acontece automaticamente se quem consome só passar maxLength sem pensar no modo; 'warn' é estritamente opt-in, pra quando o caso de uso realmente precisa deixar o usuário ver o próprio texto passar do limite antes de cortar."
+  ],
+  "references": { "tokensFile": "tokens/tokens.json — Cores Semânticas (Ícones), Estrutural (raio-xp, foco-espessura, espaco-xp/pp/p)" }
+}

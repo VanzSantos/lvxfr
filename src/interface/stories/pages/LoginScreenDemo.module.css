@@ -1,0 +1,19 @@
+/* Sem borda/raio próprios — o `.canvas` do StoryDetail já é a moldura da área
+   de exemplo; duas bordas aninhadas (canvas + frame) eram um container a mais
+   sem necessidade. */
+.frame {
+  width: 100%;
+}
+
+/* Em modo standalone (App.tsx define data-standalone em <html> — usado pela
+   aba "abrir em nova página" e pelo iframe de "ver como smartphone" do
+   StoryDetail), a altura FIXA em pixels que cada *Demo.tsx passa via style
+   inline (ex.: 720px do KanbanTemplateDemo) só existe pra caber dentro do
+   canvas de preview da Playground — não tem relação com a altura real da
+   página/iframe ali fora. Sem esse override ela sobrava/faltava e criava um
+   scroll vertical externo desnecessário (BUG REAL visto testando o
+   KanbanTemplate em "ver como smartphone" — ver ROADMAP.md). !important é
+   necessário pra vencer o style inline. */
+:global(html[data-standalone]) .frame {
+  height: 100% !important;
+}

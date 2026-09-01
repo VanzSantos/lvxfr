@@ -1,0 +1,59 @@
+{
+  "name": "Card",
+  "originalName": "Cartao",
+  "oneLiner": "Superfície que agrupa conteúdo relacionado, visualmente distinta do fundo da página.",
+  "category": "display",
+  "status": "draft",
+  "whenToUse": "Agrupar conteúdo relacionado (ex.: um formulário, um resumo de item) numa superfície com borda/fundo próprios, destacada do restante da página.",
+  "whenNotToUse": "Conteúdo não precisa de agrupamento visual (evita aninhar superfícies sem necessidade real); layout inteiro de uma página (isso é Template, fora deste harness); precisa ser clicável/interativo como uma unidade (fora de escopo deste contrato — não é um botão).",
+  "anatomy": ["Superfície (fundo, borda, raio, padding, sombra opcional) — conteúdo livre via children"],
+  "dependencies": [],
+  "props": [
+    { "name": "children", "type": "node", "required": true, "description": "Conteúdo livre — Card não define título, corpo ou rodapé como slots fixos (decisão: ver decisions)." },
+    { "name": "padding", "type": "enum", "enum": ["small", "medium", "large"], "default": "large", "required": false, "description": "small=espaco-p (12px), medium=espaco-g (24px), large=espaco-gg (32px, também o padrão — reproduz o padding que já era usado ad hoc no LoginScreen)." },
+    { "name": "elevation", "type": "enum", "enum": ["none", "low", "medium", "high"], "default": "none", "required": false, "description": "none = só borda, sem sombra (comportamento original, ainda o padrão). low/medium = sutis (sombra-pp/sombra-p), diferença quase imperceptível entre elas — sinalizam que a superfície está 'um pouco acima' da página. high = mais perceptível (sombra-m), pra destacar um Card específico (ex.: item em foco/hover) sem chegar no peso visual de um overlay (Modal/Toast)." }
+  ],
+  "variants": ["none", "low", "medium", "high"],
+  "states": ["static"],
+  "tokensAllowed": {
+    "background": ["semantic.fundo-superficie"],
+    "border": ["semantic.borda-base"],
+    "radius": ["structural.raio-pp"],
+    "spacing": ["structural.espaco-p", "structural.espaco-g", "structural.espaco-gg"],
+    "shadow": ["structural.sombra-pp", "structural.sombra-p", "structural.sombra-m"]
+  },
+  "a11y": {
+    "role": "nenhuma — Card é um <div> genérico, sem semântica própria. Quem consome decide a semântica real (ex.: LoginScreen envolve o Card com <form>, não pede pro Card virar <form>).",
+    "requiredAria": [],
+    "keyboard": [],
+    "contrastMin": "N/A diretamente — Card não carrega texto próprio; o conteúdo interno (children) segue o contrastMin do próprio contrato dele.",
+    "notes": "Sem interação própria — se um dia surgir um caso real de 'card clicável', isso é decisão nova (provavelmente um Button ou Link envolvendo o Card, não um onClick no Card em si, pra manter a semântica de foco/teclado correta)."
+  },
+  "events": { "status": "não definido — componente só estrutural/visual, não dispara eventos" },
+  "composition": {
+    "canContain": ["qualquer conteúdo — children livre, incluindo outros componentes deste harness"],
+    "canBeContainedBy": ["páginas", "outros containers de layout"],
+    "doNotCombine": ["aninhar Card dentro de Card sem uma razão visual real — duas bordas/fundos empilhados sem necessidade"]
+  },
+  "forbidden": [
+    "valor de sombra fora dos 3 níveis tokenizados (sombra-pp/p/m) — nunca um box-shadow cru/ad hoc",
+    "cor de fundo ou borda fora da whitelist (ex.: fundo-secundario) sem atualizar este contrato primeiro",
+    "tornar o próprio Card clicável (onClick no container) — interatividade é responsabilidade de quem está dentro (Button, Link), não do Card",
+    "reintroduzir slots fixos (title/footer/actions) sem um segundo caso de uso real que justifique — ver decisions",
+    "usar elevation=high como substituto de Modal/overlay — Card não vira uma superfície flutuante só por causa da sombra; ele continua no fluxo normal do documento"
+  ],
+  "decisions": [
+    "RESOLVIDO com o usuário — Card agora suporta elevation (none/low/medium/high), depois de ficar bloqueado por não existir token de sombra. 3 níveis reais de sombra (sombra-pp/p/m) + 'none' (comportamento original, ainda o padrão — nenhum Card existente muda de aparência sem opt-in). Pesquisei o padrão usual antes de definir os valores (Tailwind/Material/Ant convergem em progressão não-linear: os primeiros níveis mudam pouco, o salto pro nível mais alto é mais perceptível) — segui essa referência em vez de inventar uma escala do zero.",
+    "low/medium (sombra-pp/sombra-p) são deliberadamente próximos (quase imperceptíveis entre si) — mesmo comportamento da maioria dos sistemas pesquisados, onde os níveis baixos existem mais pra 'descolar sutilmente' a superfície do fundo do que pra criar hierarquia visual forte. high (sombra-m) é o único salto realmente perceptível, pensado pra destacar um Card específico (ex.: hover, seleção) sem chegar no peso visual de um Modal/overlay — que ficaria fora de escopo deste contrato (Card não é feito pra flutuar sobre a página).",
+    "Cor da sombra usa semantic.texto-primario (#111827) como base, não preto puro (#000000) — sombra 'combina' com a paleta do harness em vez de ser um cinza genérico importado de fora; reaproveita um token de cor já existente, não introduz um novo.",
+    "Tokens sombra-pp/p/m ainda não existem na coleção do Figma (tokens.json não tem 'Sombras' hoje) — criados agora em tokens.css pra desbloquear essa necessidade real, seguindo a mesma convenção de nomenclatura xp/pp/p/m/g/gg já usada em raio-*/espaco-*. Documentado explicitamente como uma dívida a reconciliar com o Figma quando o design formalizar essa coleção — mesmo padrão já usado com fundo-apoio-3/raio-p/texto-g-forte antes.",
+    "Histórico preservado (decisão original, agora superada) — antes desta mudança, Card não tinha sombra porque nenhum token existia e o resto do harness (Button, TextField, Tooltip) usa só borda. Isso deixou de ser um bloqueio: a ausência de token foi resolvida, não a preferência por bordas — 'none' continua sendo o padrão (opt-in, não forçado), então nenhum Card existente é afetado.",
+    "BUG REAL encontrado em teste no navegador — --sombra-pp não estava sendo aplicado (elevation='low' renderizava sem sombra nenhuma), enquanto sombra-p e sombra-m funcionavam normalmente. Causa: o comentário CSS logo acima da declaração continha o trecho 'raio-*/espaco-*' — o '*/' ali fechou o comentário /* ... */ prematuramente, e o texto seguinte do comentário (mais o '*/' real, agora órfão) virou CSS inválido que o parser descartou junto com a declaração de --sombra-pp logo abaixo. Confirmado via inspeção do CSSOM (document.styleSheets), que mostrou só --sombra-p e --sombra-m realmente registrados. Corrigido reescrevendo o comentário sem a sequência '*/' embutida (trocado por 'xp, pp, p, m, g, gg' com vírgulas em vez de barras). Revalidado depois: os 3 níveis resolvem corretamente.",
+    "Contêiner genérico, sem slots fixos de título/corpo/rodapé: decisão explícita do usuário. O único caso de uso real hoje (LoginScreen) já tem título e botões como filhos livres, com estilo próprio — um slot de 'title' do Card provavelmente não bateria com esse estilo sem props extras especulativas. Revisar se um segundo caso de uso real pedir uma estrutura mais rígida.",
+    "padding vira prop de enum (small/medium/large) em vez de valor fixo, porque controlar densidade é uma necessidade genérica de qualquer card, não uma especulação — mas os valores mapeiam direto pra tokens estruturais existentes (espaco-p/g/gg), nenhum valor cru.",
+    "default de padding é 'large' (espaco-gg, 32px) porque é exatamente o valor que o LoginScreen já usava no contêiner ad hoc — troca de div-solta pra <Card> não muda nada visualmente.",
+    "Raio fixo em structural.raio-pp (8px), não exposto como prop — mesmo valor usado por Button e TextField; não havia motivo real pra variar.",
+    "Card sempre renderiza um <div> — não tem prop 'as'/polimorfismo. Quando o consumidor precisa de semântica diferente (ex.: LoginScreen precisa de <form> pra onSubmit funcionar), ele envolve o Card com o elemento certo por fora, em vez do Card decidir sua própria tag."
+  ],
+  "references": { "tokensFile": "tokens/tokens.json — Cores Semânticas (fundo-superficie, borda-base), Estrutural (raio-pp, espaco-p/g/gg, sombra-pp/p/m — sombra ainda não existe como coleção no Figma, ver decisions)" }
+}

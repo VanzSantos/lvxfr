@@ -1,0 +1,34 @@
+.card {
+  background: var(--fundo-superficie);
+  border: 1px solid var(--borda-base);
+  border-radius: var(--raio-pp);
+  box-sizing: border-box;
+}
+
+.small {
+  padding: var(--espaco-p);
+}
+
+.medium {
+  padding: var(--espaco-g);
+}
+
+.large {
+  padding: var(--espaco-gg);
+}
+
+.elevation-none {
+  box-shadow: none;
+}
+
+.elevation-low {
+  box-shadow: var(--sombra-pp);
+}
+
+.elevation-medium {
+  box-shadow: var(--sombra-p);
+}
+
+.elevation-high {
+  box-shadow: var(--sombra-m);
+}

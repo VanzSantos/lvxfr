@@ -1,0 +1,44 @@
+.composer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-pp);
+  width: 100%;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espaco-p);
+}
+
+.utilities {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-xp);
+}
+
+.utilityButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: none;
+  border: none;
+  border-radius: var(--raio-xp);
+  cursor: pointer;
+}
+
+.utilityButton:hover:not(:disabled) {
+  background: var(--fundo-secundario);
+}
+
+.utilityButton:focus-visible {
+  outline: var(--foco-espessura) solid var(--borda-foco);
+  outline-offset: 1px;
+}
+
+.utilityButton:disabled {
+  cursor: not-allowed;
+}

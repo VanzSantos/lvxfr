@@ -1,0 +1,77 @@
+{
+  "name": "Modal",
+  "originalName": "Modal/Diálogo",
+  "oneLiner": "Superfície que interrompe o fluxo da página, exigindo atenção ou uma decisão antes de continuar — diferente do Toast (não bloqueia) e do Card (não flutua sobre a página).",
+  "category": "overlay",
+  "status": "draft",
+  "whenToUse": "Uma ação precisa de confirmação explícita antes de prosseguir (ex.: excluir algo), ou um fluxo curto precisa acontecer sem sair da página atual (ex.: editar um item numa lista), sempre bloqueando a interação com o resto da tela até ser resolvido.",
+  "whenNotToUse": "Feedback que não precisa de decisão nem bloquear nada (isso é Toast); painel lateral persistente que não precisa cobrir o centro da tela (isso é Drawer, próximo da fila); confirmação tão simples que caberia num Tooltip/inline (modal é pesado demais pra isso).",
+  "anatomy": [
+    "Backdrop (::backdrop nativo do <dialog> — escurece o resto da página)",
+    "Cabeçalho (opcional) — título (h2) e/ou botão de fechar (X); 4 variações possíveis: título+X, só título, só X, ou nenhum dos dois (sem cabeçalho) — ver decisions",
+    "Corpo — conteúdo livre via children (formulário, texto, ações — sem slots fixos, mesma filosofia do Card)"
+  ],
+  "dependencies": ["Icon"],
+  "props": [
+    { "name": "open", "type": "boolean", "required": true, "description": "Controlado — Modal não gerencia a própria visibilidade, mesmo padrão de Alert/Toast." },
+    { "name": "onClose", "type": "function", "required": true, "description": "Assinatura () => void. Chamado ao fechar por qualquer via permitida (X, backdrop, Esc) — Modal não desmonta a si mesmo, quem consome decide (mesmo padrão 100% controlado do resto do harness)." },
+    { "name": "title", "type": "string", "required": false, "description": "Vira o <h2> do cabeçalho e o aria-labelledby do <dialog>, quando presente. Opcional — ver as 4 variações de cabeçalho em decisions. Quando omitido, accessibleLabel passa a ser obrigatório." },
+    { "name": "accessibleLabel", "type": "string", "required": false, "requiredWhen": "title não é fornecido", "description": "Nome acessível do <dialog> (vira aria-label) quando não há título visível — mesmo padrão de accessibleLabel usado em Icon/Avatar/Badge." },
+    { "name": "children", "type": "node", "required": true, "description": "Conteúdo livre do corpo — sem slot fixo de 'footer/actions'; botões de ação (ex.: Cancelar/Confirmar, em qualquer quantidade) entram como filhos normais, com o próprio layout de quem consome (mesma decisão já usada no Card)." },
+    { "name": "size", "type": "enum", "enum": ["small", "medium", "large"], "default": "medium", "required": false, "description": "small=400px, medium=560px, large=720px de largura máxima (sempre limitada a 100vw - 2×espaco-g, responsivo)." },
+    { "name": "padding", "type": "enum", "enum": ["small", "medium", "large"], "default": "large", "required": false, "description": "Mesma escala e mesmos tokens do Card (small=espaco-p, medium=espaco-g, large=espaco-gg) — aplicado uniformemente ao redor do cabeçalho+corpo juntos, não duas paddings independentes. Ver decisions." },
+    { "name": "dismissible", "type": "boolean", "default": true, "required": false, "description": "true = pode fechar clicando no backdrop, no X, ou apertando Esc. false = bloqueia as 3 vias — só fecha por uma ação explícita dentro de children (ex.: um Button de Cancelar). Também controla se o X aparece no cabeçalho. Ver decisions sobre por que as 3 vias ficam amarradas numa prop só." },
+    { "name": "role", "type": "enum", "enum": ["dialog", "alertdialog"], "default": "dialog", "required": false, "description": "alertdialog é pra confirmações críticas (ex.: 'excluir permanentemente') que merecem ser anunciadas de forma mais assertiva por leitor de tela — mesma distinção que a spec ARIA já define entre os dois roles." }
+  ],
+  "variants": ["small", "medium", "large"],
+  "states": ["static"],
+  "tokensAllowed": {
+    "background": ["semantic.fundo-superficie", "semantic.fundo-secundario", "semantic.fundo-sobreposicao"],
+    "border": ["semantic.borda-base", "semantic.borda-foco"],
+    "text": ["semantic.texto-primario", "semantic.texto-secundario"],
+    "radius": ["structural.raio-pp", "structural.raio-xp"],
+    "focusRing": ["structural.foco-espessura"],
+    "spacing": ["structural.espaco-p", "structural.espaco-g", "structural.espaco-gg", "structural.espaco-m"],
+    "iconSize": ["structural.icone-pequeno"],
+    "typography": ["type-style.texto-m-forte"]
+  },
+  "a11y": {
+    "role": "dialog nativo (<dialog>) aberto via showModal() — já ganha role=\"dialog\" e aria-modal=\"true\" implícitos do navegador; role=\"alertdialog\" só é setado explicitamente quando a prop pede.",
+    "requiredAria": ["aria-labelledby apontando pro id do <h2> do título quando title existe, senão aria-label=accessibleLabel diretamente no <dialog>", "aria-label ('Fechar') no botão X, quando dismissible=true"],
+    "keyboard": ["foco é preso dentro do Modal enquanto aberto (focus trap NATIVO do showModal(), não reimplementado)", "Esc fecha quando dismissible=true (também nativo — bloqueado via preventDefault no evento 'cancel' quando dismissible=false)", "foco retorna pro elemento que abriu o Modal ao fechar (comportamento nativo do close() em navegadores modernos)"],
+    "contrastMin": "Herda os pares já validados em outros contratos (texto-primario/secundario sobre fundo-superficie).",
+    "notes": "dismissible=false não é uma prisão sem saída — WCAG exige algum mecanismo de escape por teclado; quando dismissible=false, é responsabilidade de quem consome colocar um Button real (ex.: 'Cancelar') dentro de children, alcançável por Tab, satisfazendo o requisito mesmo com Esc bloqueado."
+  },
+  "events": { "status": "não definido no contrato original" },
+  "composition": {
+    "canContain": ["qualquer conteúdo — children livre, incluindo outros componentes deste harness"],
+    "canBeContainedBy": ["páginas (via portal/top-layer nativo do <dialog>, não importa onde é montado no JSX)"],
+    "doNotCombine": ["Modal dentro de Modal (diálogos aninhados) — padrão desencorajado, confunde foco/Esc de qual está ativo; se precisar de confirmação sobre uma ação de dentro de um Modal já aberto, fechar o primeiro antes de abrir o segundo"]
+  },
+  "forbidden": [
+    "Modal sem title E sem accessibleLabel — não tem nome acessível, erro em tempo de execução",
+    "reimplementar focus trap manualmente (ex.: listener de Tab customizado) — o <dialog> nativo via showModal() já faz isso; um Modal customizado com <div role=\"dialog\"> só se algum caso real provar que showModal() não serve, o que não é esperado",
+    "footer/actions como slot fixo, ou uma prop de 'quantidade de botões' — mesma proibição já registrada no Card, ver decisions",
+    "linha divisória (border) entre o cabeçalho e o corpo — decisão explícita do usuário, cabeçalho e corpo formam uma superfície visualmente contínua",
+    "cor fora da whitelist de tokensAllowed",
+    "aplicar display:flex incondicional em .dialog sem o seletor [open] — sobrescreve a regra do user-agent 'dialog:not([open]) { display:none }' e o modal fica visível fora do top-layer mesmo fechado (bug real já documentado internamente, ver decisions)"
+  ],
+  "decisions": [
+    "CORRIGIDO — auditoria de contratos (2026-09-01): raio-xp (botão X), focusRing (foco-espessura) e borda-foco (border) adicionados — o botão de fechar usa um anel de foco visível (outline foco-espessura + borda-foco), mesma convenção já usada em TextField/Checkbox, mas tokensAllowed não declarava essas categorias.",
+    "<dialog> NATIVO (showModal()/close()) em vez de <div role=\"dialog\"> customizado — decisão do agente, apoiada num precedente que já existe e funciona neste mesmo projeto: o Playground já usa exatamente esse padrão pro diálogo 'Ver contrato' (src/interface/stories/ContractDialog.tsx), incluindo dois problemas reais já resolvidos lá que este contrato herda a solução: (1) CSS de autor só aplica display:flex sob o seletor [open], senão sobrescreve a regra padrão do navegador e o dialog fica visível fora do top-layer mesmo fechado; (2) clique no backdrop nativo dispara onClick com event.target === o próprio elemento <dialog> (não existe um evento dedicado de 'clique fora'), então é assim que se detecta.",
+    "RESOLVIDO — dismissible é UMA prop só, amarrando as 3 vias de fechamento implícito (backdrop, X, Esc) juntas, em vez de 3 props independentes (closeOnBackdropClick, showCloseButton, closeOnEscape). Motivo: um Modal que bloqueia decisão explícita (ex.: 'você precisa escolher Salvar ou Descartar') normalmente quer bloquear TODAS as saídas implícitas de uma vez, não uma combinação arbitrária — 3 props independentes multiplicariam estados que nenhum caso de uso real pediu. Se surgir uma combinação real (ex.: bloquear só o backdrop mas manter Esc), vira decisão nova.",
+    "Esc bloqueado via preventDefault no evento nativo 'cancel' do <dialog> quando dismissible=false — não é uma prisão sem saída: WCAG exige um mecanismo de escape por teclado, que fica sendo o(s) Button(s) que quem consome coloca dentro de children (ex.: 'Cancelar'), alcançável por Tab. Modal não inventa um botão de cancelar sozinho porque não sabe qual é a ação certa (voltar? descartar? um terceiro estado?) — isso é decisão de quem consome, mesmo espírito de Card não ter opinião sobre o conteúdo.",
+    "Sem slot fixo de footer/actions — mesma decisão já tomada no Card (children livre, sem título/corpo/rodapé como props separadas). Motivo adicional aqui: forçar um layout fixo de 'botão à direita, botão à esquerda' não bate com todo caso real (ex.: um Modal de formulário pode ter só um botão, ou um link de ajuda ao lado dos botões) — quem consome já tem Button/layout próprios pra montar isso.",
+    "RESOLVIDO com o usuário — cabeçalho SEM linha divisória (border-bottom) separando do corpo; cabeçalho e corpo formam uma superfície visualmente contínua, uma única área com uma padding só ao redor de tudo (ver decisão de padding abaixo), não duas regiões com estilos próprios.",
+    "RESOLVIDO com o usuário — padding segue a MESMA escala e os MESMOS tokens do Card (small=espaco-p, medium=espaco-g, large=espaco-gg, default 'large' igual ao Card), aplicada como UMA padding só ao redor do conjunto cabeçalho+corpo (implementado como um wrapper interno único com essa padding, não duas paddings independentes em header/body) — consistente com o pedido de 'funcionar na mesma lógica dos Cards'.",
+    "RESOLVIDO com o usuário — cabeçalho tem 4 variações possíveis, resultado direto de cruzar title (agora opcional) com dismissible (já existia): título+X (title definido, dismissible=true), só título (title definido, dismissible=false), só X (title omitido, dismissible=true), ou nenhum cabeçalho (title omitido, dismissible=false — corpo começa direto no topo da padding). Não são 4 valores de um enum novo — emergem da combinação das duas props já existentes, sem inflar a API com uma prop 'headerVariant' redundante.",
+    "title deixou de ser obrigatório; quando omitido, accessibleLabel assume o papel de nome acessível do <dialog> (aria-label em vez de aria-labelledby) — mesmo padrão já usado em Icon/Avatar/Badge pra 'texto visível OU rótulo acessível explícito, nunca nenhum dos dois'.",
+    "CONSIDERADO E DESCARTADO — variações de footer com contagem fixa de botões (1/2/3), sugeridas pelo usuário com ressalva de que talvez não fosse necessário. Decisão: não implementar como prop/slot. Motivo: children já é livre (ver decisão de 'sem slot fixo de footer' acima) — 1, 2 ou 3 Button's dentro de um <div style={{display:'flex', gap:...}}> já resolve isso sem nenhuma API nova; uma prop 'footerVariant' seria uma reimplementação mais rígida do que já existe de graça via composição. Se surgir um padrão visual realmente repetitivo entre Modals reais (não hipotético), reconsiderar como um componente auxiliar (ex.: 'ModalActions'), não como prop do Modal.",
+    "role=alertdialog como prop opcional (não o padrão) — a maioria dos Modals deste harness provavelmente é do tipo 'fluxo/edição', não 'alerta crítico'; forçar alertdialog sempre anunciaria com urgência exagerada casos que não precisam disso. Quem abre um Modal de confirmação destrutiva passa role='alertdialog' explicitamente.",
+    "Tamanhos (small=400/medium=560/large=720px) sempre com teto de calc(100vw - espaco-g×2) — mesmo padrão responsivo já usado no ContractDialog interno, garante que o Modal nunca estoura a viewport em telas pequenas mesmo no tamanho 'large'.",
+    "Sem prop 'initialFocusRef' ou similar pra customizar o elemento que recebe foco ao abrir — o comportamento nativo do showModal() (foca o primeiro elemento focável, ou o próprio <dialog> se não houver nenhum) já é adequado pra maioria dos casos; se um caso real pedir foco customizado, é decisão nova.",
+    "Foco retorna pro elemento que abriu o Modal ao fechar — comportamento nativo do close() em navegadores modernos, não precisou de nenhuma lógica adicional pra implementar.",
+    "BUG REAL corrigido em teste no navegador (modo escuro) — .dialog nunca declarava background/color próprios; o <dialog> nativo tem um fundo branco (ou 'Canvas', dependendo do navegador) no user-agent stylesheet por padrão, então o Modal continuava com o card claro mesmo no tema escuro, mesmo com o resto da página já correto. Adicionado `background: var(--fundo-superficie); color: var(--texto-primario)` explícitos em .dialog — os dois já eram tokens corretos, só faltava declará-los (o :root[data-theme] já cuidava do valor certo por tema, o componente só não estava lendo)."
+  ],
+  "references": { "tokensFile": "tokens/tokens.json — Cores Semânticas (fundo-superficie, fundo-secundario, fundo-sobreposicao, borda-base, textos), Estrutural (raio-pp, espaco-pp/m/g, icone-pequeno)" }
+}

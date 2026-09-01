@@ -1,0 +1,43 @@
+.group {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--borda-base);
+  border-radius: var(--raio-pp);
+  overflow: hidden;
+  background: var(--fundo-campo);
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  background: var(--fundo-secundario);
+  cursor: pointer;
+}
+
+.button:disabled {
+  cursor: not-allowed;
+}
+
+.button:focus-visible {
+  outline: var(--foco-espessura) solid var(--borda-foco);
+  outline-offset: -2px;
+}
+
+.value {
+  min-width: 28px;
+  padding: 0 var(--espaco-xp);
+  text-align: center;
+  font-family: var(--texto-p-family);
+  font-size: var(--texto-p-size);
+  font-weight: var(--texto-p-weight);
+  color: var(--texto-primario);
+}
+
+.disabled .value {
+  color: var(--texto-inativo);
+}

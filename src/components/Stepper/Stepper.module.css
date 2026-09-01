@@ -1,0 +1,129 @@
+.nav {
+  width: 100%;
+}
+
+.list {
+  display: flex;
+  align-items: flex-start;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  display: flex;
+  align-items: flex-start;
+  flex: 1;
+  min-width: 0;
+}
+
+.itemStacked {
+  flex-direction: row;
+}
+
+.itemInline {
+  flex: 0 0 auto;
+}
+
+.list.listInline {
+  gap: var(--espaco-g);
+}
+
+.connector {
+  flex: 1;
+  min-width: var(--espaco-g);
+  height: 2px;
+  margin-top: 15px;
+  background: var(--borda-base);
+}
+
+.connectorDone {
+  background: var(--acao-primaria);
+}
+
+.step {
+  display: flex;
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+}
+
+.stepInline {
+  flex-direction: row;
+  align-items: flex-start;
+  gap: var(--espaco-pp);
+  text-align: left;
+}
+
+.stepStacked {
+  flex-direction: column;
+  align-items: center;
+  gap: var(--espaco-xp);
+  text-align: center;
+  width: 100%;
+}
+
+button.step {
+  cursor: pointer;
+}
+
+.step:focus-visible {
+  outline: var(--foco-espessura) solid var(--borda-foco);
+  outline-offset: 2px;
+}
+
+.marker {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--raio-circular);
+  border: 2px solid var(--borda-base);
+  background: var(--fundo-superficie);
+  color: var(--texto-inativo);
+  font-family: var(--texto-rotulo-botao-family);
+  font-size: var(--texto-rotulo-botao-size);
+  font-weight: var(--texto-rotulo-botao-weight);
+}
+
+.marker.current {
+  border-color: var(--acao-primaria);
+  color: var(--acao-primaria);
+}
+
+.marker.completed {
+  border-color: var(--acao-primaria);
+  background: var(--acao-primaria);
+  color: var(--acao-primaria-texto);
+}
+
+.texts {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-xp);
+  min-width: 0;
+}
+
+.stepStacked .texts {
+  align-items: center;
+  max-width: 120px;
+}
+
+.label {
+  font-family: var(--texto-p-family);
+  font-size: var(--texto-p-size);
+  font-weight: 700;
+  line-height: var(--texto-p-line-height);
+  color: var(--texto-primario);
+}
+
+.description {
+  font-family: var(--texto-micro-family);
+  font-size: var(--texto-micro-size);
+  font-weight: var(--texto-micro-weight);
+  line-height: var(--texto-micro-line-height);
+  color: var(--texto-secundario);
+}

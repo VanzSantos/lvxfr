@@ -1,0 +1,192 @@
+/* A página precisa ser sempre mais ESCURA que o SideNav ao lado, nos dois
+   temas. SideNav usa fundo-superficie no claro/fundo-secundario no escuro
+   (ver SideNav.module.css); a página usa exatamente o par oposto — mesma
+   técnica de par de regras por tema já usada em SideNav.module.css e no
+   .pageArea de Demo.module.css.
+
+   layout='scroll' (padrão) — página cresce com o conteúdo (min-height),
+   .body tem padding e rola junto com a página. layout='fixed' — altura
+   trava em 100dvh/100%, sem scroll externo; .body vira flex:1 sem padding
+   (o conteúdo, ex. KanbanBoard, gerencia o próprio scroll interno). */
+.page {
+  min-height: 100vh;
+  display: flex;
+  background: var(--fundo-secundario);
+  font-family: var(--texto-m-family);
+}
+
+.pageEmbedded {
+  height: 100%;
+  display: flex;
+  background: var(--fundo-secundario);
+  font-family: var(--texto-m-family);
+  overflow: hidden;
+}
+
+.page[data-layout="fixed"] {
+  min-height: 0;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.pageEmbedded[data-layout="fixed"] {
+  overflow: hidden;
+}
+
+:root[data-theme="dark"] .page,
+:root[data-theme="dark"] .pageEmbedded {
+  background: var(--fundo-superficie);
+}
+
+.main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Não é NavBar (que sempre vem com fundo-superficie + borda inferior,
+   comportamento fixo do próprio contrato do NavBar). É um <header> simples,
+   sem borda nenhuma, com a MESMA cor de fundo da página ao redor (par de
+   regras por tema idêntico ao de `.page` acima) — some visualmente dentro
+   da página, só o Breadcrumb e as ações ficam por cima. */
+.topBar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-p);
+  flex-shrink: 0;
+  padding: var(--espaco-m) var(--espaco-g);
+  box-sizing: border-box;
+  background: var(--fundo-secundario);
+}
+
+:root[data-theme="dark"] .topBar {
+  background: var(--fundo-superficie);
+}
+
+.topRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espaco-m);
+}
+
+.topBarActions {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-pp);
+}
+
+/* No mobile, o logo do produto aparece na linha de cima do header, à
+   esquerda, onde o Breadcrumb fica no desktop (ver .desktopBreadcrumb/
+   .mobileBreadcrumbRow abaixo — os 3 juntos formam uma troca só por CSS,
+   sem duplicar lógica de layout em JS). */
+.mobileLogo {
+  display: none;
+}
+
+.desktopBreadcrumb {
+  display: flex;
+}
+
+.mobileBreadcrumbRow {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobileLogo {
+    display: flex;
+    align-items: center;
+  }
+
+  .desktopBreadcrumb {
+    display: none;
+  }
+
+  .mobileBreadcrumbRow {
+    display: flex;
+  }
+}
+
+/* Hambúrguer do menu mobile (gatilho do Drawer de navegação, controlado via
+   SideNav mobileOpen/onMobileOpenChange) dentro do header, à direita do
+   NotificationCenter. Mesmo breakpoint do próprio SideNav (768px) e mesmo
+   tamanho/estilo do botão de hambúrguer embutido que ele substitui
+   (SideNav.module.css, .hamburger). */
+.mobileMenuButton {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: none;
+  border: none;
+  border-radius: var(--raio-pp);
+  cursor: pointer;
+}
+
+.mobileMenuButton:hover {
+  background: var(--fundo-superficie);
+}
+
+.mobileMenuButton:focus-visible {
+  outline: var(--foco-espessura) solid var(--borda-foco);
+  outline-offset: 2px;
+}
+
+@media (max-width: 768px) {
+  .mobileMenuButton {
+    display: inline-flex;
+  }
+}
+
+.body {
+  flex: 1;
+  min-height: 0;
+  padding: 0 var(--espaco-g) var(--espaco-g);
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+.page[data-layout="fixed"] .body,
+.pageEmbedded[data-layout="fixed"] .body {
+  padding: 0;
+  overflow: hidden;
+}
+
+.menuRow {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-pp);
+  width: 100%;
+  padding: var(--espaco-p);
+  border: none;
+  border-radius: var(--raio-pp);
+  background: none;
+  color: var(--texto-primario);
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+}
+
+.menuRow:hover {
+  background: var(--fundo-secundario);
+}
+
+.menuRow:focus-visible {
+  outline: var(--foco-espessura) solid var(--borda-foco);
+  outline-offset: -2px;
+}
+
+/* Painel do menu de conta MOBILE, expande como collapse logo abaixo do User
+   Card (não um Popover flutuante) — mesmo espaçamento vertical entre os
+   MenuRow já usado no content do Popover de desktop (ProfileFooter), só sem
+   o painel/sombra/borda flutuante, já que aqui faz parte do fluxo normal da
+   página. */
+.userCardCollapsePanel {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--espaco-xp) 0;
+}

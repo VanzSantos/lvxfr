@@ -1,0 +1,127 @@
+{
+  "name": "UserCard",
+  "originalName": "CartaoDeUsuario",
+  "oneLiner": "Gatilho de identificação do usuário — Avatar + nome/e-mail (StackedText) + caret — pensado pro rodapé do SideNav, sem popover/menu embutido: só o cartão, o consumidor decide o que abre.",
+  "category": "action",
+  "status": "draft",
+  "whenToUse": "Identificar o usuário logado num ponto fixo da interface que também funciona como gatilho de um menu de conta (ex.: rodapé do SideNav, mesma composição já usada em SideNavDemo/BackofficeTemplate antes de virar componente) — sempre acompanhado de um Popover por fora, com o menu de conta como content.",
+  "whenNotToUse": "Exibir o usuário só como informação, sem nenhuma ação/menu (isso é só Avatar+StackedText direto, sem UserCard); avatar sozinho sem nome/e-mail (isso é Avatar puro — ex.: footerCollapsed do SideNav).",
+  "anatomy": [
+    "<button> ocupando 100% da largura do container, sem borda, fundo igual ao fundo da PÁGINA ao redor (não o fundo do painel/SideNav que o contém — ver decisions), padding pp, cantos raio-p",
+    "Avatar (size='small') + StackedText (primaryText=name, secondaryText=secondaryText) à esquerda",
+    "Icon 'caret-up' ou 'caret-down' à direita, conforme caretDirection (estático, não gira/anima sozinho) — indica a direção em que o menu acionado por este cartão abre"
+  ],
+  "dependencies": [
+    "Avatar",
+    "StackedText",
+    "Icon"
+  ],
+  "props": [
+    {
+      "name": "name",
+      "type": "string",
+      "required": true,
+      "description": "Nome do usuário — vira primaryText do StackedText e alimenta as iniciais do Avatar (quando avatarSrc não é fornecido ou falha)."
+    },
+    {
+      "name": "secondaryText",
+      "type": "string",
+      "required": true,
+      "description": "Texto secundário (tipicamente o e-mail) — vira secondaryText do StackedText."
+    },
+    {
+      "name": "avatarSrc",
+      "type": "string",
+      "required": false,
+      "description": "Repassado direto pro src do Avatar. Ausente = Avatar cai pras iniciais de name (comportamento padrão do próprio Avatar)."
+    },
+    {
+      "name": "accessibleLabel",
+      "type": "string",
+      "required": false,
+      "description": "aria-label do botão. Sem valor default fixo — UserCard não assume que o botão sempre abre 'o menu da conta' (quem decide o que abre é o Popover por fora, ver decisions); omitir deixa o botão sem aria-label explícito, dependendo do texto visível (Avatar+StackedText) como nome acessível via conteúdo, mesmo racional de outros gatilhos de Popover no harness que não fixam um aria-label obrigatório."
+    },
+    {
+      "name": "caretDirection",
+      "type": "enum",
+      "enum": [
+        "up",
+        "down"
+      ],
+      "default": "up",
+      "required": false,
+      "description": "'up' = o menu acionado por este cartão abre pra cima (Popover no rodapé de um painel). 'down' = abre pra baixo (ex.: collapse inline, cartão no TOPO de um painel). UserCard não sabe o que abre de fato — só ajusta a seta pra indicar a direção certa."
+    }
+  ],
+  "variants": [],
+  "states": [
+    "default",
+    "hover",
+    "focus-visible"
+  ],
+  "tokensAllowed": {
+    "background": [
+      "semantic.fundo-secundario",
+      "semantic.fundo-superficie"
+    ],
+    "border": [
+      "semantic.borda-foco"
+    ],
+    "iconColor": [
+      "semantic.icone-secundario"
+    ],
+    "focusRing": [
+      "structural.foco-espessura"
+    ],
+    "radius": [
+      "structural.raio-p"
+    ],
+    "spacing": [
+      "structural.espaco-pp"
+    ]
+  },
+  "a11y": {
+    "role": "nenhuma role própria — é um <button> nativo.",
+    "requiredAria": [
+      "aria-expanded/aria-haspopup são injetados pelo Popover que envolve o UserCard (cloneElement), não pelo próprio UserCard — ver composition"
+    ],
+    "keyboard": [
+      "Tab foca o botão, Enter/Espaço ativa (comportamento nativo de <button>) — abrir o menu de fato é responsabilidade do Popover por fora, que escuta esse clique via useClick"
+    ],
+    "contrastMin": "Mesma régua já validada em StackedText (texto-primario/texto-secundario sobre fundo-secundario/fundo-superficie, ambos já testados em outros contratos do harness)."
+  },
+  "events": {
+    "status": "não definido no contrato original"
+  },
+  "composition": {
+    "canContain": [
+      "Avatar",
+      "StackedText",
+      "Icon"
+    ],
+    "canBeContainedBy": [
+      "Popover (como children/gatilho — UserCard usa forwardRef especificamente pra isso, ver decisions)",
+      "footer do SideNav (slot livre, ver side-nav.contract.json)"
+    ],
+    "doNotCombine": [
+      "UserCard sem Popover envolvendo — o caret sinaliza um menu que se abre; sem Popover, o caret vira um enfeite sem função"
+    ]
+  },
+  "forbidden": [
+    "abrir um menu/popover de dentro do próprio UserCard (ex.: um Popover hardcoded) — UserCard só expõe o gatilho (o <button>), o que abre é responsabilidade de quem consome, mesmo racional já estabelecido em action-card.contract.json pra onInfo/onSettings",
+    "reimplementar Avatar, StackedText ou Icon inline em vez de reaproveitar os átomos/moléculas",
+    "cor fora da whitelist de tokensAllowed",
+    "UserCard como children de Popover sem repassar ref (é forwardRef especificamente pra isso — usar sem ref quebra o posicionamento do floating-ui, que depende do nó DOM real do gatilho)"
+  ],
+  "decisions": [
+    "CORRIGIDO — auditoria de contratos (2026-09-01): border (borda-foco, anel de foco do botão) e iconColor (icone-secundario, cor do caret) adicionados a tokensAllowed — usados no componente mas ausentes do contrato.",
+    "Extraído a pedido do usuário — a composição (Avatar+StackedText+Popover+caret, sem borda, fundo igual ao fundo da página) já existia DUPLICADA como função local `ProfileFooter` em SideNavDemo.tsx e BackofficeTemplate.tsx (resultado de rodadas anteriores de ajuste do 'User Card' do SideNav). Virou componente próprio pra parar de duplicar esse padrão a cada novo consumidor do SideNav.",
+    "UserCard é só o CARTÃO/gatilho, não envolve Popover internamente — mesmo racional já estabelecido em action-card.contract.json (onInfo/onSettings 'só expõe o gatilho, o que abre é responsabilidade de quem consome'): o menu de conta (itens, quantidade, texto) varia por consumidor (SideNavDemo tem 4 itens incl. 'Device management', BackofficeTemplate tem 3), então o content do Popover continua 100% livre e por fora, só o botão-gatilho virou componente.",
+    "Fundo do cartão é o par de tokens da PÁGINA (fundo-secundario no claro/fundo-superficie no escuro), não do painel/SideNav que o contém (que usa o par OPOSTO) — decisão herdada de rodadas anteriores do SideNav ('a cor de fundo do User Card deve ser igual à cor de fundo da página'), agora fixada dentro do próprio componente em vez de precisar ser reimplementada em CSS module por consumidor (era a mesma regra duplicada em Demo.module.css/.pageArea e BackofficeTemplate.module.css/.userCard).",
+    "REVISADO a pedido do usuário — Ícone deixou de ser fixo 'caret-up' e virou configurável via caretDirection ('up' padrão, 'down' novo). Motivo: surgiu um segundo consumidor real com a direção OPOSTA — BackofficeTemplate, no rodapé mobile, precisa do User Card no TOPO do Drawer, com o menu expandindo PRA BAIXO como um collapse inline (não um Popover) — um caret fixo 'pra cima' ficaria semanticamente errado ali. Mesma régua já usada no resto do harness ('cresce sob demanda de um consumidor real, nunca especulativamente') aplicada aqui: a prop só foi criada quando um segundo caso real precisando do oposto apareceu, não antes.",
+    "forwardRef — primeiro componente customizado do harness usado como children direto de Popover (até aqui só elementos nativos como <button> eram usados). Popover faz cloneElement injetando ref+onClick no children (ver popover.contract.json) — sem forwardRef, o ref cairia no vazio (componentes de função não aceitam ref por padrão) e o floating-ui não conseguiria medir a posição real do gatilho no DOM."
+  ],
+  "references": {
+    "tokensFile": "tokens/tokens.json — Cores Semânticas (Fundos), Estrutural (raio-p, foco-espessura, espaco-pp)"
+  }
+}

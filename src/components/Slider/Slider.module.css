@@ -1,0 +1,118 @@
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-pp);
+  width: 100%;
+}
+
+.label {
+  color: var(--texto-primario);
+  font-family: var(--texto-p-family);
+  font-size: var(--texto-p-size);
+  font-weight: 700;
+}
+
+.trackWrapper {
+  position: relative;
+  height: 20px;
+  display: flex;
+  align-items: center;
+}
+
+.track {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 4px;
+  border-radius: var(--raio-circular);
+  background: var(--borda-base);
+}
+
+.trackFill {
+  position: absolute;
+  height: 4px;
+  border-radius: var(--raio-circular);
+  background: var(--acao-primaria);
+}
+
+.rangeInput {
+  position: absolute;
+  left: 0;
+  right: 0;
+  width: 100%;
+  margin: 0;
+  background: transparent;
+  appearance: none;
+  -webkit-appearance: none;
+  pointer-events: none;
+  outline: none;
+}
+
+.rangeInput::-webkit-slider-runnable-track {
+  background: transparent;
+  height: 4px;
+}
+
+.rangeInput::-moz-range-track {
+  background: transparent;
+  height: 4px;
+}
+
+.rangeInput::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+  pointer-events: auto;
+  width: 18px;
+  height: 18px;
+  border-radius: var(--raio-circular);
+  background: var(--acao-primaria);
+  border: 2px solid var(--fundo-superficie);
+  box-shadow: 0 0 0 1px var(--acao-primaria);
+  cursor: pointer;
+  margin-top: 0;
+}
+
+.rangeInput::-moz-range-thumb {
+  pointer-events: auto;
+  width: 18px;
+  height: 18px;
+  border-radius: var(--raio-circular);
+  background: var(--acao-primaria);
+  border: 2px solid var(--fundo-superficie);
+  box-shadow: 0 0 0 1px var(--acao-primaria);
+  cursor: pointer;
+}
+
+.rangeInput:focus-visible::-webkit-slider-thumb {
+  outline: var(--foco-espessura) solid var(--borda-foco);
+  outline-offset: 2px;
+}
+
+.rangeInput:focus-visible::-moz-range-thumb {
+  outline: var(--foco-espessura) solid var(--borda-foco);
+  outline-offset: 2px;
+}
+
+.rangeInput:disabled::-webkit-slider-thumb {
+  background: var(--texto-inativo);
+  box-shadow: 0 0 0 1px var(--texto-inativo);
+  cursor: not-allowed;
+}
+
+.rangeInput:disabled::-moz-range-thumb {
+  background: var(--texto-inativo);
+  box-shadow: 0 0 0 1px var(--texto-inativo);
+  cursor: not-allowed;
+}
+
+.value {
+  color: var(--texto-secundario);
+  font-family: var(--texto-p-family);
+  font-size: var(--texto-p-size);
+}
+
+.helperText {
+  color: var(--texto-secundario);
+  font-family: var(--texto-p-family);
+  font-size: var(--texto-p-size);
+}

@@ -1,0 +1,154 @@
+{
+  "name": "Popover",
+  "originalName": "BalaoDeConteudo",
+  "oneLiner": "Painel flutuante genérico, ancorado num gatilho clicável — a peça de posicionamento/dismiss (@floating-ui) reaproveitável que Select/Tooltip/Datatable/Breadcrumb/DatePicker/TimePicker já reimplementam cada um por conta própria.",
+  "category": "overlay",
+  "status": "draft",
+  "whenToUse": "Construir um NOVO componente que precisa de um painel flutuante ancorado a um gatilho (menu de ações, filtro extra, mini-formulário) sem reimplementar posicionamento/flip/shift/dismiss/foco do zero — reaproveitar este átomo por baixo.",
+  "whenNotToUse": "Tooltip (texto curto só-informativo acionado por hover, já tem seu próprio contrato/componente); um <select>/Select real de opções (use o próprio Select, não um Popover com uma lista dentro); confirmação de ação destrutiva (isso é Modal, que bloqueia a página inteira, não flutua ancorado a um gatilho).",
+  "anatomy": [
+    "Gatilho — o único filho (children), clonado com o ref/props de referência do floating-ui; qualquer elemento clicável existente (Button, ícone, etc.), não um componente próprio",
+    "Painel flutuante — content livre dentro de um container posicionado via floating-ui (FloatingPortal), com offset/flip/shift já aplicados"
+  ],
+  "dependencies": [],
+  "props": [
+    {
+      "name": "children",
+      "type": "node",
+      "required": true,
+      "description": "Elemento único que vira o gatilho (mesmo padrão de Tooltip) — recebe ref e props de referência via cloneElement, incluindo o onClick que abre/fecha o painel."
+    },
+    {
+      "name": "content",
+      "type": "node",
+      "required": true,
+      "description": "Conteúdo livre do painel flutuante — Popover não sabe nem decide nada sobre o que tem dentro."
+    },
+    {
+      "name": "placement",
+      "type": "string",
+      "required": false,
+      "default": "bottom-start",
+      "description": "Placement do floating-ui (ex.: 'bottom-start', 'top', 'right-end')."
+    },
+    {
+      "name": "role",
+      "type": "enum",
+      "enum": [
+        "dialog",
+        "menu",
+        "listbox"
+      ],
+      "default": "dialog",
+      "required": false,
+      "description": "Repassado pro useRole do floating-ui — decide a semântica ARIA do painel (menu pra lista de ações, listbox pra lista de opções, dialog pro caso genérico)."
+    },
+    {
+      "name": "accessibleLabel",
+      "type": "string",
+      "required": false,
+      "description": "aria-label do painel flutuante, quando o conteúdo não tem um heading próprio que já sirva de nome."
+    },
+    {
+      "name": "open",
+      "type": "boolean",
+      "required": false,
+      "description": "Estado controlado opcional. Ausente = comportamento original (estado interno). Presente = o consumidor decide quando o painel abre/fecha (ex.: fechar programaticamente após selecionar um item de um menu de ações) — precisa vir sempre acompanhado de onOpenChange, ver decisions."
+    },
+    {
+      "name": "onOpenChange",
+      "type": "function",
+      "required": false,
+      "description": "Assinatura (open: boolean) => void. Notifica toda mudança de estado (clique no gatilho, Esc, clique fora) pro consumidor espelhar em open — mesmo padrão de componente controlado usado no resto do harness (ex.: TextField value/onChange)."
+    },
+    {
+      "name": "tone",
+      "type": "enum",
+      "enum": [
+        "light",
+        "dark"
+      ],
+      "default": "light",
+      "required": false,
+      "description": "'light' = painel claro de sempre (fundo-superficie + borda-base), comportamento original. 'dark' = fundo-invertido (mesmo tom escuro de superfícies como o CallControlBar) — só resolve o fundo/borda do PAINEL; o conteúdo (content) continua 100% livre e precisa usar cores de texto claras por conta própria (Popover não força cor de texto nenhuma, ver decisions)."
+    }
+  ],
+  "variants": [],
+  "states": [
+    "closed",
+    "open"
+  ],
+  "tokensAllowed": {
+    "background": [
+      "semantic.fundo-superficie",
+      "semantic.fundo-invertido"
+    ],
+    "border": [
+      "semantic.borda-base"
+    ],
+    "radius": [
+      "structural.raio-pp"
+    ],
+    "shadow": [
+      "structural.sombra-p"
+    ],
+    "spacing": [
+      "structural.espaco-pp"
+    ],
+    "typography": [
+      "type-style.texto-p"
+    ]
+  },
+  "a11y": {
+    "role": "o role do painel vem da prop role (dialog/menu/listbox, via useRole do floating-ui) — Popover não fixa uma semântica única porque o conteúdo interno varia bastante entre consumidores.",
+    "requiredAria": [
+      "aria-label ou aria-labelledby no painel",
+      "aria-expanded no gatilho refletindo o estado aberto/fechado"
+    ],
+    "keyboard": [
+      "Enter/Espaço no gatilho abre/fecha (mesmo padrão de clique)",
+      "Esc fecha o painel e devolve o foco pro gatilho (useDismiss)",
+      "navegação DENTRO do painel é responsabilidade do conteúdo (content) — Popover não impõe roving tabindex nem grid de navegação, já que o conteúdo é livre"
+    ],
+    "contrastMin": "N/A diretamente — Popover não define tipografia/cor de texto própria, herda do conteúdo livre.",
+    "notes": "Estado aberto/fechado é interno ao Popover por padrão (mesmo padrão já usado em Select/ComboBox/Breadcrumb), mas agora pode ser controlado via open/onOpenChange quando o consumidor precisa fechar o painel programaticamente (ver decisions, EXTENSÃO)."
+  },
+  "events": {
+    "status": "não definido no contrato original"
+  },
+  "composition": {
+    "canContain": [
+      "qualquer conteúdo livre via content"
+    ],
+    "canBeContainedBy": [
+      "qualquer componente que precise de um painel ancorado — base de implementação, não usado sozinho numa tela"
+    ],
+    "doNotCombine": [
+      "Popover dentro de Popover sem uma razão real (aninhamento raso é aceitável, ex.: submenu, mas não é o caso comum)",
+      "usar Popover pra reimplementar Tooltip (hover) — os dois têm gatilhos de interação diferentes por design"
+    ]
+  },
+  "forbidden": [
+    "abrir mais de um Popover controlado pelo mesmo gatilho ao mesmo tempo",
+    "conteúdo do painel sem nenhum nome acessível (nem accessibleLabel nem heading interno)",
+    "cor fora da whitelist de tokensAllowed",
+    "reimplementar posicionamento manual (getBoundingClientRect + position:absolute cru) em vez de floating-ui",
+    "usar o componente Button do harness como children — sua API fechada (sem ref nem spread de props) faz o cloneElement falhar silenciosamente (ver decisions)"
+  ],
+  "decisions": [
+    "CORRIGIDO — auditoria de A11y (2026-09-01): BUG REAL, o painel não estava envolvido em FloatingFocusManager (só useClick/useDismiss/useRole) — o próprio contrato já prometia \"Esc fecha o painel e devolve o foco pro gatilho\", mas sem FloatingFocusManager isso não é garantido: se o usuário tivesse tabulado pra dentro do conteúdo antes de fechar, o foco não retornava ao desmontar, caindo pro <body>. Corrigido envolvendo o painel em <FloatingFocusManager context={context} modal={false}> — modal=false porque Popover não bloqueia o resto da página (mesma classificação de Drawer modal=false).",
+    "Construído AGORA como componente novo, sem refatorar Select/Tooltip/Datatable/Breadcrumb/DatePicker/TimePicker/DateTimePicker pra consumi-lo — cada um já tem sua própria integração de floating-ui testada e funcionando; migrá-los pra este átomo é dedup especulativo sem um bug real puxando a mudança agora (mesma disciplina já aplicada em Pagination vs. a paginação embutida da Datatable). Este Popover existe pra componentes NOVOS que ainda vão precisar dessa peça, não pra substituir o que já existe.",
+    "Gatilho via children + cloneElement (mesmo padrão já usado em Tooltip), não um render-prop — mantém a mesma 'forma' de API que o resto do harness já usa pra esse tipo de wrapper, em vez de introduzir um segundo estilo de API só pra este componente.",
+    "Estado aberto/fechado é interno ao Popover por padrão — mesmo racional de Select/ComboBox/Breadcrumb: é estado de UI transiente na maioria dos casos.",
+    "EXTENSÃO a pedido do usuário — open/onOpenChange adicionados como controle OPCIONAL (padrão idêntico ao já previsto nesta decision antes de existir um caso real): TicketCard precisava fechar seu menu de ações (Duplicar/Habilitar-Desabilitar/Apagar/Editar/Ver detalhes) automaticamente depois de o usuário escolher um item, o que o estado 100% interno não permitia. Quando `open` não é passado, o comportamento é idêntico ao de antes (internalOpen); quando é passado, controla de fato — mesmo padrão de componente controlado-opcional já usado em Textarea (enforceMaxLength) e SelectableCard (selectedTone), nenhuma quebra de compatibilidade pros consumidores existentes (Datatable continua com sua própria integração de floating-ui, PopoverDemo continua funcionando sem passar open).",
+    "EXTENSÃO a pedido do usuário — prop tone ('light' padrão | 'dark') adicionada porque o CallControlBar precisava que seus 3 popovers (dispositivo de mic/câmera, configurações) tivessem fundo escuro pra combinar com a cápsula escura de onde eles abrem — o painel branco padrão destoava visualmente de um gatilho que já vive numa superfície escura. Só resolve fundo/borda do PAINEL (fundo-invertido reaproveitado, nenhum token novo); Popover continua sem opinião sobre a cor do TEXTO dentro de content — cabe a cada consumidor com tone='dark' usar cores de texto claras no próprio conteúdo (mesmo racional de Popover nunca ter decidido tipografia/cor de texto, só o invólucro).",
+    "role é uma prop de enum fechado (dialog/menu/listbox) que alimenta useRole do floating-ui, em vez de Popover não ter role nenhum — dá ao consumidor a semântica ARIA certa pro tipo de conteúdo sem precisar reimplementar a integração com useRole por fora.",
+    "Sem seta/arrow apontando pro gatilho (diferente de Tooltip) — arrow é uma decisão visual específica de Tooltip (baloon curto, precisa indicar de onde veio); painéis maiores (menu, formulário) tipicamente não usam esse recurso. Se um consumidor real precisar, pode compor a própria seta dentro de content.",
+    "Navegação por teclado DENTRO do painel (setas, roving tabindex) não é responsabilidade do Popover — o conteúdo é livre (content), então cada consumidor decide sua própria navegação interna (ex.: um menu de ações usaria roving tabindex próprio, uma lista de opções usaria outro padrão) — mesmo racional de TabPanel não saber nada sobre o que tem dentro.",
+    "LIMITAÇÃO CONHECIDA (mesma já documentada implicitamente em Tooltip) — children precisa ser um elemento que aceite ref e spread de props (ref, onClick, aria-expanded, aria-haspopup) diretamente, ex.: um <button> nativo. O átomo Button do harness tem API fechada (ButtonProps não inclui ref nem onClick, só onPress, e não faz spread de props desconhecidas no <button> interno) — por isso NÃO funciona como filho direto de Popover (nem de Tooltip). Confirmado testando no navegador: usar <Button> como children resultava em aria-expanded/aria-haspopup nunca aplicados e o clique nunca abrindo o painel, sem nenhum erro visível. Consumidores que precisam de um gatilho com a aparência de Button devem usar um <button> nativo estilizado (ou compor visualmente parecido com Button), não o componente Button em si — mesma solução já adotada no demo do Tooltip.",
+    "BUG REAL corrigido a pedido do usuário — o painel flutuante (FloatingPortal) renderiza fora da árvore de DOM estilizada do app (nó solto no fim do <body>), então conteúdo livre (`content`) que dependesse de herança normal de font-family (ex.: `font: inherit` num <button> dentro do content) caía pra fonte padrão do navegador — html/body não define font-family nenhuma no harness (cada componente declara a própria, ver base.css). Sintoma real: os itens de menu do 'User Card' (SideNavDemo/BackofficeTemplate) apareciam numa fonte diferente do resto da interface. Corrigido definindo font-family/font-size (texto-p) direto no `.popover` (o próprio painel), mesmo racional do fix de cor já existente em base.css pra Drawer/Modal — dá um valor padrão sensato pra QUALQUER conteúdo livre dentro do popover, sem depender de cada consumidor lembrar de declarar font-family manualmente. Conteúdo que já declara a própria fonte (ex.: StackedText, que sempre define texto-p/texto-micro) continua intacto — sobrescreve o padrão normalmente, é só um fallback pra quem não declara nada."
+  ],
+  "references": {
+    "tokensFile": "tokens/tokens.json — Cores Semânticas (Fundos, Bordas), Estrutural (raio-pp, sombra-p, espaco-pp)"
+  }
+}

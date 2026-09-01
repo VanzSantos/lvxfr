@@ -1,0 +1,91 @@
+.toast {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--espaco-pp);
+  padding: var(--espaco-m);
+  border: 1px solid transparent;
+  border-radius: var(--raio-pp);
+  box-sizing: border-box;
+  width: 360px;
+  max-width: calc(100vw - var(--espaco-gg));
+}
+
+.content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-xp);
+}
+
+.message {
+  font-family: var(--texto-m-family);
+  font-size: var(--texto-m-size);
+  font-weight: var(--texto-m-weight);
+  line-height: var(--texto-m-line-height);
+}
+
+.action {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: inherit;
+  text-decoration: underline;
+  font-family: var(--texto-rotulo-botao-family);
+  font-size: var(--texto-rotulo-botao-size);
+  font-weight: var(--texto-rotulo-botao-weight);
+  line-height: var(--texto-rotulo-botao-line-height);
+}
+
+.action:focus-visible {
+  outline: var(--foco-espessura) solid var(--borda-foco);
+  outline-offset: 2px;
+}
+
+.dismissButton {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: none;
+  border: none;
+  border-radius: var(--raio-xp);
+  cursor: pointer;
+}
+
+.dismissButton:hover {
+  background: color-mix(in srgb, currentColor 10%, transparent);
+}
+
+.dismissButton:focus-visible {
+  outline: var(--foco-espessura) solid var(--borda-foco);
+  outline-offset: 1px;
+}
+
+.info {
+  background: var(--fundo-info-forte);
+  border-color: var(--fundo-info-forte);
+  color: var(--texto-invertido);
+}
+
+.success {
+  background: var(--fundo-sucesso-forte);
+  border-color: var(--fundo-sucesso-forte);
+  color: var(--texto-invertido);
+}
+
+.warning {
+  background: var(--fundo-aviso-forte);
+  border-color: var(--fundo-aviso-forte);
+  color: var(--texto-escuro-fixo);
+}
+
+.error {
+  background: var(--fundo-erro-forte);
+  border-color: var(--fundo-erro-forte);
+  color: var(--texto-invertido);
+}

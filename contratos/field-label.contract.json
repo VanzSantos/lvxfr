@@ -1,0 +1,46 @@
+{
+  "name": "FieldLabel",
+  "originalName": "RotuloCampo",
+  "oneLiner": "Texto que nomeia um campo de formulário, com indicador opcional de obrigatório e de ajuda.",
+  "category": "display",
+  "status": "draft",
+  "whenToUse": "Todo campo de formulário precisa de um nome visível — caso padrão.",
+  "whenNotToUse": "Texto que não nomeia campo (use HelperText); texto dentro de um botão (rótulo interno ao Button).",
+  "anatomy": ["Texto do rótulo (obrigatório)", "Indicador de obrigatório — asterisco (opcional)", "Ícone de informação que dispara Tooltip (opcional)"],
+  "dependencies": ["Icon", "Tooltip"],
+  "props": [
+    { "name": "text", "type": "string", "required": true },
+    { "name": "required", "type": "boolean", "default": false, "required": false, "description": "Exibe o asterisco. É puramente decorativo/visual — a obrigatoriedade real (atributo required/aria-required) é responsabilidade de quem consome (ex.: TextField), não deste átomo." },
+    { "name": "withInfo", "type": "boolean", "default": false, "required": false },
+    { "name": "infoText", "type": "string", "required": false, "requiredWhen": "withInfo = true" },
+    { "name": "fieldId", "type": "string", "required": false, "description": "Associa o rótulo ao campo (for/htmlFor)." }
+  ],
+  "variants": ["text-only", "required", "with-info"],
+  "states": ["static"],
+  "tokensAllowed": {
+    "text": ["semantic.texto-primario", "semantic.texto-obrigatorio", "semantic.icone-secundario"],
+    "typography": ["type-style.texto-rotulo-campo"],
+    "iconSize": ["structural.icone-pequeno"]
+  },
+  "a11y": {
+    "role": "label nativa (label/htmlFor na web)",
+    "requiredAria": ["aria-label no alvo do ícone de info: 'Mais informações sobre {text}'"],
+    "keyboard": ["alvo do ícone de info participa da ordem de tabulação"],
+    "contrastMin": "WCAG AA",
+    "notes": "Asterisco não comunica obrigatoriedade sozinho — o campo associado precisa carregar required/aria-required. Tooltip do ícone de info deve abrir por foco de teclado E toque, não só hover — crítico para o público 60+."
+  },
+  "events": { "status": "não definido no contrato original" },
+  "composition": { "canContain": ["Icon", "Tooltip"], "canBeContainedBy": ["TextField"], "doNotCombine": [] },
+  "forbidden": [
+    "colocar o gatilho do ícone de info dentro do <label> junto com o texto — navegadores propagam clique de qualquer parte do label pro campo associado; se o gatilho estivesse dentro, clicar nele também focaria/ativaria o campo (efeito colateral indesejado)",
+    "tornar o ícone em si clicável — a interatividade mora no wrapper ao redor, nunca no Icon",
+    "implementar a obrigatoriedade real (required/aria-required) neste átomo — isso é responsabilidade do consumidor"
+  ],
+  "decisions": [
+    "Token de tipografia dedicado (texto-rotulo-campo), não reusa o de botão — mesmos valores hoje, mas função diferente, livre pra divergir no futuro (ex.: tema Sênior).",
+    "Cor do obrigatório usa token próprio (texto-obrigatorio), separado do token de erro — 'obrigatório' não é 'com erro'.",
+    "<label> cobre só o texto (+ asterisco); o alvo do ícone de info é um <span> irmão, fora do <label>.",
+    "Tooltip é dependência externa (via componente Tooltip) — este contrato define só o gatilho, não o balão em si."
+  ],
+  "references": { "tokensFile": "tokens/tokens.json — Cores Semânticas (texto-primario, texto-obrigatorio, icone-secundario), Tipografia Estilo (texto-rotulo-campo), Estrutural (icone-pequeno)" }
+}

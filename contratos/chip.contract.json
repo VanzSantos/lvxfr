@@ -1,0 +1,71 @@
+{
+  "name": "Chip",
+  "originalName": "Chip/Tag",
+  "oneLiner": "Elemento pequeno e interativo — selecionável (toggle, tipo filtro) e/ou removível (tag com X) — diferente do Badge, que é só exibição, nunca interativo.",
+  "category": "action",
+  "status": "draft",
+  "whenToUse": "Filtro clicável que liga/desliga (ex.: 'Ativos', 'Pendentes' numa lista), ou tag removível (ex.: item selecionado num multi-select, mostrado como chip com X pra remover).",
+  "whenNotToUse": "Rótulo/contador sem interação nenhuma (isso é Badge); ação primária de uma tela (isso é Button); grupo de abas mutuamente exclusivas navegáveis (isso é Tabs, mais estruturado que um grupo de Chips selecionáveis).",
+  "anatomy": [
+    "Cápsula (fundo, borda, raio-circular)",
+    "Texto do label — <button> quando selected é usado (toggle), <span> quando só exibição/removível",
+    "Botão de remover (X, opcional, sempre um <button> IRMÃO do label, nunca aninhado — ver decisions)"
+  ],
+  "dependencies": ["Icon"],
+  "props": [
+    { "name": "label", "type": "string", "required": true },
+    { "name": "variant", "type": "enum", "enum": ["neutral", "info", "success", "warning", "error"], "default": "neutral", "required": true, "description": "Cor de base do chip (mesmos tokens sólidos do Badge). Independente do estado selected — ver decisions sobre por que seleção não muda por variant." },
+    { "name": "selected", "type": "boolean", "required": false, "description": "Ausente = chip não é selecionável (label vira <span> estático). Presente = modo toggle: label vira <button aria-pressed>, e o chip inteiro assume o visual 'selecionado' (acao-primaria), independente da variant." },
+    { "name": "onToggle", "type": "function", "required": false, "requiredWhen": "selected é fornecido", "description": "Assinatura (nextSelected: boolean) => void." },
+    { "name": "removable", "type": "boolean", "default": false, "required": false },
+    { "name": "onRemove", "type": "function", "required": false, "requiredWhen": "removable = true", "description": "Assinatura () => void." },
+    { "name": "disabled", "type": "boolean", "default": false, "required": false }
+  ],
+  "variants": ["neutral", "info", "success", "warning", "error"],
+  "states": ["default", "selected", "disabled"],
+  "tokensAllowed": {
+    "background": ["semantic.fundo-secundario", "semantic.fundo-erro-forte", "semantic.fundo-sucesso-forte", "semantic.fundo-info-forte", "semantic.borda-aviso", "semantic.acao-primaria", "semantic.acao-inativa"],
+    "border": ["semantic.borda-base"],
+    "text": ["semantic.texto-secundario", "semantic.texto-invertido", "semantic.texto-escuro-fixo", "semantic.texto-primario", "semantic.acao-primaria-texto", "semantic.acao-inativa-texto"],
+    "radius": ["structural.raio-circular"],
+    "spacing": ["structural.espaco-xp", "structural.espaco-pp"],
+    "iconSize": ["structural.icone-pequeno"],
+    "typography": ["type-style.texto-p"]
+  },
+  "variantTokenMap": {
+    "note": "Mesma fórmula do Badge: sufixo em português concorda com Sinalização; warning→aviso é o único par não-cognato. neutral não segue a fórmula (usa fundo-secundario/texto-secundario, não um '-neutro' da Sinalização).",
+    "info": "info", "success": "sucesso", "warning": "aviso", "error": "erro"
+  },
+  "a11y": {
+    "role": "Nenhuma role própria no wrapper — <span> genérico. O label vira <button aria-pressed={selected}> quando selecionável (papel 'toggle button' nativo via aria-pressed); botão de remover é <button aria-label=\"Remover {label}\">.",
+    "requiredAria": ["aria-pressed no botão de label quando selected é usado", "aria-label ('Remover {label}') no botão de remover", "aria-disabled + disabled nativo nos dois botões quando disabled=true"],
+    "keyboard": ["Tab move entre o botão de label e o botão de remover (dois alvos de foco independentes, nunca um dentro do outro)", "Enter/Espaço ativa qualquer um dos dois botões nativos, sem reimplementação"],
+    "contrastMin": "AA como meta (mesma régua dos tons sólidos do Badge/Toast): variantes de status herdam os números já validados em badge.contract.json (success 5.56, error 5.18, warning exceção — semantic.borda-aviso + texto-primario, fundo claro com texto preto, contraste alto por natureza); selected (acao-primaria + acao-primaria-texto) é o mesmo par já usado no Button primary, contraste já implicitamente validado ali.",
+    "notes": "Altura visual do chip fica em ~32px, abaixo do piso de 44×44 já seguido em Checkbox/Radio/Switch/Button — desvio deliberado (ver decisions): chips aparecem tipicamente em grupo/linha, e inflar cada um pra 44px prejudicaria mais a leitura do conjunto do que ajudaria o toque. Compensado com espaçamento generoso entre chips (espaco-pp) pra reduzir erro de toque adjacente."
+  },
+  "events": { "status": "não definido no contrato original" },
+  "composition": {
+    "canContain": ["Icon (só dentro do botão de remover, ícone 'x')"],
+    "canBeContainedBy": ["grupos de filtro", "campos de multi-select (mostrando valores escolhidos)", "listas de tags"],
+    "doNotCombine": ["Chip dentro de Chip", "botão de remover aninhado dentro do botão de label (inválido em HTML — ver decisions, são sempre irmãos)"]
+  },
+  "forbidden": [
+    "selected sem onToggle, ou onToggle sem selected — mutuamente dependentes",
+    "removable=true sem onRemove — erro em tempo de execução",
+    "aninhar o botão de remover DENTRO do <button> do label (<button><button/></button> é HTML inválido) — sempre elementos irmãos",
+    "cor fora da whitelist de tokensAllowed pra variant/estado ativo",
+    "usar Chip como substituto de Button pra ação primária de tela"
+  ],
+  "decisions": [
+    "RESOLVIDO com o usuário — Chip suporta os dois comportamentos, independentes: selected/onToggle (modo filtro/toggle) e removable/onRemove (modo tag). Um chip pode ter só um dos dois, os dois juntos, ou nenhum (aí é só um rótulo estático, sem interação — mas nesse caso Badge provavelmente já resolve melhor, ver whenNotToUse).",
+    "RESOLVIDO com o usuário — Chip TEM variantes de cor por status (info/success/warning/error), mesmos tokens sólidos do Badge, além de neutral.",
+    "Estado selected usa um visual FIXO (acao-primaria + acao-primaria-texto, os mesmos tokens do Button variant=primary), independente da variant — decisão do agente, não perguntada de novo pra não aumentar a interferência: seleção é uma dimensão diferente de status. Um chip 'error' selecionado não vira 'mais vermelho', vira 'azul/verde de seleção' como qualquer outro chip selecionado — o mesmo padrão visual de 'isto está ativo' em todo lugar do produto, independente de qual filtro é. Se um caso real pedir seleção com cor por variant, é decisão nova.",
+    "Solução pro problema de HTML inválido (<button> dentro de <button>, quando um chip é selecionável E removível ao mesmo tempo): o wrapper é um <span> não-interativo; o label vira <button aria-pressed> SÓ quando selected é usado; o botão de remover é sempre um <button> IRMÃO, nunca aninhado. Isso preserva navegação por Tab independente pros dois controles, sem quebrar HTML nem reimplementar semântica de botão.",
+    "Sem leading icon/avatar (ex.: chip com foto pequena de um usuário) neste contrato — não foi pedido, e adicionar agora seria especular; candidato natural se surgir um caso real (ex.: chip de 'responsável' com Avatar).",
+    "Altura ~32px, abaixo do piso de 44×44 já exigido em outros controles interativos do harness — desvio deliberado por causa do padrão de uso em grupo/linha de Chips; compensado com espaçamento generoso entre eles. Documentado explicitamente em vez de simplesmente ignorar a régua de toque do resto do harness.",
+    "AJUSTADO a pedido do usuário — success/warning/error clareados um degrau, mesma mudança e mesmos tokens novos (fundo-erro-forte/fundo-sucesso-forte/fundo-aviso-forte) já aplicados no Badge (ver contratos/badge.contract.json, decisions, pro racional completo de contraste). warning é a exceção: usa semantic.texto-primario (preto) em vez de texto-invertido, tanto no label quanto no ícone 'x' do botão de remover — o mesmo fundo mais claro que falha contraste AA com texto branco (3.10:1).",
+    "AJUSTADO a pedido do usuário — warning clareado MAIS um degrau (mesma mudança do Badge, ver contratos/badge.contract.json, decisions): de fundo-aviso-forte (Amarelo-600) pra semantic.borda-aviso (Amarelo-500, já existente). Texto/ícone 'x' continuam semantic.texto-primario (preto), sem mudança. success/error e demais variantes não mudaram nesta rodada.",
+    "BUG REAL corrigido em teste no navegador (modo escuro) — mesmo bug do Badge (ver badge.contract.json, decisions, pro racional completo): variant='info' usava semantic.texto-info como fundo (vira azul claro no escuro, ilegível com texto branco por cima) — trocado pra semantic.fundo-info-forte. variant='warning' usava semantic.texto-primario como texto (vira claro no escuro, ilegível sobre o fundo amarelo que continua vivo em qualquer tema) — trocado pra semantic.texto-escuro-fixo (token novo, não muda de valor entre temas)."
+  ],
+  "references": { "tokensFile": "tokens/tokens.json — Cores Semânticas (Ações/Primárias, Fundos, Textos, Sinalização), Estrutural (raio-circular, espaco-xp/pp, icone-pequeno), Tipografia Estilo (texto-p)" }
+}

@@ -1,0 +1,147 @@
+{
+  "name": "Radio",
+  "originalName": "Radio",
+  "oneLiner": "Controle de formulário para escolher exatamente 1 entre N opções mutuamente exclusivas.",
+  "category": "data-entry",
+  "status": "draft",
+  "whenToUse": "Usuário precisa escolher exatamente uma opção entre um grupo pequeno e visível de alternativas (2 a ~6). Radios do mesmo grupo compartilham o atributo name — é isso que dá a exclusividade mútua e a navegação por seta do teclado nativamente, sem JS extra.",
+  "whenNotToUse": "Mais de uma opção pode estar marcada ao mesmo tempo (use Checkbox); lista longa de opções (considerar Select, a construir); só 2 opções onde uma delas é o estado 'desligado' de uma configuração instantânea (considerar Switch, fora deste harness por enquanto).",
+  "anatomy": [
+    "<label> envolvendo a linha inteira (clicar em qualquer parte — círculo ou texto — seleciona, associação nativa via htmlFor/id)",
+    "Círculo externo (borda, raio-circular)",
+    "Círculo interno preenchido (só quando checked)",
+    "Texto do rótulo"
+  ],
+  "dependencies": [],
+  "props": [
+    {
+      "name": "checked",
+      "type": "boolean",
+      "required": true,
+      "description": "Campo controlado. Quem decide qual radio do grupo está marcado é o consumidor (não existe RadioGroup neste harness ainda — ver decisions)."
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "Sempre visível — mesma decisão do Checkbox."
+    },
+    {
+      "name": "value",
+      "type": "string",
+      "required": true,
+      "description": "Valor nativo do <input type=\"radio\">, usado em submit de formulário e no onChange."
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "required": true,
+      "description": "Obrigatório (diferente do Checkbox, onde é opcional) — é o que agrupa radios pro navegador tratar como mutuamente exclusivos e navegáveis por seta. Radio sem name é praticamente inútil."
+    },
+    {
+      "name": "state",
+      "type": "enum",
+      "enum": [
+        "default",
+        "error",
+        "disabled"
+      ],
+      "default": "default",
+      "required": false,
+      "description": "error existe pensando num futuro RadioGroup aplicar a mesma aparência a todas as opções do grupo — um Radio isolado raramente decide sozinho que está 'errado'."
+    },
+    {
+      "name": "onChange",
+      "type": "function",
+      "required": false,
+      "description": "Assinatura (value: string) => void, chamada só quando ESTE radio passa a ser o marcado (radios que perdem a marcação não dísparam — mesmo comportamento nativo do navegador)."
+    }
+  ],
+  "variants": [],
+  "states": [
+    "default",
+    "error",
+    "disabled"
+  ],
+  "tokensAllowed": {
+    "background": [
+      "semantic.fundo-superficie",
+      "semantic.acao-inativa",
+      "semantic.fundo-campo"
+    ],
+    "border": [
+      "semantic.borda-base",
+      "semantic.borda-foco",
+      "semantic.borda-erro",
+      "semantic.borda-inativo"
+    ],
+    "dotColor": [
+      "semantic.acao-primaria",
+      "semantic.icone-inativo"
+    ],
+    "text": [
+      "semantic.texto-primario",
+      "semantic.texto-inativo"
+    ],
+    "radius": [
+      "structural.raio-circular"
+    ],
+    "focusRing": [
+      "structural.foco-espessura"
+    ],
+    "spacing": [
+      "structural.espaco-pp"
+    ],
+    "typography": [
+      "type-style.texto-m"
+    ]
+  },
+  "a11y": {
+    "role": "radio nativo (<input type=\"radio\">) — sem role ARIA explícita, o navegador já expõe checked e a navegação por seta a partir do name compartilhado",
+    "requiredAria": [
+      "aria-invalid quando state=error"
+    ],
+    "keyboard": [
+      "Espaço marca o radio focado",
+      "setas do teclado movem a marcação entre radios do mesmo name — comportamento nativo, não reimplementado",
+      "disabled sai da ordem de tabulação"
+    ],
+    "contrastMin": "AAA (7:1) como meta pro público 60+, mesma régua do Checkbox/Button/TextField.",
+    "notes": "Alvo de toque mínimo 44×44px (igual Checkbox) — a área clicável real é o <label> inteiro. Foco nunca só cor. Foco + erro: erro vence (mesma regra do TextField/Checkbox, aplicada por consistência)."
+  },
+  "events": {
+    "status": "não definido no contrato original"
+  },
+  "composition": {
+    "canContain": [],
+    "canBeContainedBy": [
+      "formulários",
+      "grupos de opções (mesmo name)"
+    ],
+    "doNotCombine": [
+      "radios do mesmo grupo lógico com name diferente — quebra a exclusividade mútua nativa"
+    ]
+  },
+  "forbidden": [
+    "Radio sem name — perde a exclusividade mútua e a navegação por seta nativas do navegador",
+    "Radio sem label visível — mesma regra do Checkbox",
+    "reimplementar a exclusividade mútua via JS (onChange desmarcando os outros manualmente) quando um name compartilhado já resolveria nativamente",
+    "onChange com assinatura diferente de (value: string) => void",
+    "cor crua fora da whitelist de tokensAllowed"
+  ],
+  "decisions": [
+    "Sem RadioGroup neste contrato: um Radio isolado não gerencia value selecionado, role=radiogroup ou navegação — isso é responsabilidade de um componente futuro (RadioGroup), candidato natural quando surgir um caso de uso real de 'escolher 1 entre N' options. Construir RadioGroup especulativamente agora, sem esse caso, contrariaria o mesmo princípio que levou o Card a ficar genérico sem slots fixos.",
+    "name é obrigatório (diferente do Checkbox, onde é opcional) — sem ele, múltiplos Radios na mesma tela não têm como o navegador saber que pertencem ao mesmo grupo; a exclusividade mútua depende inteiramente disso.",
+    "state=error existe no contrato mesmo sem RadioGroup, pensando em quando ele existir: nesse momento, RadioGroup provavelmente vai repassar o mesmo state pra todos os radios do grupo. Um Radio isolado decidir sozinho que está errado é raro, mas a prop já fica pronta em vez de precisar voltar depois e mexer no contrato de novo.",
+    "Sem dependência de HelperText (diferente do Checkbox): erro/ajuda em radios tipicamente é do GRUPO inteiro ('selecione uma opção'), não de uma opção isolada — cabe a um futuro RadioGroup montar o HelperText uma vez, não a cada Radio repetir a mesma mensagem.",
+    "Sem dependência de Icon: o 'dot' interno de seleção é só uma cor de fundo (semantic.acao-primaria) num círculo menor — não precisa de nenhum glifo do Phosphor.",
+    "raio-circular (9999) pro círculo externo e interno — reaproveita token estrutural existente, mesmo family de decisão do Checkbox usar raio-xp.",
+    "Alvo de toque 44×44px com o círculo visual em structural.icone-medio (20px) centralizado — mesma decisão do Checkbox, mesmo motivo (público 60+).",
+    "Borda fixa em 2px — não é token, mesma constante não-tokenizada usada no Checkbox/Spinner.",
+    "Erro + foco: erro vence visualmente — mesma regra já fixada em text-field.contract.json/checkbox.contract.json, aplicada aqui por consistência.",
+    "AJUSTADO a pedido do usuário — fundo do campo trocado de semantic.fundo-superficie pra semantic.fundo-campo (token novo): 'o fundo dos inputs de forma geral, devem ser levemente mais escuros que a cor de fundo da página onde estão, para destacar melhor'. No modo claro fundo-campo é idêntico a fundo-superficie (sem mudança visual, branco com borda já bastava) — só no modo escuro os dois valores divergem (fundo-campo um degrau mais escuro que a página), porque era só ali que o campo ficava indistinguível da própria página por trás."
+  ],
+  "references": {
+    "tokensFile": "tokens/tokens.json — Cores Semânticas (Ações/Primárias, Bordas, Fundos, Textos), Estrutural (raio-circular, foco-espessura, espaco-pp, icone-medio), Tipografia Estilo (texto-m)"
+  }
+}

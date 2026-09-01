@@ -1,0 +1,28 @@
+.wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espaco-xp);
+}
+
+.label {
+  font-family: var(--texto-rotulo-campo-family);
+  font-size: var(--texto-rotulo-campo-size);
+  font-weight: var(--texto-rotulo-campo-weight);
+  line-height: var(--texto-rotulo-campo-line-height);
+  color: var(--texto-primario);
+}
+
+.required {
+  color: var(--texto-obrigatorio);
+}
+
+.infoTrigger {
+  display: inline-flex;
+  cursor: help;
+  border-radius: var(--raio-pp);
+}
+
+.infoTrigger:focus-visible {
+  outline: var(--foco-espessura) solid var(--borda-foco);
+  outline-offset: 1px;
+}

@@ -1,0 +1,241 @@
+{
+  "name": "TextField",
+  "originalName": "Entrada",
+  "oneLiner": "Campo de texto de formulário, com rótulo, mensagem de apoio, ícones internos e estados.",
+  "category": "data-entry",
+  "status": "draft",
+  "whenToUse": "Usuário precisa digitar um valor de texto curto (nome, e-mail, etc.).",
+  "whenNotToUse": "Texto longo e multilinha (use Textarea, a construir); escolha entre opções pré-definidas (use Select, a construir); valor booleano (use Checkbox/Radio, fora deste harness).",
+  "anatomy": [
+    "FieldLabel (em cima)",
+    "Container do campo (fundo, borda, texto/placeholder)",
+    "Ícone interno esquerdo (opcional, leftIcon)",
+    "Ícone interno direito (opcional, rightIcon)",
+    "HelperText (embaixo, opcional)",
+    "Botão de alternância mostrar/ocultar senha (só quando type=password, substitui o rightIcon)",
+    "Prefixo fixo '+55' (DDI), não-editável, separado por borda vertical (só quando type='tel' e showCountryCode=true, entre o leftIcon opcional e o input)"
+  ],
+  "dependencies": [
+    "FieldLabel",
+    "HelperText",
+    "Icon",
+    "Tooltip"
+  ],
+  "props": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "required",
+      "type": "boolean",
+      "default": false,
+      "required": false
+    },
+    {
+      "name": "withInfo",
+      "type": "boolean",
+      "default": false,
+      "required": false
+    },
+    {
+      "name": "infoText",
+      "type": "string",
+      "required": false,
+      "requiredWhen": "withInfo = true"
+    },
+    {
+      "name": "placeholder",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "value",
+      "type": "string",
+      "required": false,
+      "description": "Campo controlado."
+    },
+    {
+      "name": "state",
+      "type": "enum",
+      "enum": [
+        "default",
+        "focus",
+        "error",
+        "disabled",
+        "readOnly"
+      ],
+      "default": "default",
+      "required": false
+    },
+    {
+      "name": "helperText",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "leftIcon",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "rightIcon",
+      "type": "string",
+      "required": false,
+      "description": "Ignorado quando type=password — o slot direito vira o toggle de mostrar/ocultar (ver decisions)."
+    },
+    {
+      "name": "onChange",
+      "type": "function",
+      "required": false
+    },
+    {
+      "name": "type",
+      "type": "enum",
+      "enum": [
+        "text",
+        "email",
+        "password",
+        "tel",
+        "number",
+        "url",
+        "cpf"
+      ],
+      "default": "text",
+      "required": false,
+      "description": "Adicionado após o contrato original não prever mascaramento de valor. Atributo nativo do <input>; quando 'password', o campo sempre embute o toggle de mostrar/ocultar (ver decisions). Quando 'tel', o campo aplica máscara automática de telefone brasileiro (ver decisions). Quando 'cpf', aplica máscara automática de CPF (000.000.000-00) — 'cpf' NÃO é um type nativo de <input>, renderiza como type='text' por baixo (mesmo racional de 'tel', que é nativo, mas com um formato que o HTML não tem) — 'number'/'url' continuam só repassando o atributo type nativo, sem mascaramento (nenhum caso de uso real pediu isso ainda)."
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "required": false,
+      "description": "Adicionado após o contrato original: nome do campo pro form nativo (submit, autofill)."
+    },
+    {
+      "name": "autoComplete",
+      "type": "string",
+      "required": false,
+      "description": "Adicionado após o contrato original: valor do atributo autocomplete nativo (ex.: 'username', 'current-password')."
+    },
+    {
+      "name": "showCountryCode",
+      "type": "boolean",
+      "required": false,
+      "default": false,
+      "description": "Só se aplica com type='tel'. true = mostra o prefixo fixo '+55' (DDI) à esquerda do número mascarado, separado por uma borda vertical. false (padrão) = só o número mascarado, sem DDI. Cobre os dois casos reais: formulário nacional (sem DDI) e formulário que precisa deixar explícito o código do país."
+    }
+  ],
+  "variants": [
+    "no-icon",
+    "left-icon",
+    "right-icon",
+    "both-icons",
+    "password",
+    "phone",
+    "cpf"
+  ],
+  "states": [
+    "default",
+    "focus",
+    "error",
+    "disabled",
+    "readOnly"
+  ],
+  "tokensAllowed": {
+    "background": [
+      "semantic.fundo-superficie",
+      "semantic.fundo-secundario",
+      "semantic.fundo-campo"
+    ],
+    "border": [
+      "semantic.borda-base",
+      "semantic.borda-foco",
+      "semantic.borda-erro",
+      "semantic.borda-inativo"
+    ],
+    "text": [
+      "semantic.texto-primario",
+      "semantic.texto-placeholder",
+      "semantic.texto-inativo",
+      "semantic.texto-secundario"
+    ],
+    "radius": [
+      "structural.raio-pp"
+    ],
+    "focusRing": [
+      "structural.foco-espessura"
+    ],
+    "spacing": [
+      "structural.espaco-xp"
+    ],
+    "iconSize": [
+      "structural.icone-medio"
+    ],
+    "iconColor": [
+      "semantic.icone-secundario",
+      "semantic.icone-inativo"
+    ],
+    "typography": [
+      "type-style.texto-m"
+    ]
+  },
+  "a11y": {
+    "role": "textbox nativo",
+    "requiredAria": [
+      "aria-required quando required=true",
+      "aria-invalid quando state=error",
+      "readonly quando state=readOnly"
+    ],
+    "keyboard": [
+      "foco nativo do <input>, mas o anel visual usa :focus-within no container inteiro (ícones inclusos)"
+    ],
+    "contrastMin": "WCAG AA em todas as combinações texto/fundo, incluindo placeholder",
+    "notes": "Foco nunca só cor — combina cor + espessura visível (foco-espessura), perceptível por quem tem daltonismo. Quando focado E com erro simultaneamente, o erro vence visualmente: borda em semantic.borda-erro E o anel de foco também assume semantic.borda-erro (não fica verde) — reforça que o problema tem prioridade sobre o indicador de foco padrão. [decisão adicionada após teste de determinismo: 1 de 3 gerações já implementou assim, as outras 2 mantinham o anel verde — fechando aqui pra eliminar a ambiguidade]. readOnly mantém texto legível (texto-primario) e recebe foco — diferente de disabled (texto-inativo, sai da navegação). O container (não o <input>) deve usar :focus-within nativo do CSS para o anel — não reimplementar com estado React (onFocus/onBlur) salvo se houver razão técnica concreta para isso. O toggle de mostrar/ocultar senha é um <button type='button'> real com aria-label ('Mostrar senha'/'Ocultar senha') e aria-pressed refletindo o estado — o Icon dentro dele permanece decorativo (aria-hidden), a interatividade mora só no botão, nunca no Icon (consistente com o forbidden de icon.contract.json)."
+  },
+  "events": {
+    "status": "não definido no contrato original"
+  },
+  "composition": {
+    "canContain": [
+      "FieldLabel",
+      "HelperText",
+      "Icon"
+    ],
+    "canBeContainedBy": [
+      "formulários"
+    ],
+    "doNotCombine": []
+  },
+  "forbidden": [
+    "comunicar obrigatoriedade só pelo asterisco do FieldLabel, sem aria-required no input",
+    "comunicar erro só pela borda vermelha, sem aria-invalid + texto explicando",
+    "state=readOnly usando a cor de texto de disabled",
+    "gerar/receber ids manualmente fora do padrão — ver decisão de useId abaixo",
+    "usar semantic.texto-secundario (ou qualquer token fora de iconColor) para os ícones internos leftIcon/rightIcon",
+    "passar o nome do token como string literal (ex.: 'semantic.icone-secundario') no lugar de um valor CSS de verdade (ex.: var(--icone-secundario)) — o token precisa resolver pra uma cor real, não ficar como texto",
+    "reimplementar FieldLabel, HelperText, Icon ou Tooltip inline dentro do TextField — se o arquivo do átomo não estiver disponível no contexto, peça o contrato/arquivo em vez de recriar do zero (recriar do zero já causou pelo menos uma violação real: um átomo decidindo sozinho se renderiza, contrariando a decisão registrada)"
+  ],
+  "decisions": [
+    "leftIcon e rightIcon são independentes e combináveis: dá pra ter só um dos dois ou os dois ao mesmo tempo (variant 'both-icons') — não é preciso escolher um lado só. Documentado explicitamente aqui porque só estava implícito na lista de variants.",
+    "borda-base corrigido: apontava para cinza-800 (escuro demais) e estava invertido com borda-forte — agora aponta pro tom discreto correto.",
+    "borda-foco corrigido: apontava para um cinza quase invisível — agora aponta pro verde-600 da marca.",
+    "Foco + erro: erro vence (borda vermelha), mas o anel de foco continua visível.",
+    "texto-placeholder é um token próprio (cinza-500), mais legível que texto-inativo.",
+    "TextField gera seu próprio id via useId e conecta tudo internamente (htmlFor no FieldLabel, aria-describedby no input apontando pro id derivado do HelperText) — quem usa TextField nunca lida com ids.",
+    "FieldLabel/HelperText só são montados quando há conteúdo (sem label, não renderiza; sem helperText, não renderiza).",
+    "Espaçamento vertical entre rótulo/campo/mensagem: espaco-xp (4px) — não estava especificado, escolhido por ser o menor degrau da escala.",
+    "Altura fixa 44px — padrão de acessibilidade de toque, confortável para o público 60+; mesma altura do Button para alinhar em formulários.",
+    "type=password NÃO virou um componente separado (ex.: 'PasswordField'): a única diferença real é o slot direito (toggle em vez de ícone estático) e o atributo type do <input> alternando entre 'password'/'text' — não há anatomia, token ou estado novo o suficiente pra justificar um contrato à parte. Reavaliar só se surgir um requisito que TextField genuinamente não cubra (ex.: indicador de força de senha).",
+    "type=password sempre sobrepõe rightIcon — não dá pra combinar um rightIcon custom com o toggle no mesmo campo. Se isso virar necessário, é decisão nova, não implícita.",
+    "type/name/autoComplete adicionados retroativamente (não estavam no contrato original) para viabilizar mascaramento de senha e autofill do navegador — sinalizado, não decidido em silêncio.",
+    "AJUSTADO a pedido do usuário — type='tel' agora aplica máscara automática de telefone brasileiro (formato progressivo: (DD) DDDD-DDDD pra 10 dígitos/fixo, (DD) DDDDD-DDDD pra 11 dígitos/celular — o split muda de 4 pra 5 dígitos assim que o 9º dígito do número é digitado). Lógica extraída pra src/components/shared/phoneMask.ts, mesmo racional de reaproveitamento já usado em dateTimeMask.ts pros pickers de data/hora — evita duplicar a função onlyDigits e a lógica de máscara caso outro componente precise formatar telefone no futuro.",
+    "AJUSTADO a pedido do usuário — nova prop 'showCountryCode' (só com type='tel') mostra um prefixo fixo '+55', não-editável, à esquerda do número. NÃO é um seletor de país completo com lista/bandeira/código dinâmico — o harness inteiro já assume locale fixo pt-BR/Brasil em todo lugar que lida com formato (DatePicker sempre DD/MM/AAAA, Calendar sempre locale pt-BR), então um DDI fixo '+55' é consistente com essa decisão já tomada, não uma escolha nova. Se aparecer um caso real de formulário multi-país, é decisão nova (provavelmente um componente PhoneField dedicado, não uma prop a mais aqui).",
+    "Telefone mascarado permanece o próprio 'value' do campo (a string já formatada com parênteses/traço), não um valor 'limpo' por trás de bastidores — mesma escolha de superfície simples já usada no restante do TextField (o campo é 100% controlado e devolve exatamente o que está mostrando, sem um segundo formato paralelo pro consumidor gerenciar). Quem precisar só dos dígitos aplica o próprio replace(/\\D/g, '') no value recebido.",
+    "AJUSTADO a pedido do usuário — fundo do campo trocado de semantic.fundo-superficie pra semantic.fundo-campo (token novo): 'o fundo dos inputs de forma geral, devem ser levemente mais escuros que a cor de fundo da página onde estão, para destacar melhor'. No modo claro fundo-campo é idêntico a fundo-superficie (sem mudança visual, branco com borda já bastava) — só no modo escuro os dois valores divergem (fundo-campo um degrau mais escuro que a página), porque era só ali que o campo ficava indistinguível da própria página por trás.",
+    "EXTENSÃO — nova opção type='cpf', motivada pelo redesenho do LoginScreen (padrão real dos produtos do usuário: campo de identificação por CPF, mascarado 000.000.000-00). Mesmo racional e mesma técnica já estabelecidos por type='tel': lógica extraída pra src/components/shared/cpfMask.ts (mesmo padrão de phoneMask.ts/dateTimeMask.ts — nunca duplicar a função onlyDigits), aplica só dígitos e insere pontuação progressivamente conforme o usuário digita (sem exigir um separador manual). CPF não é um type nativo de <input> (diferente de 'tel', que É nativo) — renderiza como type='text' por baixo, com inputMode='numeric' pra teclado numérico em telas touch, mesmo comportamento visual de 'tel' nesse quesito. Sem validação de dígito verificador (algoritmo de CPF válido) nesta v1 — TextField mascara o FORMATO, não valida se o número é um CPF real; validação de conteúdo é responsabilidade de quem consome (ex.: no submit do formulário), mesma fronteira já estabelecida pro resto do harness (Checkbox 'required' não valida se marcado É a resposta certa, só que foi marcado)."
+  ],
+  "references": {
+    "tokensFile": "tokens/tokens.json — Cores Semânticas (Fundos, Bordas, Textos), Estrutural (raio-pp, foco-espessura, espaco-xp, icone-medio), Tipografia Estilo (texto-m)"
+  }
+}

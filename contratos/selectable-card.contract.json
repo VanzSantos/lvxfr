@@ -1,0 +1,78 @@
+{
+  "name": "SelectableCard",
+  "originalName": "CartaoSelecionavel",
+  "oneLiner": "Cartão radio-selecionável rico — título, descrição, preço opcional e um Badge de destaque opcional, com o cartão inteiro (não só um círculo pequeno) funcionando como alvo de clique/seleção.",
+  "category": "data-entry",
+  "status": "draft",
+  "whenToUse": "Escolher 1 entre N opções ricas e comparáveis, cada uma com informação suficiente (nome, descrição, preço) pra justificar um cartão inteiro em vez de uma linha de Radio simples — ex.: seleção de plano/produto num fluxo de venda, onde comparar preço/benefício lado a lado importa. Padrão identificado na análise de sistemas legados (analise-sistemas-legados.md, item 1.2).",
+  "whenNotToUse": "Lista de opções só com texto curto, sem preço/descrição rica (isso é RadioGroup, mais compacto); mais de uma opção pode ficar marcada ao mesmo tempo (isso é Checkbox/Chip selecionável, não um grupo radio); a opção não precisa de comparação visual lado a lado (um Select já resolve com menos espaço).",
+  "anatomy": [
+    "Cartão (fundo, borda, raio-pp) — o próprio <label> que envolve o input radio real (mesma técnica de Radio: input visualmente oculto mas focável/lido, sr-only)",
+    "Cabeçalho — círculo indicador de seleção (esquerda) + Badge de destaque opcional (direita, ex.: 'Padrão'/'Promocional'/'Black'/'Infinite')",
+    "Título (negrito)",
+    "Descrição opcional (texto secundário, uma ou duas linhas curtas)",
+    "Preço opcional (texto grande/negrito, embaixo)"
+  ],
+  "dependencies": ["Badge"],
+  "props": [
+    { "name": "checked", "type": "boolean", "required": true, "description": "Se este cartão é a opção atualmente selecionada do grupo. Controlado, mesmo padrão de Radio." },
+    { "name": "name", "type": "string", "required": true, "description": "Nome do grupo radio nativo — todos os SelectableCard do mesmo grupo compartilham o mesmo name, mesmo padrão de Radio/RadioGroup." },
+    { "name": "value", "type": "string", "required": true, "description": "Valor deste cartão, repassado pro onChange quando selecionado." },
+    { "name": "title", "type": "string", "required": true, "description": "Nome da opção (ex.: 'MedSênior Black')." },
+    { "name": "onChange", "type": "function", "required": false, "description": "Assinatura (value: string) => void. Ausente só faz sentido em contextos de puro display (sem interação real) — mesmo racional de Radio." },
+    { "name": "description", "type": "string", "required": false, "description": "Descrição curta da opção (ex.: 'Ambulatorial e hospitalar, sem obstetrícia')." },
+    { "name": "price", "type": "string", "required": false, "description": "Valor já formatado pra exibição (ex.: 'R$ 000,00'). SelectableCard não formata número nenhum, mesmo racional de DataField.value." },
+    { "name": "badgeLabel", "type": "string", "required": false, "description": "Texto do Badge de destaque opcional no canto superior direito (ex.: 'Promocional', 'Black'). Ausente = nenhum Badge é renderizado." },
+    { "name": "badgeVariant", "type": "BadgeVariant", "required": false, "default": "neutral", "description": "Variant do Badge de destaque — reaproveita o enum já definido em badge.contract.json, sem redefinir aqui. Só tem efeito quando badgeLabel está presente." },
+    { "name": "state", "type": "enum", "enum": ["default", "disabled"], "default": "default", "required": false },
+    { "name": "selectedTone", "type": "enum", "enum": ["dark", "primary", "accent1", "accent2", "accent3", "info"], "default": "dark", "required": false, "description": "Cor de fundo sólido do cartão quando checked=true. dark (padrão) = fundo-invertido/preto, o comportamento original. primary = acao-primaria (verde, a cor de ação principal do harness). accent1/2/3 = kiwi/roxo/laranja (mesma paleta de accent do Badge). info = azul (texto-info). Só tem efeito com checked=true — não muda nada no estado não selecionado (ver decisions)." }
+  ],
+  "variants": [],
+  "states": ["default", "checked", "disabled", "focus"],
+  "tokensAllowed": {
+    "background": ["semantic.fundo-superficie", "semantic.fundo-invertido", "semantic.acao-primaria", "semantic.borda-apoio-3", "semantic.fundo-apoio-1-forte", "semantic.fundo-apoio-2-forte", "semantic.texto-info"],
+    "border": ["semantic.borda-base", "semantic.acao-primaria", "semantic.fundo-invertido", "semantic.borda-foco"],
+    "text": ["semantic.texto-primario", "semantic.texto-secundario", "semantic.texto-invertido", "semantic.acao-primaria-texto"],
+    "focusRing": ["structural.foco-espessura"],
+    "radius": ["structural.raio-pp", "structural.raio-circular"],
+    "spacing": ["structural.espaco-xp", "structural.espaco-p"],
+    "iconSize": ["structural.icone-medio"],
+    "typography": ["type-style.texto-m-forte", "type-style.texto-p", "type-style.texto-g-forte"]
+  },
+  "a11y": {
+    "role": "input nativo type=\"radio\", visualmente oculto (técnica sr-only, mesma de Radio) mas real pro teclado/leitor de tela — o <label> visível (o cartão inteiro) é o alvo de clique, clicar em qualquer parte do cartão ativa o radio por comportamento nativo de <label for>.",
+    "requiredAria": ["nenhuma aria custom — o <input type='radio'> nativo já expõe checked/name/value corretamente sozinho, sem necessidade de role/aria-checked manuais"],
+    "keyboard": ["Tab entra/sai do GRUPO de cards (comportamento nativo de radio: só o marcado, ou o primeiro, é parte da ordem de tabulação)", "setas do teclado movem a marcação entre os cards do mesmo name — comportamento nativo do input radio, não reimplementado", "Espaço/clique marca o card focado"],
+    "contrastMin": "AAA — texto-primario sobre fundo-superficie (não selecionado) e texto-invertido sobre fundo-invertido (selecionado), os dois pares de maior contraste já validados no harness (mesmos usados em Badge variant='dark').",
+    "notes": "O anel de foco (outline) aparece no cabeçalho/título do cartão quando o input interno recebe foco via teclado (seletor `:focus-visible ~`), não no card inteiro como borda — evita um anel de foco duplicado/confuso sobre o próprio fundo escuro do estado selecionado."
+  },
+  "events": { "status": "não definido no contrato original" },
+  "composition": {
+    "canContain": ["Badge"],
+    "canBeContainedBy": ["formulários de seleção de plano/produto", "grades de comparação (grid de N SelectableCard lado a lado)"],
+    "doNotCombine": ["SelectableCard dentro de SelectableCard", "SelectableCard fora de um grupo (mesmo name) com mais de 1 opção — pra uma opção só, um Checkbox ou confirmação simples resolve melhor"]
+  },
+  "forbidden": [
+    "checked sem name/value/title — os 4 sempre juntos, mesmo padrão de obrigatoriedade de Radio",
+    "mais de um SelectableCard do mesmo name com checked=true simultaneamente — quem consome garante isso, mesmo racional de radio nativo (o browser já impede via name compartilhado, mas o estado controlado precisa refletir isso)",
+    "onClick customizado no <label> por fora do fluxo do input — toda a interatividade passa pelo input radio nativo, não por um handler solto no container",
+    "cor fora da whitelist de tokensAllowed",
+    "reimplementar Badge inline em vez de reaproveitar o átomo"
+  ],
+  "decisions": [
+    "Nasceu da análise de sistemas legados (analise-sistemas-legados.md, item 1.2) — cartão de seleção de plano no fluxo de venda do corretor, com badge+preço+estado selecionado com fundo escuro sólido.",
+    "Reaproveita a MESMA técnica de input nativo sr-only + <label> visual que Radio já usa (ver radio.contract.json) — SelectableCard não é um componente do zero, é o mesmo padrão de acessibilidade aplicado a um layout de cartão rico em vez de uma linha simples. Motivo: reimplementar seleção radio com aria-checked manual + roving tabindex do zero recriaria um bug de acessibilidade já resolvido pelo próprio <input type='radio'> nativo — nenhuma vantagem real em não reaproveitar.",
+    "SelectableCard é o componente INDIVIDUAL (como Radio), não um 'SelectableCardGroup' — quem consome monta a grade de N cards com o mesmo name, mesmo racional de Radio existir solto e RadioGroup ser uma molécula separada opcional. Não construímos um Group agora porque o layout real observado (grid responsivo, geralmente 3-4 colunas) varia bastante caso a caso — um Group prematuro arriscaria impor um layout que não bate com o próximo caso de uso real. Se aparecer necessidade clara de um wrapper (ex.: repetir a mesma grade de 4 colunas em 3+ lugares), é decisão nova.",
+    "Estado selecionado por padrão (selectedTone='dark') usa fundo-invertido (o mesmo 'quase-preto' que Badge variant='dark' e Tooltip já usam) + texto-invertido — reaproveita o par de maior contraste já validado no harness, em vez de introduzir uma cor de 'seleção' nova. Reflete fielmente o visual observado nos prints legados (cartão selecionado com fundo escuro sólido). Ver decision abaixo sobre selectedTone pra outras cores.",
+    "badgeLabel/badgeVariant são props FLAT (não um objeto { label, variant }) — SelectableCard renderiza só 1 Badge por cartão (não uma lista), então o padrão de objeto único usado em componentes com N itens (ex.: DatatableColumn, TimelineItem) não se aplica aqui; props flat são mais diretas pra um valor único.",
+    "description e price são opcionais e independentes — um SelectableCard pode ter só título (caso mínimo), só título+preço, ou os 3 juntos. Nenhum força a presença do outro, porque nem todo caso de seleção de opção tem preço (ex.: pode ser usado fora de fluxo de venda, pra qualquer 'escolha rica' comparável).",
+    "Preço em type-style.texto-g-forte (18px/700) — maior que o título (texto-m-forte, 16px/700) porque nos prints legados o preço é o dado mais escaneável do cartão (o que a pessoa está comparando entre as opções), reforçado por tamanho.",
+    "circle (indicador de seleção) reaproveita as mesmas cores/proporções do círculo do Radio (border 2px, dot 10px, acao-primaria quando marcado) no estado NÃO selecionado — mas no estado selecionado, o círculo usa currentColor em vez de acao-primaria fixo, pra acompanhar automaticamente a cor de texto de qualquer selectedTone (ver decision abaixo) sem precisar repetir uma regra de cor por tom.",
+    "AJUSTADO a pedido do usuário — nova prop 'selectedTone' (dark/primary/accent1/accent2/accent3/info), pra escolher a cor de fundo do cartão quando checked=true, em vez de fundo-invertido fixo. Pedido explícito: 'no estado selecionado deve ser possível escolher a cor do fundo, entre verde (a cor principal), preto, kiwi, azul, etc'. Mapeamento: dark=fundo-invertido (preto, o default original), primary=acao-primaria (verde principal, com acao-primaria-texto branco — mesmo par já usado no Button variant=primary), accent1=borda-apoio-3 (kiwi, com texto-primario preto — kiwi-500 falha contraste com texto branco, mesma exceção já documentada em Badge accent1), accent2=fundo-apoio-1-forte (roxo), accent3=fundo-apoio-2-forte (laranja), info=texto-info (azul) — os 3 últimos com texto-invertido. Nenhum token novo criado: os 6 tons reaproveitam exatamente os mesmos tokens já usados no Badge (accent1/2/3, info) e no Button (acao-primaria/acao-primaria-texto), mantendo a paleta de 'fundo sólido + texto contrastante' consistente entre os componentes do harness. Implementado via classes CSS '.tone*' que definem background+color (texto/círculo herdam color via currentColor), aplicadas só junto de .checked — selectedTone não tem efeito nenhum no estado não selecionado.",
+    "selectedTone NÃO reaproveita o enum BadgeVariant diretamente (apesar da sobreposição de nomes accent1/2/3/info) — são dois conceitos parecidos mas não idênticos: Badge tem 10 variantes (incluindo status como success/warning/error/critical, que não fazem sentido como 'cor de card selecionado' — um cartão de plano selecionado não está 'com erro' ou 'em aviso'), e SelectableCard precisava de 'primary' (verde-ação), que não existe no Badge. Definido um enum próprio (SelectableCardTone) só com os tons que fazem sentido como preenchimento de card inteiro.",
+    "AJUSTADO a pedido do usuário — quando badgeVariant é da MESMA família de cor que selectedTone (dark↔dark, accent1↔accent1, accent2↔accent2, accent3↔accent3, info↔info — 'primary' nunca colide, não existe BadgeVariant equivalente) E o cartão está checked, o Badge passa inverted=true automaticamente (nova prop do Badge, ver contratos/badge.contract.json, decisions) — o Badge troca de fundo sólido pra fundo claro + texto na cor da seleção, em vez de ficar 'invisível' contra um fundo da própria cor. Pedido explícito: 'quando a cor do fundo selecionado for a mesma cor da tag... a tag deve assumir o fundo branco e o texto ficar na cor da seleção (mas em um tom melhor de contraste)'. Comparação feita por EQUIVALÊNCIA DE FAMÍLIA (mapa fixo SelectableCardTone→BadgeVariant), não por igualdade de string — badgeVariant='accent2' e selectedTone='accent2' são a mesma família (roxo) mesmo sendo enums tecnicamente diferentes. A detecção e a troca de aparência são inteiramente responsabilidade da prop `inverted` do Badge (SelectableCard só decide QUANDO usá-la) — mantém a lógica de 'como fica um badge invertido' centralizada num só lugar, reaproveitável por qualquer outro consumidor do Badge que precise do mesmo ajuste no futuro.",
+    "AJUSTADO a pedido do usuário — 'a cor de fundo do StatCard selecionado padrão, ainda está azulada' (referência ao tom dark/preto padrão de selectedTone, o mais provável de ter sido testado). Nenhuma mudança de código aqui: fundo-invertido (reaproveitado por selectedTone='dark') foi neutralizado direto em tokens.css (era azul-ardósia #111827, virou #111111) — resolve automaticamente qualquer consumidor que reaproveite esse token, sem precisar tocar em cada componente."
+  ],
+  "references": { "tokensFile": "tokens/tokens.json — Cores Semânticas (Fundos incluindo Apoio-1/2/3, Bordas, Textos incluindo Info, Ações/Primária), Estrutural (raio-pp/circular, foco-espessura, espaco-xp/p, icone-medio), Tipografia Estilo (texto-m-forte, texto-p, texto-g-forte)" }
+}
+

@@ -1,0 +1,15 @@
+.helperText {
+  display: block;
+  font-family: var(--texto-p-family);
+  font-size: var(--texto-p-size);
+  font-weight: var(--texto-p-weight);
+  line-height: var(--texto-p-line-height);
+}
+
+.default {
+  color: var(--texto-secundario);
+}
+
+.error {
+  color: var(--texto-erro);
+}

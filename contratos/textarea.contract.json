@@ -1,0 +1,209 @@
+{
+  "name": "Textarea",
+  "originalName": "AreaTexto",
+  "oneLiner": "Campo de texto de formulário multi-linha, com rótulo, mensagem de apoio e estados — mesma família visual do TextField.",
+  "category": "data-entry",
+  "status": "draft",
+  "whenToUse": "Usuário precisa digitar um valor de texto longo, com múltiplas linhas (comentário, descrição, observação).",
+  "whenNotToUse": "Texto curto de uma linha (use TextField); escolha entre opções pré-definidas (use Select, a construir); valor booleano (use Checkbox/Radio).",
+  "anatomy": [
+    "FieldLabel (em cima)",
+    "Container do campo (fundo, borda, texto/placeholder, redimensionável verticalmente)",
+    "Rodapé (embaixo, opcional) — HelperText à esquerda + contador de caracteres 'N/max' à direita, quando presentes"
+  ],
+  "dependencies": [
+    "FieldLabel",
+    "HelperText",
+    "Icon",
+    "Tooltip"
+  ],
+  "props": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "required",
+      "type": "boolean",
+      "default": false,
+      "required": false
+    },
+    {
+      "name": "withInfo",
+      "type": "boolean",
+      "default": false,
+      "required": false
+    },
+    {
+      "name": "infoText",
+      "type": "string",
+      "required": false,
+      "requiredWhen": "withInfo = true"
+    },
+    {
+      "name": "placeholder",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "value",
+      "type": "string",
+      "required": false,
+      "description": "Campo controlado."
+    },
+    {
+      "name": "state",
+      "type": "enum",
+      "enum": [
+        "default",
+        "focus",
+        "error",
+        "disabled",
+        "readOnly"
+      ],
+      "default": "default",
+      "required": false
+    },
+    {
+      "name": "helperText",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "onChange",
+      "type": "function",
+      "required": false
+    },
+    {
+      "name": "rows",
+      "type": "number",
+      "default": 4,
+      "required": false,
+      "description": "Atributo nativo rows do <textarea> — controla a altura inicial visível, em linhas."
+    },
+    {
+      "name": "resizable",
+      "type": "boolean",
+      "default": true,
+      "required": false,
+      "description": "true = redimensionável só na vertical (CSS resize: vertical). false = altura fixa em rows. Nunca horizontal — ver forbidden."
+    },
+    {
+      "name": "maxLength",
+      "type": "number",
+      "required": false,
+      "description": "Limite de caracteres. Usado como atributo nativo maxLength do <textarea> QUANDO enforceMaxLength=true (padrão) — bloqueia a digitação além do limite. Também é o denominador do contador visual quando showCharacterCount=true, independente de enforceMaxLength (ver decisions)."
+    },
+    {
+      "name": "enforceMaxLength",
+      "type": "boolean",
+      "default": true,
+      "required": false,
+      "description": "true (padrão) = maxLength vira o atributo nativo do <textarea>, bloqueando fisicamente a digitação além do limite ('bloqueio rígido'). false = maxLength NÃO é aplicado como atributo nativo — o usuário pode digitar livremente além do limite; maxLength nesse caso só alimenta o contador visual e o estado de 'acima do limite' (útil pra quem consome querer avisar em vez de bloquear, ver decisions)."
+    },
+    {
+      "name": "showCharacterCount",
+      "type": "boolean",
+      "default": false,
+      "required": false,
+      "description": "Mostra o contador 'N/max' no rodapé do campo, alinhado à direita. Só aparece quando maxLength também está definido — sem maxLength não há denominador pra mostrar. Texto fica na cor de erro (texto-erro) quando a contagem atual ultrapassa maxLength (só possível de acontecer com enforceMaxLength=false)."
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "variants": [],
+  "states": [
+    "default",
+    "focus",
+    "error",
+    "disabled",
+    "readOnly"
+  ],
+  "tokensAllowed": {
+    "background": [
+      "semantic.fundo-superficie",
+      "semantic.fundo-secundario",
+      "semantic.fundo-campo"
+    ],
+    "border": [
+      "semantic.borda-base",
+      "semantic.borda-foco",
+      "semantic.borda-erro",
+      "semantic.borda-inativo"
+    ],
+    "text": [
+      "semantic.texto-primario",
+      "semantic.texto-placeholder",
+      "semantic.texto-inativo",
+      "semantic.texto-secundario",
+      "semantic.texto-erro"
+    ],
+    "radius": [
+      "structural.raio-pp"
+    ],
+    "focusRing": [
+      "structural.foco-espessura"
+    ],
+    "spacing": [
+      "structural.espaco-xp",
+      "structural.espaco-pp"
+    ],
+    "typography": [
+      "type-style.texto-m",
+      "type-style.texto-micro"
+    ]
+  },
+  "a11y": {
+    "role": "textbox nativo, multiline (<textarea>) — o navegador já expõe 'multi-line' pro leitor de tela a partir do elemento, sem role/aria extra",
+    "requiredAria": [
+      "aria-required quando required=true",
+      "aria-invalid quando state=error",
+      "readonly quando state=readOnly",
+      "aria-live=\"polite\" no contador de caracteres (showCharacterCount=true) — anuncia a contagem atualizada pra quem usa leitor de tela sem interromper a digitação"
+    ],
+    "keyboard": [
+      "foco nativo do <textarea>, anel visual usa :focus-within no container inteiro — mesma técnica do TextField"
+    ],
+    "contrastMin": "AAA (7:1) como meta pro público 60+, mesma régua do TextField.",
+    "notes": "Mesma regra do TextField: foco nunca só cor, e foco+erro faz o erro vencer visualmente (borda e anel assumem borda-erro). readOnly mantém texto legível e recebe foco, diferente de disabled."
+  },
+  "events": {
+    "status": "não definido no contrato original"
+  },
+  "composition": {
+    "canContain": [
+      "FieldLabel",
+      "HelperText"
+    ],
+    "canBeContainedBy": [
+      "formulários"
+    ],
+    "doNotCombine": []
+  },
+  "forbidden": [
+    "leftIcon/rightIcon — não suportado neste contrato; não há espaço natural pra ícone interno num campo multi-linha sem sobrepor o texto (ver decisions)",
+    "resize horizontal ou both (CSS resize) — só vertical é permitido, resize horizontal quebra layouts responsivos",
+    "comunicar obrigatoriedade só pelo asterisco do FieldLabel, sem aria-required no textarea",
+    "comunicar erro só pela borda vermelha, sem aria-invalid + HelperText explicando",
+    "state=readOnly usando a cor de texto de disabled",
+    "reimplementar FieldLabel ou HelperText inline dentro do Textarea — mesma regra do TextField"
+  ],
+  "decisions": [
+    "Sem leftIcon/rightIcon (diferente do TextField): um campo multi-linha não tem uma posição natural de 1 linha pra ancorar um ícone interno sem ele flutuar estranhamente ou sobrepor texto em wrap. Se surgir um caso real (ex.: ícone de anexo), é decisão nova, não uma adivinhação agora.",
+    "AJUSTADO a pedido do usuário — a decisão anterior ('sem contador de caracteres nesta versão... candidato a entrar depois') foi revisada: CommentComposer (ver comment-composer.contract.json) trouxe o caso de uso real que faltava. Nova prop showCharacterCount (default false, opt-in) mostra 'N/max' no rodapé, alinhado à direita do HelperText — quando ausente, nada muda (comportamento idêntico ao anterior). Contador só aparece se maxLength também estiver definido (sem denominador não há o que mostrar).",
+    "AJUSTADO a pedido do usuário — maxLength deixou de ser SÓ o atributo nativo; ganhou um modo de aplicação configurável via enforceMaxLength (default true = comportamento antigo, bloqueio rígido nativo). Motivo: o pedido do usuário incluía duas formas de lidar com o limite — 'bloqueando a digitação' (mapeia direto pro atributo nativo maxLength, já existia) OU 'permitindo digitar e alertando e bloqueando o botão' (exige que o USUÁRIO consiga digitar ALÉM do limite, o que o atributo nativo maxLength nunca permitiria por definição). enforceMaxLength=false resolve o segundo caso: maxLength continua existindo como número de referência (pro contador e pra quem consome decidir o que fazer quando ultrapassado), só não é mais aplicado como restrição física do navegador.",
+    "Estado 'acima do limite' (count > maxLength) só é fisicamente alcançável com enforceMaxLength=false — com o padrão (true), o navegador nunca deixa a contagem passar de maxLength, então o contador nunca chega a ficar na cor de erro nesse modo. Isso é intencional, não uma inconsistência: o texto vermelho no contador é reforço visual do MESMO estado que enforceMaxLength=false already permite existir, não um estado novo e independente.",
+    "resizable=true por padrão, e mesmo assim só CSS resize:vertical — nunca horizontal/both (quebraria o layout de formulários responsivos). resizable=false trava a altura em rows.",
+    "rows (padrão 4) substitui a altura fixa de 44px que Button/TextField usam — não faz sentido forçar uma altura de alvo de toque numa caixa que já é naturalmente grande o suficiente por ser multi-linha; altura real é rows × altura de linha + padding.",
+    "Reaproveita FieldLabel e HelperText exatamente como o TextField (mesmo padrão de id via useId, aria-describedby, withInfo/infoText) — nenhuma reimplementação.",
+    "Foco + erro: erro vence visualmente — mesma regra já fixada em text-field.contract.json, aplicada aqui por consistência entre contratos de data-entry, não reaberta.",
+    "AJUSTADO a pedido do usuário — fundo do campo trocado de semantic.fundo-superficie pra semantic.fundo-campo (token novo): 'o fundo dos inputs de forma geral, devem ser levemente mais escuros que a cor de fundo da página onde estão, para destacar melhor'. No modo claro fundo-campo é idêntico a fundo-superficie (sem mudança visual, branco com borda já bastava) — só no modo escuro os dois valores divergem (fundo-campo um degrau mais escuro que a página), porque era só ali que o campo ficava indistinguível da própria página por trás."
+  ],
+  "references": {
+    "tokensFile": "tokens/tokens.json — Cores Semânticas (Fundos, Bordas, Textos incluindo texto-erro), Estrutural (raio-pp, foco-espessura, espaco-xp/pp), Tipografia Estilo (texto-m, texto-micro)"
+  }
+}

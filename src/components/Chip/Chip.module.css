@@ -1,0 +1,102 @@
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espaco-xp);
+  min-height: 32px;
+  box-sizing: border-box;
+  padding: 0 var(--espaco-pp);
+  border: 1px solid transparent;
+  border-radius: var(--raio-circular);
+  font-family: var(--texto-p-family);
+  font-size: var(--texto-p-size);
+  font-weight: var(--texto-p-weight);
+  line-height: var(--texto-p-line-height);
+}
+
+.label {
+  background: none;
+  border: none;
+  padding: 0;
+  color: inherit;
+  font: inherit;
+}
+
+button.label {
+  cursor: pointer;
+}
+
+.label:focus-visible {
+  outline: var(--foco-espessura) solid var(--borda-foco);
+  outline-offset: 2px;
+  border-radius: var(--raio-xp);
+}
+
+.removeButton {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  background: none;
+  border: none;
+  border-radius: var(--raio-circular);
+  cursor: pointer;
+}
+
+.removeButton:hover:not(:disabled) {
+  background: color-mix(in srgb, currentColor 15%, transparent);
+}
+
+.removeButton:focus-visible {
+  outline: var(--foco-espessura) solid var(--borda-foco);
+  outline-offset: 1px;
+}
+
+.removeButton:disabled,
+button.label:disabled {
+  cursor: not-allowed;
+}
+
+.neutral {
+  background: var(--fundo-secundario);
+  border-color: var(--borda-base);
+  color: var(--texto-secundario);
+}
+
+.info {
+  background: var(--fundo-info-forte);
+  border-color: var(--fundo-info-forte);
+  color: var(--texto-invertido);
+}
+
+.success {
+  background: var(--fundo-sucesso-forte);
+  border-color: var(--fundo-sucesso-forte);
+  color: var(--texto-invertido);
+}
+
+.warning {
+  background: var(--borda-aviso);
+  border-color: var(--borda-aviso);
+  color: var(--texto-escuro-fixo);
+}
+
+.error {
+  background: var(--fundo-erro-forte);
+  border-color: var(--fundo-erro-forte);
+  color: var(--texto-invertido);
+}
+
+.selected {
+  background: var(--acao-primaria);
+  border-color: var(--acao-primaria);
+  color: var(--acao-primaria-texto);
+}
+
+.disabled {
+  background: var(--acao-inativa);
+  border-color: var(--acao-inativa);
+  color: var(--acao-inativa-texto);
+  cursor: not-allowed;
+}

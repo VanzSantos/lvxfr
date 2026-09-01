@@ -1,0 +1,163 @@
+{
+  "name": "NavBar",
+  "originalName": "BarraDeNavegacao",
+  "oneLiner": "Barra de navegação principal do produto — marca à esquerda, links de navegação primária no meio (com até 4 níveis de submenu em dropdown), ações livres à direita; colapsa num Drawer abaixo de 768px.",
+  "category": "action",
+  "status": "draft",
+  "whenToUse": "Navegação de topo entre as áreas principais do produto (ex.: 'Início', 'Pedidos', 'Relatórios'), presente em praticamente toda página logada — inclusive quando algumas dessas áreas têm subseções (submenu em dropdown, até 4 níveis).",
+  "whenNotToUse": "Hierarquia de onde o usuário está dentro de uma página (isso é Breadcrumb); alternância entre painéis de conteúdo dentro da MESMA página (isso é Tabs); menu lateral persistente (isso é SideNav — ver side-nav.contract.json); menu de opções contextual de um item específico (isso é um Menu/Popover, fora de escopo aqui).",
+  "anatomy": [
+    "<nav aria-label> envolvendo tudo, layout horizontal",
+    "Marca (slot brand, à esquerda) — logo/wordmark, conteúdo livre do consumidor",
+    "Lista de links de navegação primária (centro/esquerda, depois da marca) — átomo Link real para cada item sem filhos, item ativo com aria-current=page",
+    "Item COM filhos (item.children) vira um <button> (não um Link) com aria-haspopup=\"menu\" + aria-expanded — clicar abre um dropdown ancorado (@floating-ui/react, FloatingPortal) listando os filhos; um filho que também tem filhos abre um SEGUNDO dropdown em cascata, ancorado à direita do primeiro (placement right-start), até o 4º nível",
+    "Slot de ações (à direita) — conteúdo livre do consumidor (ex.: busca, notificações, Avatar do usuário), sempre visível mesmo no modo mobile",
+    "Abaixo de 768px de viewport: a lista de itens (com todos os níveis) some da barra e um botão de hambúrguer aparece no lugar — clicar abre o Drawer (componente já existente do harness, reaproveitado) com a MESMA árvore de itens, renderizada verticalmente com os níveis 2-4 em formato de árvore expansível (mesmo padrão visual do SideNav, ver side-nav.contract.json) em vez de dropdown — dropdown em cascata não faz sentido dentro de um painel estreito"
+  ],
+  "dependencies": [
+    "Link",
+    "Icon",
+    "Drawer"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "node",
+      "required": false,
+      "description": "Slot livre pro logo/wordmark do produto — NavBar não sabe nada sobre ele, mesma filosofia de children livre já usada em Card/Modal."
+    },
+    {
+      "name": "items",
+      "type": "array",
+      "required": true,
+      "description": "Árvore recursiva de { label: string, href?: string, active?: boolean, children?: NavBarItem[] }. Um item com children não precisa de href (vira gatilho de dropdown, não link); um item sem children e sem href é erro (ver forbidden). active marcado pelo consumidor em qualquer nível (NavBar não tem acesso à rota atual — agnóstico de biblioteca de roteamento, mesmo racional de Breadcrumb/Link). Profundidade máxima de 4 níveis (o array raiz já conta como nível 1) — 5º nível é erro em tempo de execução. Array vazio é válido (NavBar só com brand+actions, ex.: topbar mínima)."
+    },
+    {
+      "name": "actions",
+      "type": "node",
+      "required": false,
+      "description": "Slot livre à direita pra ações (ex.: busca, notificações, Avatar+menu do usuário) — mesmo padrão de toolbarActions em datatable.contract.json. NavBar não sabe o que tem dentro. Continua visível no modo mobile (só a lista de items colapsa pro Drawer, actions nunca)."
+    },
+    {
+      "name": "accessibleLabel",
+      "type": "string",
+      "default": "Navegação principal",
+      "required": false,
+      "description": "Nome acessível do <nav>. Tem default sensato (diferente de Modal/Drawer, que exigem accessibleLabel explícito) porque quase toda NavBar de topo é 'a' navegação principal do produto — não há ambiguidade real a resolver na maioria dos casos."
+    },
+    {
+      "name": "sticky",
+      "type": "boolean",
+      "default": false,
+      "required": false,
+      "description": "true = position:sticky no topo do container de scroll mais próximo. NavBar não sabe nada sobre o resto do layout da página além disso (mesmo racional de layout='push' em drawer.contract.json)."
+    }
+  ],
+  "variants": [],
+  "states": [
+    "default",
+    "item-active",
+    "submenu-open",
+    "mobile-menu-open"
+  ],
+  "tokensAllowed": {
+    "background": [
+      "semantic.fundo-superficie",
+      "semantic.fundo-secundario"
+    ],
+    "border": [
+      "semantic.borda-base",
+      "semantic.borda-foco"
+    ],
+    "text": [
+      "semantic.texto-primario",
+      "semantic.texto-secundario",
+      "semantic.acao-primaria"
+    ],
+    "iconColor": [
+      "semantic.icone-secundario"
+    ],
+    "focusRing": [
+      "structural.foco-espessura"
+    ],
+    "radius": [
+      "structural.raio-pp"
+    ],
+    "spacing": [
+      "structural.espaco-xp",
+      "structural.espaco-pp",
+      "structural.espaco-p",
+      "structural.espaco-m",
+      "structural.espaco-g"
+    ],
+    "typography": [
+      "type-style.texto-rotulo-botao",
+      "type-style.texto-p"
+    ],
+    "shadow": [
+      "structural.sombra-p"
+    ]
+  },
+  "a11y": {
+    "role": "navigation nativo via <nav aria-label>. Item sem filhos é um Link real (<a href>); item ativo tem aria-current=\"page\". Item COM filhos é um <button aria-haspopup=\"menu\" aria-expanded>; o dropdown que ele abre tem role=\"menu\"... na verdade não — mesma simplificação já documentada em breadcrumb.contract.json: o painel do dropdown é só uma lista de Link/button reais, sem roving tabindex nem role=menu/menuitem completo (Tab navega em ordem de DOM, não setas). No modo mobile, o botão de hambúrguer tem aria-label + aria-expanded refletindo o Drawer.",
+    "requiredAria": [
+      "aria-label no <nav> (accessibleLabel)",
+      "aria-current=\"page\" no item com active=true, em qualquer nível",
+      "aria-haspopup=\"menu\" + aria-expanded no botão de item com children",
+      "aria-label ('Abrir menu de navegação') + aria-expanded no botão de hambúrguer do modo mobile"
+    ],
+    "keyboard": [
+      "Tab navega entre os links/botões de navegação e o conteúdo de actions, na ordem do DOM",
+      "Enter/Espaço num botão de item com children abre o dropdown daquele nível; Esc fecha e devolve o foco pro botão que abriu (useDismiss do floating-ui, mesmo padrão de Select/DatePicker/Breadcrumb)",
+      "dentro do dropdown, Tab navega pelos itens do nível atual e, se um deles tiver filhos, pelo botão que abre o próximo nível em cascata — sem roving tabindex nesta v1 (mesma simplificação já usada em Accordion/Calendar/Stepper/Breadcrumb)"
+    ],
+    "contrastMin": "texto-primario/acao-primaria contra fundo-superficie — mesmos pares já validados AA/AAA usados no resto do harness pra texto primário e para o verde de ação primária.",
+    "notes": "Diferente do Breadcrumb, o item ativo da NavBar CONTINUA sendo um link real e clicável (recarregar/permanecer na mesma área é uma ação válida) — só ganha aria-current=page e destaque visual, nunca vira <span> estático. Isso vale em qualquer nível da árvore, não só no nível 1."
+  },
+  "events": {
+    "status": "não definido no contrato original"
+  },
+  "composition": {
+    "canContain": [
+      "Link",
+      "Icon",
+      "Drawer (internamente, só no modo mobile)",
+      "qualquer conteúdo livre em brand/actions — Icon, Avatar, Badge, Button etc., escolha do consumidor"
+    ],
+    "canBeContainedBy": [
+      "topo de layout de página, fora da área de scroll do conteúdo"
+    ],
+    "doNotCombine": [
+      "NavBar dentro de NavBar",
+      "usar NavBar pra navegação secundária/hierárquica de localização — isso é Breadcrumb",
+      "usar NavBar como menu lateral persistente — isso é SideNav"
+    ]
+  },
+  "forbidden": [
+    "reimplementar o link dos itens de navegação fora do átomo Link (<a> cru, etc.), exceto o próprio botão-gatilho de um item com children (que não é um link, é um disclosure)",
+    "item ativo virando texto estático sem href — diferente do Breadcrumb, aqui o ativo continua um link de verdade (ver a11y.notes)",
+    "NavBar assumir ou importar qualquer biblioteca de roteamento — active é sempre informado de fora",
+    "cor fora da whitelist de tokensAllowed",
+    "empilhar a barra raiz de navegação em coluna (layout vertical) em telas largas — este contrato é sempre horizontal no desktop; a versão vertical em telas estreitas só existe DENTRO do Drawer, não é a NavBar 'virando' vertical no mesmo lugar",
+    "mais de 4 níveis de profundidade em items — erro em tempo de execução",
+    "item sem children E sem href — não é nem link nem gatilho de dropdown, erro em tempo de execução",
+    "reimplementar o painel do Drawer mobile com uma div/position:fixed própria — reaproveita o componente Drawer existente"
+  ],
+  "decisions": [
+    "CORRIGIDO — auditoria de A11y (2026-09-01): BUG REAL, os dropdowns de item com children usavam floating-ui cru (useClick/useDismiss/useRole) sem FloatingFocusManager — sem foco preso/devolvido de verdade, o mesmo problema documentado em popover.contract.json. Corrigido envolvendo cada painel em <FloatingFocusManager context={context} modal={false}>.",
+    "CORRIGIDO — auditoria de contratos (2026-09-01): borda-foco (border) e focusRing (foco-espessura) adicionados — anel de foco visível dos links/botões de navegação, categoria que não estava declarada.",
+    "Agnóstico de biblioteca de roteamento — items[].active é sempre calculado e passado pelo consumidor (comparando a rota atual com o href de cada item, em qualquer nível), NavBar não importa react-router nem nenhuma lib de rotas. Mesmo racional já usado em Link/Breadcrumb.",
+    "brand e actions são slots 100% livres (ReactNode), sem sub-componentes fixos — mesma filosofia de children livre do Card/Modal.",
+    "accessibleLabel tem DEFAULT ('Navegação principal'), diferente de Modal/Drawer (que exigem a prop explícita) — a maioria das NavBars de topo realmente É 'a' navegação principal do produto.",
+    "Item ativo é um Link real com aria-current=page, NUNCA vira texto estático — na NavBar, clicar no item já ativo é uma ação válida e comum (recarregar a lista, voltar ao topo da página atual).",
+    "sticky é uma prop simples (position:sticky), não um comportamento de scroll customizado.",
+    "AJUSTADO a pedido do usuário — REVISA a decisão anterior ('só layout horizontal, vertical fora de escopo até pedido real'). Agora existe suporte a até 4 níveis de submenu, resolvidos como dropdown em cascata (nível 2 abre abaixo do item do nível 1, nível 3 abre à direita do nível 2, e assim por diante) — decisão tomada junto com o usuário entre dropdown-cascata vs. mega-menu; dropdown-cascata escolhido por ser o padrão mais comum e não exigir um sistema de colunas/agrupamento novo. A barra RAIZ (nível 1) continua sempre horizontal — só os dropdowns dos níveis 2-4 são painéis próprios, não fazem a barra virar vertical.",
+    "AJUSTADO a pedido do usuário — REVISA a decisão anterior ('sem colapso responsivo, lacuna conhecida, decisão grande demais sem pedido real'). Agora existe colapso abaixo de 768px (mesmo breakpoint já usado nas páginas de auth — LoginScreen e afins), resolvido reaproveitando o Drawer que já existe no harness em vez de inventar um mecanismo de painel novo: abaixo do breakpoint, a lista de itens some, um botão de hambúrguer aparece no lugar, e clicar nele abre um Drawer (modal=true, mesmo comportamento padrão) contendo a MESMA árvore de itens — mas renderizada como árvore vertical expansível (mesmo padrão do SideNav), não como dropdown em cascata, porque cascata não cabe/não faz sentido dentro de um painel estreito de 320-440px.",
+    "Dropdown de cada nível reaproveita @floating-ui/react (useFloating + useClick + useDismiss + FloatingPortal), mesmo padrão já usado em Select/DatePicker/TimePicker/Breadcrumb — não introduz uma quarta forma de resolver 'painel ancorado que não pode sair da viewport'. Clique (não hover) abre o dropdown, mesma escolha já feita em Breadcrumb (reticências) e Select — hover-intent com timers é uma classe de bug a mais (flicker, dropdown fechando cedo demais) que o harness não usa em nenhum outro popover existente.",
+    "Profundidade máxima de 4 níveis é um limite validado em tempo de execução (erro, não silenciosamente truncado) — número que o próprio usuário definiu como razoável ('eu acho que funciona'); acima disso o dropdown em cascata provavelmente já não é mais utilizável na prática, então travar o contrato aqui evita que o componente vire suporte informal de hierarquias maiores no futuro.",
+    "AJUSTADO a pedido do usuário — REVISA a paleta de cor dos itens: em repouso agora é texto-primario (branco no modo escuro, tom neutro escuro no modo claro — o mesmo token já usado no resto do texto primário do harness, então continua legível nos dois temas) em vez das cores fixas de link (acao-link-texto/-sobreposto); ativo/hover é acao-primaria (verde, igual nos dois temas). A cor é reaplicada por cima do átomo Link via um seletor CSS de maior especificidade (`.nav a`, `.dropdown a`) no próprio NavBar — Link continua 100% intacto (href, foco, aria-current, semântica), só a cor visual é reafirmada pelo contexto. `itemButton` (o botão-gatilho de um item com children, que não é Link) segue a mesma paleta diretamente, sem precisar de override."
+  ],
+  "references": {
+    "tokensFile": "tokens/tokens.json — Cores Semânticas (Fundos, Bordas, Ações/Link, Textos, Ícones), Estrutural (raio-pp, espaco-xp/pp/p/m/g, sombra-p), Tipografia Estilo (texto-rotulo-botao, texto-p)"
+  }
+}

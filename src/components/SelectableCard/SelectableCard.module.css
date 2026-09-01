@@ -1,0 +1,150 @@
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-xp);
+  width: 100%;
+  box-sizing: border-box;
+  padding: var(--espaco-p);
+  background: var(--fundo-superficie);
+  border: 1px solid var(--borda-base);
+  border-radius: var(--raio-pp);
+  cursor: pointer;
+}
+
+.disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* visualmente escondido, mas focável e lido por leitor de tela — mesma técnica
+   já usada em Radio (o card inteiro é o "label" visual do input real) */
+.input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.input:focus-visible ~ .header,
+.input:focus-visible ~ .title {
+  outline: var(--foco-espessura) solid var(--borda-foco);
+  outline-offset: 2px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.circle {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--icone-medio);
+  height: var(--icone-medio);
+  box-sizing: border-box;
+  border: 2px solid var(--borda-base);
+  border-radius: var(--raio-circular);
+  background: var(--fundo-superficie);
+}
+
+.circleMarked {
+  border-color: var(--acao-primaria);
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: var(--raio-circular);
+  background: var(--acao-primaria);
+}
+
+.title {
+  color: var(--texto-primario);
+  font-family: var(--texto-m-forte-family);
+  font-size: var(--texto-m-forte-size);
+  font-weight: var(--texto-m-forte-weight);
+  line-height: var(--texto-m-forte-line-height);
+}
+
+.description {
+  color: var(--texto-secundario);
+  font-family: var(--texto-p-family);
+  font-size: var(--texto-p-size);
+  font-weight: var(--texto-p-weight);
+  line-height: var(--texto-p-line-height);
+}
+
+.price {
+  color: var(--texto-primario);
+  font-family: var(--texto-g-forte-family);
+  font-size: var(--texto-g-forte-size);
+  font-weight: var(--texto-g-forte-weight);
+  line-height: var(--texto-g-forte-line-height);
+}
+
+/* Selecionado — fundo sólido, cor escolhida via selectedTone (ver decisions). O texto/
+   círculo usam currentColor (herdado do `color` de cada .tone*), então só o bloco de tons
+   abaixo precisa saber a cor de texto certa por tom — título/preço/círculo não repetem a
+   cor em cada tom. */
+.checked {
+  border-color: transparent;
+  color: var(--texto-invertido);
+}
+
+.checked .circle {
+  background: transparent;
+  border-color: currentColor;
+}
+
+.checked .dot {
+  background: currentColor;
+}
+
+.checked .title,
+.checked .price {
+  color: currentColor;
+}
+
+.checked .description {
+  color: currentColor;
+  opacity: 0.8;
+}
+
+.toneDark {
+  background: var(--fundo-invertido);
+  color: var(--texto-invertido);
+}
+
+.tonePrimary {
+  background: var(--acao-primaria);
+  color: var(--acao-primaria-texto);
+}
+
+.toneAccent1 {
+  background: var(--borda-apoio-3);
+  color: var(--texto-primario);
+}
+
+.toneAccent2 {
+  background: var(--fundo-apoio-1-forte);
+  color: var(--texto-invertido);
+}
+
+.toneAccent3 {
+  background: var(--fundo-apoio-2-forte);
+  color: var(--texto-invertido);
+}
+
+.toneInfo {
+  background: var(--texto-info);
+  color: var(--texto-invertido);
+}

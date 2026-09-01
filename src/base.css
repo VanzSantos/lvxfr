@@ -1,0 +1,43 @@
+/*
+ * Reset base — dá a QUALQUER texto/superfície sem cor própria um valor
+ * padrão que reage ao tema (data-theme). Sem isso, conteúdo livre passado
+ * como children (ex.: parágrafos dentro de Drawer/Modal) herda o preto
+ * padrão do navegador em vez de acompanhar o modo escuro — bug real
+ * encontrado testando Drawer/Modal no navegador (ver ROADMAP.md).
+ */
+html,
+body {
+  margin: 0;
+  background: var(--fundo-superficie);
+  color: var(--texto-primario);
+}
+
+/* Barra de rolagem minimalista, temática nos dois modos — não é um
+   componente React (scrollbar é renderizada pelo navegador, não algo que se
+   componha em JSX), então vive aqui como CSS global em vez de virar um
+   "Scrollbar.tsx" sem props/comportamento nenhum. Firefox via
+   scrollbar-color/scrollbar-width; Chrome/Safari/Edge via ::-webkit-*. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--borda-inativo) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: var(--borda-inativo);
+  border-radius: var(--raio-circular);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: var(--icone-secundario);
+}

@@ -1,0 +1,210 @@
+{
+  "name": "Drawer",
+  "originalName": "Painel Lateral",
+  "oneLiner": "Painel que desliza da borda direita da tela — reaproveita a base do Modal (<dialog> nativo), mas pode bloquear a página (modal=true, padrão) ou ficar aberto ao lado do conteúdo (modal=false, persistente).",
+  "category": "overlay",
+  "status": "draft",
+  "whenToUse": "Editar/ver detalhe de um item sem sair do contexto da lista atrás (modal=true, o caso mais comum); ou um painel de referência que fica aberto enquanto a pessoa continua interagindo com o resto da tela (modal=false, ex.: filtros avançados, painel de anotações).",
+  "whenNotToUse": "Confirmação centralizada que não precisa de contexto lateral (isso é Modal); menos conteúdo do que justificaria um painel inteiro (Tooltip/Popover cabem melhor); navegação principal do produto (isso é NavBar, fora do harness ainda).",
+  "anatomy": [
+    "Backdrop (::backdrop nativo — só existe quando modal=true; modal=false não tem, automaticamente, por diferença nativa entre showModal() e show())",
+    "Cabeçalho (opcional) — mesmas 4 variações do Modal: título+X, só título, só X, ou nenhum",
+    "Corpo — conteúdo livre via children, mesma filosofia do Card/Modal (sem slots fixos)"
+  ],
+  "dependencies": [
+    "Icon"
+  ],
+  "props": [
+    {
+      "name": "open",
+      "type": "boolean",
+      "required": true,
+      "description": "Controlado — mesmo padrão do Modal."
+    },
+    {
+      "name": "onClose",
+      "type": "function",
+      "required": true,
+      "description": "Assinatura () => void."
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": false,
+      "description": "Mesma regra do Modal — opcional, vira <h2> + aria-labelledby quando presente."
+    },
+    {
+      "name": "accessibleLabel",
+      "type": "string",
+      "required": false,
+      "requiredWhen": "title não é fornecido",
+      "description": "Mesma regra do Modal."
+    },
+    {
+      "name": "children",
+      "type": "node",
+      "required": true
+    },
+    {
+      "name": "size",
+      "type": "enum",
+      "enum": [
+        "small",
+        "medium",
+        "large"
+      ],
+      "default": "medium",
+      "required": false,
+      "description": "Controla LARGURA (não largura máxima centralizada como no Modal — Drawer é sempre encostado na borda direita, altura sempre 100vh): small=320px, medium=440px, large=560px, sempre limitado a 100vw em telas estreitas."
+    },
+    {
+      "name": "padding",
+      "type": "enum",
+      "enum": [
+        "small",
+        "medium",
+        "large"
+      ],
+      "default": "large",
+      "required": false,
+      "description": "Mesma escala, mesmos tokens e mesmo comportamento (uma padding só ao redor de cabeçalho+corpo) já definidos em modal.contract.json."
+    },
+    {
+      "name": "dismissible",
+      "type": "boolean",
+      "default": true,
+      "required": false,
+      "description": "Mesmo espírito do Modal (mostra o X, permite fechamento implícito), mas o CONJUNTO de vias implícitas muda com modal — ver decisions: com modal=true são backdrop+X+Esc (idêntico ao Modal); com modal=false são só X+Esc (sem backdrop nativo pra clicar fora)."
+    },
+    {
+      "name": "modal",
+      "type": "boolean",
+      "default": true,
+      "required": false,
+      "description": "true (padrão) = bloqueia a página, dialog.showModal() nativo, focus trap, backdrop — mesmo mecanismo do Modal. false = não bloqueia, dialog.show() nativo, sem backdrop, sem focus trap, o resto da página continua interativa — painel persistente. Ver decisions pro porquê do padrão ser true."
+    },
+    {
+      "name": "layout",
+      "type": "enum",
+      "enum": [
+        "overlay",
+        "push"
+      ],
+      "default": "overlay",
+      "required": false,
+      "description": "Só tem efeito prático quando modal=false (com modal=true, o Drawer é sempre overlay — bloqueia, não faz sentido 'empurrar' conteúdo que está bloqueado). 'overlay' (padrão) = position:fixed, sobrepõe o conteúdo, comportamento idêntico ao que sempre existiu. 'push' = deixa de ser fixed, vira um item de layout normal que participa do flex/grid da página onde o consumidor colocar o Drawer — o conteúdo ao lado precisa estar no mesmo container flex pra 'ganhar espaço' de verdade (Drawer não sabe nada sobre o resto do layout da página, ver decisions)."
+    },
+    {
+      "name": "role",
+      "type": "enum",
+      "enum": [
+        "dialog",
+        "alertdialog"
+      ],
+      "default": "dialog",
+      "required": false,
+      "description": "Só tem efeito prático quando modal=true — mesmo raciocínio do Modal."
+    }
+  ],
+  "variants": [
+    "small",
+    "medium",
+    "large",
+    "overlay",
+    "push"
+  ],
+  "states": [
+    "static"
+  ],
+  "tokensAllowed": {
+    "background": [
+      "semantic.fundo-superficie",
+      "semantic.fundo-secundario",
+      "semantic.fundo-sobreposicao"
+    ],
+    "border": [
+      "semantic.borda-base",
+      "semantic.borda-foco"
+    ],
+    "text": [
+      "semantic.texto-primario",
+      "semantic.texto-secundario"
+    ],
+    "radius": [
+      "structural.raio-pp",
+      "structural.raio-xp"
+    ],
+    "focusRing": [
+      "structural.foco-espessura"
+    ],
+    "spacing": [
+      "structural.espaco-p",
+      "structural.espaco-g",
+      "structural.espaco-gg",
+      "structural.espaco-m"
+    ],
+    "iconSize": [
+      "structural.icone-pequeno"
+    ],
+    "typography": [
+      "type-style.texto-m-forte"
+    ]
+  },
+  "a11y": {
+    "role": "dialog nativo (<dialog>). Com modal=true: showModal() dá role=\"dialog\"/aria-modal=\"true\" implícitos, igual Modal. Com modal=false: show() dá role=\"dialog\" mas SEM aria-modal (corretamente sinaliza pra tecnologia assistiva que o resto da página não está bloqueado) — diferença nativa do navegador, não precisa de código extra.",
+    "requiredAria": [
+      "mesmas regras do Modal: aria-labelledby (com title) ou aria-label=accessibleLabel (sem title); aria-label ('Fechar') no X quando dismissible=true"
+    ],
+    "keyboard": [
+      "modal=true: focus trap nativo do showModal() (idêntico ao Modal)",
+      "modal=false: SEM focus trap — o resto da página continua totalmente navegável por Tab enquanto o Drawer está aberto, é o comportamento nativo esperado de um painel persistente, não uma falha de a11y",
+      "Esc fecha quando dismissible=true, nos dois modos — com modal=true é nativo (bloqueado via preventDefault no 'cancel', igual Modal); com modal=false NÃO é nativo (show() não dá Esc de graça) — Drawer adiciona um listener de keydown próprio só nesse caso, ver decisions"
+    ],
+    "contrastMin": "Herda os pares já validados em modal.contract.json.",
+    "notes": "modal=false não tem backdrop pra clicar fora — 'dismissible' nesse modo controla só o X e o Esc (adicionado via JS). Focus trap ausente em modal=false é uma CONSEQUÊNCIA ESPERADA de ser persistente, documentada aqui pra não ser confundida com bug."
+  },
+  "events": {
+    "status": "não definido no contrato original"
+  },
+  "composition": {
+    "canContain": [
+      "qualquer conteúdo — children livre, mesma filosofia do Card/Modal"
+    ],
+    "canBeContainedBy": [
+      "páginas"
+    ],
+    "doNotCombine": [
+      "Drawer dentro de Modal ou vice-versa — dois <dialog> tentando coordenar foco/Esc ao mesmo tempo é confuso; se precisar de confirmação sobre fechar um Drawer com alterações não salvas, fechar o Drawer primeiro"
+    ]
+  },
+  "forbidden": [
+    "Drawer sem title E sem accessibleLabel — erro em tempo de execução, mesma regra do Modal",
+    "esquerda/topo/base como posição — só borda direita neste contrato (ver decisions); se um caso real pedir, é decisão nova",
+    "reimplementar o focus trap quando modal=true — nativo, mesma regra do Modal",
+    "adicionar um backdrop customizado quando modal=false — contradiz a própria decisão de ser persistente/não-bloqueante; se precisa bloquear, é modal=true",
+    "layout='push' com modal=true — combinação sem efeito (Drawer força overlay quando modal=true, ver decisions), não é erro em tempo de execução, só é ignorada silenciosamente (documentado aqui pra não ser confundido com bug)",
+    "Drawer layout='push' assumir sozinho que vai 'ficar ao lado' sem o consumidor colocar o resto do conteúdo no mesmo container flex — o componente só deixa de ser fixed, quem monta o layout ao redor é responsabilidade de quem consome (mesmo racional de TabPanel)",
+    "cor fora da whitelist de tokensAllowed",
+    "animação de entrada/saída fora do mecanismo nativo (@starting-style + transition + allow-discrete) — nunca reimplementar via JS (setTimeout coordenando classes, etc.) enquanto o navegador suportar nativamente"
+  ],
+  "decisions": [
+    "CORRIGIDO — auditoria de contratos (2026-09-01): raio-xp, focusRing (foco-espessura) e borda-foco (border) adicionados — botão de fechar usa o mesmo anel de foco visível do Modal, tokensAllowed não declarava essas categorias.",
+    "RESOLVIDO com o usuário — só desliza da borda DIREITA neste contrato (sem prop 'placement'). Esquerda/topo/base ficam de fora até um caso de uso real pedir — mesmo raciocínio já usado no Divider antes de ganhar a orientação vertical (só depois de pedido explícito).",
+    "RESOLVIDO com o usuário — modal é uma prop configurável (true/false), não uma escolha fixa. Default TRUE (bloqueia, igual Modal) — decisão do agente dentro do espaço que ficou em aberto: a maioria dos casos reais de painel lateral neste tipo de produto é 'editar um item sem perder o contexto da lista' (temporário, deveria bloquear até resolver), não um painel permanentemente fixado ao lado do conteúdo (mais raro fora de apps estilo IDE). Se o padrão real do produto pedir o contrário, é só trocar o default, a prop já existe pros dois casos.",
+    "REAPROVEITAMENTO do mesmo <dialog> nativo do Modal, alternando entre showModal() (modal=true) e show() (modal=false) conforme a prop — a MESMA API nativa (open/close, evento 'close', evento 'cancel') funciona nos dois modos, só o comportamento de backdrop/focus-trap/Esc muda automaticamente por diferença do próprio navegador entre os dois métodos. Evita ter dois componentes/mecanismos completamente separados pra 'a mesma coisa com e sem bloqueio'.",
+    "BUG REAL encontrado em teste no navegador — o Drawer abria encostado na ESQUERDA da tela, não na direita. Causa: o user-agent stylesheet do <dialog> quando modal (showModal()) define 'inset: 0', que inclui left:0 — como o CSS de autor só sobrescrevia top/right/bottom (não left), o navegador ficou com left:0 E right:0 E width:440px simultaneamente definidos (caso super-restringido do CSS: com left, right e width todos setados, a especificação manda IGNORAR right), então o painel se posicionou pela esquerda. Corrigido adicionando 'left: auto' explícito — cede o controle da posição horizontal de volta pro 'right'. Revalidado depois: bounding rect confirma o painel encostado exatamente na borda direita da viewport nos dois modos (modal=true e modal=false).",
+    "ÚNICA peça de JS customizado que o Modal não precisava: Esc não fecha nativamente quando aberto via show() (só showModal() dá isso de graça) — Drawer adiciona um listener de keydown (document, só enquanto open && dismissible && !modal) que chama onClose no Escape, pra manter a experiência consistente entre os dois modos. Removido corretamente no cleanup do efeito.",
+    "Animação de slide via CSS nativo (@starting-style + transition com allow-discrete no translate/overlay/display) — não reimplementada em JS. É a forma correta e moderna de animar entrada E saída de um <dialog> (que normalmente pula de display:none pra display:block sem transição possível) sem precisar coordenar setTimeout com a chamada real de close(). Funciona igual nos dois modos (modal=true e false), porque a técnica não depende de qual método abriu o dialog.",
+    "size controla LARGURA (não largura máxima responsiva centralizada como no Modal) — Drawer é sempre encostado na borda, então 'tamanho' aqui é sempre a largura real do painel, com altura fixa em 100vh. Valores (320/440/560px) escolhidos numa escala um pouco mais estreita que o Modal (400/560/720px), porque um painel lateral tipicamente não precisa da mesma largura que um diálogo centralizado.",
+    "padding/dismissible/header (4 variações)/role — todos reaproveitados SEM MUDANÇA do modal.contract.json, incluindo os tokens e a lógica de 'uma padding só ao redor de cabeçalho+corpo, sem divisória'. Não foram redecididos aqui porque o usuário pediu explicitamente que Drawer seguisse a mesma lógica do Modal onde não houvesse uma razão real pra divergir.",
+    "PERGUNTADO AO USUÁRIO — layout='push' é uma prop NOVA (opt-in), não uma mudança de comportamento do modal=false existente. O oneLiner deste contrato já prometia 'ficar aberto ao lado do conteúdo' pra modal=false, mas a implementação sempre usou position:fixed (overlay de verdade, nunca empurrou nada) — um gap real entre o que o contrato dizia e o que o código fazia. Perguntado ao usuário se a correção deveria valer sempre que modal=false, ou virar uma prop nova preservando o overlay como padrão: escolheu a prop nova (layout, default='overlay') pra não mudar o comportamento de quem já usa modal=false hoje.",
+    "layout só tem efeito com modal=false — com modal=true, Drawer força overlay independente do valor de layout (bloquear E ao mesmo tempo tentar participar do layout normal da página é contraditório: um Drawer bloqueante precisa estar acima de tudo, não ao lado). Não é erro em tempo de execução, só é ignorado (documentado em forbidden pra não parecer bug).",
+    "layout='push' NÃO anima a largura/reflow do conteúdo vizinho — a reserva de espaço no layout aparece instantaneamente quando o Drawer abre (é assim que flexbox funciona, a não ser que se anime width/flex-basis explicitamente, o que a técnica de @starting-style deste componente não cobre). O slide visual (transform: translateX) continua suave, só o 'espaço se abrindo' no restante da página é instantâneo. Se um caso real pedir a largura animada também, é decisão nova (provavelmente exigiria uma técnica de transição diferente, ex.: animar grid-template-columns).",
+    "position:relative (não static) no layout='push' — mantém o Drawer como contexto de posicionamento pro próprio conteúdo interno (cabeçalho/corpo), sem herdar nada de position:static que pudesse interferir com z-index caso o consumidor precise sobrepor outra coisa pontualmente.",
+    "BUG REAL corrigido em teste no navegador (modo escuro) — 'o texto de conteúdo do Drawer está com a cor escura'. Causa: <dialog> nativo tem `color: CanvasText` no user-agent stylesheet, aplicado DIRETO no próprio elemento — um reset global (`body { color: ... }`, criado nesta mesma rodada) não alcança o children do Drawer, porque a herança de `color` segue a árvore do DOM a partir do próprio <dialog> (que já tem seu valor UA), não pula direto de <body>. Mesmo bug e mesmo fix já feitos em modal.contract.json/.dialog: adicionado `color: var(--texto-primario)` explícito em .drawer.",
+    "BUG REAL corrigido em teste no navegador (reportado pelo usuário: \"o drawer não está ocupando toda a altura da tela\") — o stylesheet nativo do <dialog> (UA stylesheet) define um max-height próprio pra `dialog:modal` (encontrado como `calc(100% - 38px)` no navegador de teste, o valor varia por engine/versão) que VENCIA sobre `height: 100vh` já declarado em `.drawer` — o painel ficava alguns pixels mais baixo que o topo/fundo reais da tela. Isso afeta QUALQUER consumidor do Drawer (bug do componente como um todo, não de um caso de uso específico) porque o CSS nunca redeclarava max-height, só height — mesma classe de problema já documentada aqui pro left/right (propriedade da UA vencendo quando o CSS autoral não a redeclara). Corrigido com `max-height: 100vh` explícito ao lado de `height: 100vh`."
+  ],
+  "references": {
+    "tokensFile": "tokens/tokens.json — mesmos grupos usados em modal.contract.json (Fundos, Bordas, Textos, raio-pp, espaco-p/g/gg/m, icone-pequeno, texto-m-forte)"
+  }
+}

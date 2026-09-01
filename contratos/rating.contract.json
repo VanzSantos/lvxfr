@@ -1,0 +1,74 @@
+{
+  "name": "Rating",
+  "originalName": "AvaliacaoPorEstrelas",
+  "oneLiner": "Avaliação por estrelas, clicável (inteiro ou com meio-ponto) ou só leitura (ex.: nota média de um produto).",
+  "category": "data-entry",
+  "status": "draft",
+  "whenToUse": "Capturar ou exibir uma avaliação numérica curta e comparável visualmente (ex.: nota de um produto/atendimento), tanto no modo em que o usuário avalia (interativo) quanto no modo em que só mostra uma nota já existente (readOnly, ex.: 'nota média: 4.5').",
+  "whenNotToUse": "Escala numérica ampla ou textual (isso é um Select/RadioGroup com as opções certas); métrica que não é uma 'nota comparável' no sentido de avaliação (ex.: progresso — isso é Progress Bar).",
+  "anatomy": [
+    "Sequência de max ícones de estrela — preenchida (weight='fill') até o value, vazia (weight='regular') depois; quando allowHalf e value cai no meio de uma estrela, essa posição usa o ícone star-half em vez de dividir visualmente a estrela cheia",
+    "Variante compacta (display='compact', só disponível com state='readOnly') — 1 única estrela cheia (weight='fill') + texto do value ao lado (ex.: '3.5'), sem a sequência inteira de max estrelas; usada quando o espaço é curto ou o contexto já deixa claro que é uma nota (ex.: dentro de uma linha de tabela, um card compacto)"
+  ],
+  "dependencies": ["Icon"],
+  "props": [
+    { "name": "value", "type": "number", "required": true, "description": "Nota atual, entre 0 e max. Múltiplo de 0.5 quando allowHalf=true, inteiro quando allowHalf=false. 100% controlado." },
+    { "name": "onChange", "type": "function", "required": false, "description": "Assinatura (value: number) => void. Ausente quando state='readOnly' (não faz sentido notificar mudança num campo só-leitura) — ver forbidden." },
+    { "name": "max", "type": "number", "required": false, "default": 5, "description": "Quantidade de estrelas/nota máxima." },
+    { "name": "allowHalf", "type": "boolean", "required": false, "default": false, "description": "false = só valores inteiros (clicar em qualquer parte de uma estrela vale o número inteiro dela). true = metade esquerda de cada estrela vale X.5, metade direita vale X inteiro." },
+    { "name": "state", "type": "enum", "enum": ["default", "readOnly", "disabled"], "default": "default", "required": false, "description": "default = interativo (clicável/navegável). readOnly = só exibição, sem nenhuma interação nem foco (ex.: nota média de um produto que o usuário não está avaliando agora). disabled = visualmente esmaecido, também não-interativo (mesma distinção visual já usada em TextField/Select entre readOnly e disabled)." },
+    { "name": "display", "type": "enum", "enum": ["stars", "compact"], "default": "stars", "required": false, "description": "Só se aplica com state='readOnly' (ver forbidden). 'stars' = sequência completa de max estrelas (comportamento original). 'compact' = 1 estrela cheia + texto do value ao lado (ex.: '3.5'), sem interatividade nenhuma nos dois casos." },
+    { "name": "color", "type": "enum", "enum": ["green", "yellow"], "default": "green", "required": false, "description": "Cor das estrelas preenchidas (e do texto no display='compact'). 'green' = semantic.acao-primaria (cor de ação padrão do harness). 'yellow' = semantic.borda-aviso (amarelo-ouro, Amarelo/amarelo-500 na escala primitiva — o padrão visual mais comum em avaliação por estrelas fora do harness). Estrelas vazias continuam sempre semantic.icone-secundario, independente da cor escolhida." },
+    { "name": "size", "type": "enum", "enum": ["default", "large"], "default": "default", "required": false, "description": "'default' = structural.icone-medio (20px, tamanho original). 'large' = structural.icone-grande (24px) — pra contextos de mais destaque (ex.: nota em destaque numa página de produto) sem precisar reimplementar o componente." },
+    { "name": "accessibleLabel", "type": "string", "required": false, "default": "Avaliação", "description": "Nome acessível do controle (ex.: 'Avaliação do produto')." }
+  ],
+  "variants": ["stars", "compact"],
+  "states": ["default", "hover", "readOnly", "disabled"],
+  "tokensAllowed": {
+    "iconColor": ["semantic.acao-primaria", "semantic.borda-aviso", "semantic.icone-secundario", "semantic.icone-inativo"],
+    "iconSize": ["structural.icone-medio", "structural.icone-grande"],
+    "text": ["semantic.texto-primario", "semantic.acao-primaria", "semantic.texto-aviso"],
+    "typography": ["type-style.texto-m-forte"],
+    "border": ["semantic.borda-foco"],
+    "radius": ["structural.raio-xp"],
+    "focusRing": ["structural.foco-espessura"],
+    "spacing": ["structural.espaco-xp"]
+  },
+  "a11y": {
+    "role": "slider (aria-valuenow=value, aria-valuemin=0, aria-valuemax=max, aria-valuetext ex.: '4.5 de 5') quando state='default' — o valor é contínuo o bastante (com allowHalf) pra caber melhor em slider do que num radiogroup de N opções discretas. Quando state='readOnly', vira role=\"img\" com aria-label formatado (ex.: 'Avaliação: 4.5 de 5') — puramente informativo, sem semântica de controle.",
+    "requiredAria": ["aria-valuenow/valuemin/valuemax/valuetext no modo default (slider)", "aria-label formatado no modo readOnly (role=img)", "aria-disabled quando state='disabled' (também sai da ordem de tabulação)", "estrelas individuais são aria-hidden — só o container tem semântica, mesmo padrão de Stepper/Calendar não anunciar cada marcador isoladamente"],
+    "keyboard": ["seta direita/cima aumenta o value em 1 (ou 0.5 com allowHalf), seta esquerda/baixo diminui, Home vai pro mínimo (0), End vai pro máximo (max) — comportamento padrão de um slider nativo", "clique numa estrela específica define o value direto pela posição clicada (metade esquerda/direita quando allowHalf), sem precisar navegar por teclado"],
+    "contrastMin": "AAA (7:1) não se aplica a ícone de cor sólida do mesmo jeito que texto — usa a mesma régua de contraste de ícone já validada em Icon (cor semantic.acao-primaria sobre fundo-superficie).",
+    "notes": "readOnly nunca é focável nem clicável — é puramente display, diferente de disabled que ainda comunica 'isso normalmente seria interativo, mas está bloqueado agora' (mesma distinção conceitual de TextField/Select)."
+  },
+  "events": { "status": "não definido no contrato original" },
+  "composition": {
+    "canContain": ["Icon"],
+    "canBeContainedBy": ["cards de produto", "formulários de avaliação", "listas"],
+    "doNotCombine": ["Rating dentro de Rating", "usar Rating pra progresso/porcentagem sem ser uma nota comparável — isso é Progress Bar"]
+  },
+  "forbidden": [
+    "value fora do intervalo [0, max]",
+    "value com incremento de 0.5 quando allowHalf=false (deve ser sempre inteiro nesse modo)",
+    "onChange presente junto de state='readOnly' — readOnly nunca deveria notificar mudança, pois nunca muda por interação",
+    "display='compact' junto de state !== 'readOnly' — a variante compacta é puramente informativa, não existe versão interativa dela (clicar numa única estrela pra abrir a sequência completa não é o padrão aqui)",
+    "reimplementar Icon inline pras estrelas",
+    "cor fora da whitelist de tokensAllowed"
+  ],
+  "decisions": [
+    "CORRIGIDO — auditoria de contratos (2026-09-01): border (borda-foco) e radius (raio-xp) adicionados — o anel de foco visível de cada estrela usa outline com esses dois tokens, categorias que não estavam declaradas em tokensAllowed.",
+    "role=\"slider\" no modo interativo em vez de radiogroup de N opções — motivo prático: com allowHalf, os valores possíveis (0, 0.5, 1, 1.5...max) formam uma escala contínua o bastante que um slider comunica melhor via aria-valuetext do que N inputs de rádio individuais rotulados; sem allowHalf, ainda funciona bem porque um slider com step=1 é semanticamente equivalente a escolher entre max opções discretas.",
+    "readOnly vira role=\"img\" (não slider, não radiogroup) — quando o valor é só exibido (ex.: nota média de um produto), não existe nenhuma ação possível, então a semântica correta é 'imagem informativa com texto alternativo', igual a qualquer outro indicador visual não-interativo do harness.",
+    "Meio-ponto detectado pela metade clicada de CADA estrela (esquerda=X.5, direita=X inteiro), não por um clique-e-arraste tipo slider real — mantém a interação simples (um clique só) e visualmente óbvia (a estrela sob o cursor já mostra o preview do valor ao passar o mouse, sem precisar arrastar).",
+    "onChange vira proibido (não só opcional) quando state='readOnly' — reforça a mesma regra que Card já segue (não misturar 'isso é puramente estrutural/informativo' com 'isso reage a interação'), documentado explicitamente em vez de deixar implícito.",
+    "Ícone star-half só aparece na posição exata onde value cai no meio (ex.: value=3.5 → estrelas 1-3 cheias, estrela 4 usa star-half, estrela 5 vazia) — nunca combinando duas estrelas parciais nem tentando simular frações menores que 0.5, porque não há um caso de uso real que peça granularidade maior.",
+    "max é uma prop numérica livre (não fixo em 5) — 5 é o padrão de mercado mais comum e vira o default, mas não é hardcoded, já que 'nota de 1 a 10' é um caso real conhecido (embora não peça estrelas necessariamente, mantê-lo configurável evita reescrever o componente se aparecer).",
+    "AJUSTADO a pedido do usuário — estrelas preenchidas/meio-preenchidas usam weight='fill' do Icon (glyph sólido), não só a cor var(--acao-primaria) sobre o contorno padrão. Motivo: só trocar a cor do contorno (weight='regular') não gerava contraste visual suficiente entre marcada/não-marcada à distância; o preenchimento sólido é o padrão de mercado pra esse tipo de indicador e ficou mais legível. Estrelas vazias continuam weight='regular' (só contorno).",
+    "AJUSTADO a pedido do usuário — nova prop 'color' (green/yellow) em vez de aceitar cor livre: green reaproveita semantic.acao-primaria (já era o valor fixo antes), yellow usa semantic.borda-aviso, que já existe no harness pra sinalização de 'atenção' e visualmente é o padrão mais reconhecido pra avaliação por estrelas fora daqui. Ficou restrito a essas duas opções (não virou 'qualquer token de cor') pra não abrir a porta pra combinações fora do que faz sentido semanticamente num indicador de nota.",
+    "AJUSTADO a pedido do usuário — color='yellow' trocado de semantic.icone-aviso (Amarelo/amarelo-700, #9B610D — um tom mostarda/marrom escuro na escala primitiva) para semantic.borda-aviso (Amarelo/amarelo-500, #EBB612 — um amarelo-ouro bem mais claro e saturado). Motivo: icone-aviso foi desenhado pra texto/ícone pequeno sobre fundo claro (precisa de mais contraste, por isso é escuro), mas pra uma estrela preenchida grande o resultado lia como 'marrom', não 'amarelo'. borda-aviso já existe no harness com esse tom mais claro (reaproveitado também em Avatar, Alert e PasswordStrengthMeter como indicador visual, não só como cor de borda) — nenhum token novo precisou ser criado.",
+    "AJUSTADO a pedido do usuário — no display='compact', o TEXTO do value (ex.: '4.8') usa semantic.texto-aviso (Amarelo-700, #9B610D — o mesmo tom mostarda escuro que foi trocado na estrela pela decisão acima) em vez de borda-aviso, só quando color='yellow'. A estrela continua com borda-aviso (mais clara). Motivo: o mesmo amarelo-500 que funciona bem numa estrela preenchida grande (weight='fill', área grande de cor sólida) fica claro demais pra ler como texto pequeno — texto precisa de mais contraste que uma forma sólida grande pra ser confortável de ler. color='green' não teve esse problema (acao-primaria já tem contraste suficiente pra texto), então só a combinação display='compact' + color='yellow' usa uma cor de texto diferente da cor do ícone.",
+    "AJUSTADO a pedido do usuário — nova prop 'size' (default/large) reaproveitando icone-medio/icone-grande já existentes no Icon, em vez de expor um valor numérico livre — mantém o componente preso à escala de tamanhos do harness (mesmo racional já aplicado a outras props de tamanho no design system, ex.: Switch/Avatar).",
+    "AJUSTADO a pedido do usuário — nova prop 'display' (stars/compact), só válida com state='readOnly': compact resolve o caso 'só quero mostrar a nota, sem ocupar o espaço de max estrelas' (ex.: dentro de uma linha de Datatable, um card compacto) — 1 estrela cheia (sempre weight='fill', sempre a cor escolhida em 'color') + o texto do value formatado (ex.: '3.5', usando toFixed(1) só quando o value tem parte fracionária, senão mostra inteiro) em type-style.texto-m-forte. Não existe versão interativa de display='compact' (ver forbidden) — clicar numa estrela única pra abrir/editar a nota completa não é um padrão de interação que o harness precisa resolver agora; se aparecer um caso real, é decisão nova."
+  ],
+  "references": { "tokensFile": "tokens/tokens.json — Cores Semânticas (Ações/Primária, Ícones), Estrutural (icone-medio, foco-espessura, espaco-xp)" }
+}

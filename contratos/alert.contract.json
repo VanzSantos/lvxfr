@@ -1,0 +1,70 @@
+{
+  "name": "Alert",
+  "originalName": "Alerta",
+  "oneLiner": "Mensagem de status persistente, de formulário ou de página — diferente do HelperText, que é por campo.",
+  "category": "display",
+  "status": "draft",
+  "whenToUse": "Comunicar o resultado de uma ação de formulário/página inteira (ex.: 'usuário ou senha inválidos', 'cadastro salvo com sucesso'), um aviso persistente, ou uma informação contextual que precisa de destaque visual.",
+  "whenNotToUse": "Mensagem de erro/ajuda de UM campo específico (use HelperText, já associado via aria-describedby); notificação transiente que devia sumir sozinha (isso é Toast, fora deste harness); confirmação que bloqueia o fluxo até o usuário decidir (isso é Modal/Dialog, fora deste harness).",
+  "anatomy": [
+    "Ícone (esquerda, sempre presente — reforça o intent redundantemente à cor)",
+    "Título (opcional, negrito)",
+    "Descrição (mensagem)",
+    "Ação em texto sublinhado (opcional, na mesma linha da descrição, alinhada à direita — só quando action é fornecido, ver decisions)",
+    "Botão de fechar (direita, opcional — só quando dismissible=true)"
+  ],
+  "dependencies": ["Icon"],
+  "props": [
+    { "name": "intent", "type": "enum", "enum": ["info", "success", "warning", "error", "neutral"], "default": "info", "required": true, "description": "neutral não é um status (nem erro, nem sucesso, nem aviso, nem informação) — é pra mensagem de contexto sem carga emocional/semântica, fundo cinza claro e texto escuro (ver decisions)." },
+    { "name": "title", "type": "string", "required": false },
+    { "name": "description", "type": "string", "required": true },
+    { "name": "action", "type": "object", "required": false, "description": "{ label: string, onAction: () => void }. Quando presente, renderiza um <button> em texto sublinhado (cor = a mesma cor do texto do intent, currentColor) na MESMA linha da descrição, alinhado à direita (ver decisions) — pra ações curtas tipo 'Restaurar' embutidas no próprio alerta, em vez de exigir um botão separado fora dele." },
+    { "name": "dismissible", "type": "boolean", "default": false, "required": false },
+    { "name": "onDismiss", "type": "function", "required": false, "requiredWhen": "dismissible = true", "description": "Ausência com dismissible=true é erro em tempo de execução — mesmo padrão de accessibleLabel em Button/Icon. Alert não gerencia a própria visibilidade; só avisa, quem remove da árvore é o consumidor." }
+  ],
+  "variants": ["info", "success", "warning", "error", "neutral"],
+  "states": ["static"],
+  "tokensAllowed": {
+    "background": ["semantic.fundo-erro", "semantic.fundo-sucesso", "semantic.fundo-aviso", "semantic.fundo-info", "semantic.fundo-secundario"],
+    "border": ["semantic.borda-erro", "semantic.borda-sucesso", "semantic.borda-aviso", "semantic.borda-info", "semantic.borda-base"],
+    "text": ["semantic.texto-erro", "semantic.texto-sucesso", "semantic.texto-aviso", "semantic.texto-info", "semantic.texto-primario"],
+    "icon": ["semantic.icone-erro", "semantic.icone-sucesso", "semantic.icone-aviso", "semantic.icone-info", "semantic.icone-secundario"],
+    "radius": ["structural.raio-pp"],
+    "spacing": ["structural.espaco-pp", "structural.espaco-m"],
+    "iconSize": ["structural.icone-medio"],
+    "typography": ["type-style.texto-m", "type-style.texto-m-forte"]
+  },
+  "variantTokenMap": {
+    "note": "Mesmo esquema de determinismo do Button: sufixo do token em português concorda em feminino/forma própria (erro, sucesso, aviso, info); valor da prop em inglês (error, success, warning, info). 'warning'→'aviso' é o único par que não é cognato — atenção especial. 'neutral' é exceção deliberada ao padrão de sufixo (ver decisions): usa icone-secundario/texto-primario diretamente, não 'icone-neutro'/'texto-neutro' (tokens que não existem).",
+    "info": "info", "success": "sucesso", "warning": "aviso", "error": "erro"
+  },
+  "a11y": {
+    "role": "alert (aria-live implícito assertivo) para intent=error/warning — precisam de atenção imediata; status (aria-live implícito polido) para intent=info/success/neutral — não devem interromper o que a pessoa está fazendo.",
+    "requiredAria": ["aria-label no botão de fechar, quando dismissible=true"],
+    "keyboard": ["botão de fechar é um <button> nativo — focável, ativa com Enter/Espaço, sem reimplementação"],
+    "contrastMin": "AA em todos os pares texto/fundo do mesmo intent (medido contrato-a-contrato, não contra branco — ver decisions); a maioria alcança AAA.",
+    "notes": "Ícone nunca é opcional — reforça o intent redundantemente à cor, mesma filosofia não-negociável já usada em TextField/HelperText pro público 60+: cor sozinha nunca comunica o estado."
+  },
+  "events": { "status": "não definido no contrato original" },
+  "composition": { "canContain": ["Icon"], "canBeContainedBy": ["formulários", "páginas"], "doNotCombine": ["aninhar Alert dentro de Alert"] },
+  "forbidden": [
+    "cor fora da whitelist de tokensAllowed pro intent ativo",
+    "dismissible=true sem onDismiss — erro em tempo de execução, não falha silenciosa",
+    "usar Alert pra mensagem de UM campo — isso é HelperText, que já é associado ao input via aria-describedby",
+    "esconder o ícone (decorative ou não) — o intent nunca pode depender só da cor",
+    "novo intent fora da lista sem atualizar este contrato primeiro"
+  ],
+  "decisions": [
+    "4 intents (info/success/warning/error) mapeiam direto pras 4 famílias 'Sinalização' que já existem em tokens.json — nenhum token novo de cor foi criado, só trazidos pro tokens.css. As famílias apoio-1/apoio-2 também existem no tokens.json mas não têm significado universal de status (são tons de categoria/marca, não 'isso deu certo/errado') — ficaram fora deste contrato; usar Alert pra 'apoio' não tem semântica clara. Se surgir um caso real, é decisão nova.",
+    "role dinâmica por intent: 'alert' (interrompe, aria-live assertivo) só pra error/warning, que precisam de atenção imediata — ex.: 'usuário ou senha inválidos' depois de um submit. 'status' (aria-live polido) pra info/success, que não devem cortar o que a pessoa está fazendo no meio.",
+    "Contraste testado texto-do-intent CONTRA o fundo tintado do MESMO intent (não contra branco, que seria um teste artificial já que o Alert nunca aparece sobre fundo branco puro): erro 7.32:1 (AAA), sucesso 6.87:1 (AA), aviso 4.90:1 (AA — o mais apertado, não reduzir peso do texto ali), info 6.84:1 (AA).",
+    "Título usa type-style.texto-m-forte (negrito, token de tipografia dedicado que já existe em tokens.json) — não é font-weight cru aplicado por fora.",
+    "dismissible/onDismiss: Alert é 100% controlado, como todo o resto do harness (TextField/value, Checkbox/checked) — não guarda estado próprio de 'estou visível'. onDismiss só avisa; remover da árvore é responsabilidade de quem consome.",
+    "Ícone por intent é fixo (não é uma prop customizável) — info→'info', success→'check-circle', warning→'warning-circle', error→'x-circle', neutral→'info' (mesmo glifo do info, ver decision abaixo) — mantém o registro fechado do Icon e a consistência visual entre todos os usos de Alert no produto.",
+    "REVISADO — contorno (border-color) de info/success/warning/error trocado da cor 'crua' (ex.: borda-erro #eb5757, bem saturada) pra color-mix(in srgb, var(--borda-X) 35%, var(--fundo-X)) — mistura a mesma cor semântica com o próprio fundo tintado do Alert, produzindo um contorno bem mais sutil (mesmo tom, muito menos saturado) sem inventar nenhum token de cor novo. Pedido explícito do usuário ('cores genéricas e sem graça, contorno mais sutil melhoraria'). Mesma técnica (color-mix sobre tokens existentes) já usada em outros lugares do harness (ex.: hover do botão de fechar deste próprio Alert).",
+    "Intent 'neutral' adicionado a pedido do usuário — fundo cinza claro (fundo-secundario) + texto escuro (texto-primario), pra mensagem de contexto sem carga de status (nem erro, nem sucesso, nem aviso, nem info). Ícone reaproveita o glifo de 'info' (só muda a cor, pra icone-secundario) — não existe um glifo 'neutro' que faça sentido ter separado, e a regra de 'ícone nunca é opcional' (a11y.notes) continua valendo. Contorno usa borda-base diretamente (já é um cinza neutro, sem saturação pra suavizar via color-mix como os outros 4 intents).",
+    "AJUSTADO a pedido do usuário — nova prop 'action' opcional ({ label, onAction }), pra casos como Datatable precisar de um Alert com uma ação curta embutida (ver contratos/datatable.contract.json, decisions, colunas ocultas). Renderizada como <button> em texto sublinhado, cor=currentColor (herda a cor de texto do intent ativo, sem token extra) — não é um Button do harness (variant='link') porque Button tem padding/altura pensados pra ficar fora de contexto de texto corrido; aqui a ação precisa ler como parte da frase, não como um controle separado flutuando ao lado. Alert continua 100% controlado: onAction só avisa, quem decide o que fazer (ex.: restaurar colunas) é responsabilidade de quem consome, mesmo racional já usado em onDismiss.",
+    "AJUSTADO a pedido do usuário — description e action ficam na MESMA linha (flex row, justify-content:space-between, action alinhado à direita), não mais empilhados verticalmente. Motivo: o caso de uso real (Datatable, colunas ocultas) pedia um alerta de uma linha só, sem quebra — o layout anterior (action abaixo da descrição, alinhado à esquerda) ocupava uma segunda linha sem necessidade quando a descrição é curta o bastante pra caber ao lado da ação. Quando title também está presente, ele continua numa linha própria acima (title nunca teve layout inline com a ação, isso não mudou)."
+  ],
+  "references": { "tokensFile": "tokens/tokens.json — Cores Semânticas (Fundos/Sinalização, Bordas/Sinalização, Textos/Sinalização, Ícones/Sinalização), Estrutural (raio-pp, espaco-pp/m, icone-medio), Tipografia Estilo (texto-m, texto-m-forte)" }
+}

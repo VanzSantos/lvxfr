@@ -1,0 +1,137 @@
+.wrapper {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+.small {
+  width: var(--icone-grande);
+  height: var(--icone-grande);
+}
+
+.medium {
+  width: var(--icone-extra-grande);
+  height: var(--icone-extra-grande);
+}
+
+.large {
+  width: var(--espaco-xg);
+  height: var(--espaco-xg);
+}
+
+.xlarge {
+  width: var(--espaco-xgg);
+  height: var(--espaco-xgg);
+}
+
+.frame {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.circle {
+  border-radius: var(--raio-circular);
+}
+
+.square {
+  border-radius: var(--raio-p);
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.fallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* fundo-secundario funciona bem no modo claro (fundo bem clarinho, com
+     contraste suficiente contra a página branca) — só no modo escuro ele
+     ficou clarinho demais depois do escurecimento geral dos fundos, quase
+     se fundindo com a página; ver override [data-theme="dark"] abaixo. */
+  background: var(--fundo-secundario);
+  color: var(--texto-secundario);
+}
+
+/* AJUSTADO a pedido do usuário — só no modo escuro: fundo-secundario ficou
+   próximo demais do fundo da página depois do escurecimento geral; troca
+   pra borda-inativo (mais claro, ainda neutro) só nesse tema, preservando
+   fundo-secundario (correto) no modo claro. */
+:root[data-theme="dark"] .fallback {
+  background: var(--borda-inativo);
+}
+
+.small .fallback {
+  font-family: var(--texto-p-family);
+  font-size: var(--texto-p-size);
+  font-weight: var(--texto-p-weight);
+  line-height: var(--texto-p-line-height);
+}
+
+.medium .fallback {
+  font-family: var(--texto-m-family);
+  font-size: var(--texto-m-size);
+  font-weight: var(--texto-m-weight);
+  line-height: var(--texto-m-line-height);
+}
+
+.large .fallback {
+  font-family: var(--texto-m-forte-family);
+  font-size: var(--texto-m-forte-size);
+  font-weight: var(--texto-m-forte-weight);
+  line-height: var(--texto-m-forte-line-height);
+}
+
+.xlarge .fallback {
+  font-family: var(--texto-g-forte-family);
+  font-size: var(--texto-g-forte-size);
+  font-weight: var(--texto-g-forte-weight);
+  line-height: var(--texto-g-forte-line-height);
+}
+
+.statusDot {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  box-sizing: border-box;
+  border-radius: var(--raio-circular);
+  border: 2px solid var(--fundo-superficie);
+}
+
+.small .statusDot {
+  width: 8px;
+  height: 8px;
+}
+
+.medium .statusDot {
+  width: 10px;
+  height: 10px;
+}
+
+.large .statusDot {
+  width: 14px;
+  height: 14px;
+}
+
+.xlarge .statusDot {
+  width: 18px;
+  height: 18px;
+}
+
+.online {
+  background: var(--borda-sucesso);
+}
+
+.away {
+  background: var(--borda-aviso);
+}
+
+.offline {
+  background: var(--borda-inativo);
+}

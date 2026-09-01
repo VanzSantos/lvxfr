@@ -1,0 +1,61 @@
+{
+  "name": "Wizard",
+  "originalName": "AssistenteMultiEtapas",
+  "oneLiner": "Orquestra a navegação (Anterior/Próxima/Concluir) e validação entre telas de um fluxo multi-etapa, reaproveitando o Stepper como indicador visual de progresso.",
+  "category": "data-entry",
+  "status": "draft",
+  "whenToUse": "Fluxo real onde o usuário avança por telas sequenciais até completar uma tarefa (ex.: cadastro em múltiplas etapas, checkout), com a possibilidade de voltar pra etapas já concluídas e cada etapa podendo bloquear o avanço até estar válida.",
+  "whenNotToUse": "Só mostrar progresso sem navegar de verdade entre telas (isso é Stepper sozinho, sem Wizard — ver stepper.contract.json); etapas que não têm ordem real entre si (isso é Tabs)."
+  ,
+  "anatomy": [
+    "Stepper (reaproveitado, ver stepper.contract.json) — indicador de progresso no topo, clicável só pra etapas já concluídas",
+    "Área de conteúdo — renderiza APENAS o content da etapa atual (steps[currentStep].content), livre",
+    "Rodapé de navegação — botão 'Anterior' (some/desabilita na primeira etapa) e botão 'Próxima'/'Concluir' (o label muda sozinho na última etapa)"
+  ],
+  "dependencies": ["Stepper", "Button"],
+  "props": [
+    { "name": "steps", "type": "array", "required": true, "description": "Array de { label: string, description?: string, icon?: IconName, content: node }. Mesma forma de items do Stepper, mais o content de cada etapa (conteúdo livre — formulário, texto, o que for)." },
+    { "name": "currentStep", "type": "number", "required": true, "description": "Índice (0-based) da etapa atual. Controlado — Wizard não decide sozinho, mesmo padrão do Stepper." },
+    { "name": "onStepChange", "type": "function", "required": true, "description": "Assinatura (index: number) => void, chamado ao navegar (Anterior, Próxima, ou clique numa etapa já concluída no Stepper)." },
+    { "name": "onComplete", "type": "function", "required": true, "description": "Assinatura () => void, chamado ao clicar 'Concluir' na última etapa (depois de validateStep passar, se fornecida)." },
+    { "name": "validateStep", "type": "function", "required": false, "description": "Assinatura (index: number) => boolean | Promise<boolean>. Chamada antes de avançar (Próxima/Concluir) pra etapa index. Retornando false (ou uma Promise que resolve false) BLOQUEIA o avanço — Wizard permanece na etapa atual. Ausente = qualquer etapa pode avançar livremente." },
+    { "name": "accessibleLabel", "type": "string", "required": false, "default": "Etapas do formulário", "description": "Repassado pro Stepper interno." },
+    { "name": "previousLabel", "type": "string", "required": false, "default": "Anterior", "description": "Texto do botão de voltar." },
+    { "name": "nextLabel", "type": "string", "required": false, "default": "Próxima etapa", "description": "Texto do botão de avançar (etapas que não são a última)." },
+    { "name": "completeLabel", "type": "string", "required": false, "default": "Concluir", "description": "Texto do botão na última etapa (substitui nextLabel)." }
+  ],
+  "variants": [],
+  "states": ["default", "validating"],
+  "tokensAllowed": {
+    "spacing": ["structural.espaco-m", "structural.espaco-g"]
+  },
+  "a11y": {
+    "role": "nenhum role customizado — o Stepper interno já carrega sua semântica própria (nav+ol), a área de conteúdo é um <div> genérico (mesmo racional de Card: sem semântica forçada, quem preenche content decide).",
+    "requiredAria": ["botão 'Próxima'/'Concluir' reflete state='loading' (spinner + desabilitado) durante validateStep assíncrona, mesmo padrão de Button", "foco move pro início do conteúdo da nova etapa após navegar — evita o usuário 'perder o lugar' ao trocar de tela"],
+    "keyboard": ["Tab navega dentro do content livre da etapa atual normalmente", "Enter/Espaço nos botões Anterior/Próxima/Concluir (nativo de Button)", "clicar numa etapa já concluída no Stepper navega direto pra ela (mesmo comportamento de onStepClick do Stepper)"],
+    "contrastMin": "Herdado dos componentes internos (Stepper, Button), já validados nos respectivos contratos.",
+    "notes": "Etapas pending nunca são alcançáveis por clique no Stepper (mesma regra do próprio Stepper) — a única forma de avançar é pelo botão 'Próxima'/'Concluir', que passa por validateStep quando fornecida."
+  },
+  "events": { "status": "não definido no contrato original" },
+  "composition": {
+    "canContain": ["Stepper", "Button", "qualquer conteúdo livre por etapa via steps[].content"],
+    "canBeContainedBy": ["páginas de fluxo multi-etapa (cadastro, checkout)"],
+    "doNotCombine": ["Wizard dentro de Wizard", "usar Wizard só pra mostrar progresso sem navegação real — nesse caso é só Stepper"]
+  },
+  "forbidden": [
+    "avançar de etapa sem passar por validateStep quando ela é fornecida",
+    "permitir pular pra uma etapa pending clicando no Stepper",
+    "renderizar o content de mais de uma etapa ao mesmo tempo",
+    "onComplete disparar antes da última etapa",
+    "cor fora da whitelist de tokensAllowed"
+  ],
+  "decisions": [
+    "Reaproveita Stepper como indicador (mesmo componente, mesma decisão já registrada em stepper.contract.json: 'Wizard reaproveita Stepper como indicador visual, mas Stepper nunca sabe o que está sendo validado ou quando avançar') — Wizard é quem decide a lógica de navegação/validação, Stepper só reflete currentStep.",
+    "validateStep aceita retorno síncrono OU Promise — cobre tanto validação local instantânea (ex.: campos obrigatórios preenchidos) quanto validação que depende de uma chamada de rede (ex.: verificar disponibilidade de um e-mail) sem precisar de duas APIs diferentes.",
+    "Falha de validateStep (retorna/resolve false) só IMPEDE o avanço — Wizard não sabe nem mostra POR QUE falhou; a etapa atual (content) é responsável por exibir seus próprios erros (ex.: HelperText de erro no campo problemático), mesmo racional de FileUpload's onReject: quem sabe o motivo é quem consome, não o orquestrador.",
+    "content de cada etapa é sempre montado/desmontado ao trocar (diferente do TabPanel de Tabs, que usa hidden pra preservar estado) — decisão deliberada: etapas de um Wizard tipicamente representam blocos de formulário distintos que o próprio consumidor já mantém em estado externo (ex.: um objeto de formulário no componente pai), então não há necessidade de preservar o DOM interno de uma etapa não-visível.",
+    "Botão muda de 'Próxima etapa' pra 'Concluir' sozinho na última etapa (via nextLabel/completeLabel) — evita o consumidor ter que checar currentStep === steps.length - 1 toda vez só pra trocar o texto do botão.",
+    "CORRIGIDO — auditoria de A11y (2026-09-01): o contrato já prometia (requiredAria) que o foco move pro início do conteúdo da nova etapa após navegar, mas o componente não implementava isso — Wizard não tinha nenhum useRef/.focus(). BUG REAL, não uma decisão nova: sem isso, um usuário de teclado/leitor de tela avança de etapa e o foco fica parado no botão 'Próxima etapa', sem indicação nenhuma de que o conteúdo mudou. Corrigido com um ref no container do conteúdo (tabIndex={-1}, focável programaticamente sem entrar na ordem normal de Tab) + useEffect que chama .focus() nele toda vez que currentStep muda."
+  ],
+  "references": { "tokensFile": "tokens/tokens.json — Estrutural (espaco-m/g) — a maior parte do visual vem dos componentes reaproveitados (Stepper, Button)" }
+}

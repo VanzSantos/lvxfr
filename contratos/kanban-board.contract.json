@@ -1,0 +1,70 @@
+{
+  "name": "KanbanBoard",
+  "originalName": "QuadroKanban",
+  "oneLiner": "Grade de colunas de mesma altura (ex.: Novos/Em andamento/Concluídos), cada uma com contador no cabeçalho e uma lista vertical de TicketCard arrastável — dentro da coluna e entre colunas.",
+  "category": "display",
+  "status": "draft",
+  "whenToUse": "Visualizar uma fila de trabalho organizada por estágio/status, com um TicketCard por item, opcionalmente reordenável por drag-and-drop — ex.: módulo de Tickets do Credenciamento (analise-sistemas-legados.md, item 1.5). Colunas são definidas por quem consome (não um enum fixo do harness), porque o vocabulário de estágios varia por domínio (Novos/Em andamento/Concluídos num sistema, Aberto/Triagem/Resolvido em outro).",
+  "whenNotToUse": "Lista simples sem noção de estágio/coluna (isso é só uma lista de TicketCard, sem KanbanBoard por cima).",
+  "anatomy": [
+    "Container com altura 100% do espaço disponível (definida por quem consome) e scroll horizontal (colunas não quebram linha, cada uma com largura fixa) — todas as colunas esticadas pra mesma altura (align-items:stretch), até o fim do espaço disponível",
+    "Por coluna: cabeçalho FIXO (título + Badge neutro com a contagem de tickets, nunca rola) + corpo com scroll vertical PRÓPRIO (um TicketCard por ticket, empilhados verticalmente) quando os cards excedem a altura da coluna",
+    "Coluna vazia mostra um texto simples 'Nenhum ticket' no lugar da lista — continua sendo um alvo de drop válido quando onMoveTicket é fornecido",
+    "Cada TicketCard é arrastável (quando onMoveTicket é fornecido) — @dnd-kit/core + @dnd-kit/sortable por baixo; DragOverlay mostra uma cópia do card sendo arrastado, coluna de origem reflete a remoção em tempo real (onDragOver), posição final confirmada em onDragEnd"
+  ],
+  "dependencies": ["TicketCard", "Badge", "@dnd-kit/core", "@dnd-kit/sortable", "@dnd-kit/utilities"],
+  "props": [
+    { "name": "columns", "type": "array", "required": true, "description": "Array de { id: string, title: string, tickets: KanbanTicket[] }. KanbanTicket = { id, title, priority, deadlineLabel?, metadata?, assignee?, enabled? } — mesmo shape de dados do TicketCard, mais um id obrigatório (usado como key, pros callbacks fechados por ticket E como id de item arrastável do dnd-kit)." },
+    { "name": "onMoveTicket", "type": "function", "required": false, "description": "Assinatura ({ ticketId, fromColumnId, toColumnId, toIndex }) => void. Presença ativa TODO o drag-and-drop (monta DndContext, sensores, listeners em cada card) — ausência = colunas 100% estáticas, nenhum listener de arrastar montado (nem custo de performance nem risco de interação acidental). KanbanBoard reflete o arrasto visualmente em tempo real usando um espelho de estado local (ver decisions), mas quem tem a fonte da verdade é sempre quem consome — precisa aplicar o evento no PRÓPRIO array de columns pra manter consistência (mesmo padrão de componente controlado do resto do harness)." },
+    { "name": "onDuplicate", "type": "function", "required": false, "description": "Assinatura (ticketId: string) => void. Repassado a cada TicketCard como onDuplicate, já fechado (closure) sobre o id do ticket específico." },
+    { "name": "onToggleEnabled", "type": "function", "required": false, "description": "Assinatura (ticketId: string) => void. Mesmo padrão de onDuplicate." },
+    { "name": "onEdit", "type": "function", "required": false, "description": "Assinatura (ticketId: string) => void." },
+    { "name": "onViewDetails", "type": "function", "required": false, "description": "Assinatura (ticketId: string) => void." },
+    { "name": "onDelete", "type": "function", "required": false, "description": "Assinatura (ticketId: string) => void." }
+  ],
+  "variants": [],
+  "states": ["static", "dragging"],
+  "tokensAllowed": {
+    "background": ["semantic.fundo-secundario"],
+    "text": ["semantic.texto-primario", "semantic.texto-inativo"],
+    "radius": ["structural.raio-pp"],
+    "spacing": ["structural.espaco-xp", "structural.espaco-p"],
+    "typography": ["type-style.texto-m-forte", "type-style.texto-p"]
+  },
+  "a11y": {
+    "role": "nenhum role customizado próprio — colunas e tickets são divs comuns; a navegação relevante já vem de dentro de cada TicketCard (botão de overflow com aria-label próprio). Quando onMoveTicket é fornecido, o dnd-kit aplica role='button', aria-roledescription='sortable' e tabIndex=0 automaticamente no wrapper arrastável de cada card.",
+    "requiredAria": ["nenhuma aria própria do KanbanBoard além do que o dnd-kit já injeta no wrapper arrastável (role/aria-roledescription/tabIndex) — toda a semântica interativa dos botões continua resolvida dentro do TicketCard"],
+    "keyboard": ["Tab percorre os TicketCards e seus botões de overflow na ordem DOM (coluna a coluna, topo a baixo); sem roving tabindex customizado nesta v1", "scroll horizontal do board é nativo do navegador (setas/Tab não pulam entre colunas de propósito)", "LIMITAÇÃO CONHECIDA — drag-and-drop nesta v1 usa só PointerSensor (mouse/touch/caneta) do dnd-kit, sem KeyboardSensor; reordenar/mover um card via teclado (Espaço pra pegar, setas pra mover, Espaço pra soltar) não está implementado ainda. Se um caso real de acessibilidade exigir isso, é decisão nova (adicionar KeyboardSensor é incremental, não uma reescrita)."],
+    "contrastMin": "Herdado do TicketCard/Badge internos, já validados nos próprios contratos.",
+    "notes": "Sem semântica de lista (<ul>/<li>) nas colunas/tickets — são cartões visuais, não uma lista de navegação; mesma decisão já usada em grades de ActionCard. PointerSensor usa activationConstraint de 8px de distância — um clique simples (sem mover o mouse) nunca inicia um arrasto, então o botão de overflow (···) de cada TicketCard continua clicável normalmente mesmo com o card inteiro sendo a área de arrasto."
+  },
+  "events": { "status": "não definido no contrato original" },
+  "composition": {
+    "canContain": ["TicketCard", "Badge"],
+    "canBeContainedBy": ["páginas de gestão de fila/atendimento"],
+    "doNotCombine": ["KanbanBoard dentro de KanbanBoard", "usar KanbanBoard só pra listar itens sem noção de coluna/estágio — nesse caso é só uma lista de TicketCard"]
+  },
+  "forbidden": [
+    "reimplementar TicketCard/Badge inline",
+    "cor fora da whitelist de tokensAllowed",
+    "tickets sem id — obrigatório pra key, pros callbacks fechados por ticket E como id de item arrastável do dnd-kit",
+    "montar DndContext/sensores quando onMoveTicket não é fornecido — sem esse callback, o board é 100% estático (nem os listeners de pointer são registrados)",
+    "coluna sem altura definida pelo próprio board (min-height:0 + flex:1 no corpo) — o scroll interno depende de a coluna nunca crescer além da altura disponível"
+  ],
+  "decisions": [
+    "Nasceu da análise de sistemas legados (analise-sistemas-legados.md, item 1.5) — módulo de Tickets do Credenciamento, mesma origem do TicketCard (item 5.1 do roadmap), que o KanbanBoard compõe.",
+    "AJUSTADO a pedido do usuário — drag-and-drop real implementado com @dnd-kit (core + sortable + utilities), confirmando o caso de uso que antes só era uma interrogação no print legado ('cartões arrastáveis(?)'). @dnd-kit escolhido (com o usuário, entre opções apresentadas) em vez de react-beautiful-dnd (descontinuada) ou react-dnd (mais verbosa, menos acessível por padrão) — mantida ativamente, modular, com melhor suporte de acessibilidade de fábrica.",
+    "Arquitetura do drag: presença de onMoveTicket ativa TUDO (DndContext, PointerSensor, SortableContext por coluna, useDroppable por coluna) — ausência mantém o board 100% estático, sem nenhum listener montado (mesmo racional de onOverflowMenu opcional no TicketCard: a feature só existe quando o consumidor pede). KanbanBoard mantém um espelho de estado local (localColumns) sincronizado de columns via useEffect — durante o arrasto, onDragOver move o ticket entre os arrays LOCAIS em tempo real (pra dar feedback visual imediato cruzando colunas, sem esperar o consumidor re-renderizar), e onDragEnd calcula a posição final e chama onMoveTicket UMA VEZ com { ticketId, fromColumnId, toColumnId, toIndex } — a fonte da verdade continua sendo o consumidor, que deve aplicar esse evento no seu próprio estado (columns muda, localColumns resincroniza). Mesmo padrão 'estado local otimista + callback pra fonte de verdade' usado em qualquer lista arrastável real (ex.: exemplo oficial multi-container do próprio dnd-kit).",
+    "PointerSensor com activationConstraint.distance=8 — um clique simples (sem arrastar 8px) nunca inicia um drag, garantindo que o botão de overflow (···) dentro do card continue 100% clicável mesmo com o card inteiro funcionando como alça de arrasto (área de drag = card inteiro, não uma alcinha separada — mais fácil de pegar, print legado não mostrava uma alça dedicada).",
+    "Card sendo arrastado usa DragOverlay do dnd-kit (uma cópia visual solta do fluxo normal, seguindo o ponteiro) — o card original na lista fica com opacity:0.4 enquanto arrasta, prática padrão do dnd-kit pra deixar claro qual item está em movimento sem duplicar visualmente.",
+    "LIMITAÇÃO CONHECIDA — só PointerSensor (mouse/touch/caneta), sem KeyboardSensor: reordenar via teclado não funciona nesta v1 (ver a11y, keyboard). Adicionar suporte a teclado é incremental quando um caso real pedir.",
+    "AJUSTADO a pedido do usuário — colunas agora esticam pra MESMA altura (`.board` trocou `align-items:flex-start` por `align-items:stretch`) e cada coluna tem scroll vertical PRÓPRIO no corpo (`.columnBody` com `flex:1; min-height:0; overflow-y:auto`), com o cabeçalho (título+contador) fixo fora da área de scroll (`flex-shrink:0`). Isso faz o board precisar de uma altura definida vinda de fora (de quem consome) — decisão explícita: KanbanBoard não assume mais 'altura pelo conteúdo', ele PREENCHE o espaço vertical disponível do container pai. Quem consome (ex.: KanbanTemplate) é responsável por dar esse espaço uma altura real (100dvh menos header, por exemplo).",
+    "columns não é um enum fixo do harness (diferente de priority no TicketCard) — o vocabulário de estágios (Novos/Em andamento/Concluídos vs. outros nomes) é decisão de cada domínio que consome o board, não do design system. O harness só define COMO uma coluna se parece (cabeçalho com contador + lista de cards), não QUAIS colunas existem.",
+    "Callbacks de ação (onDuplicate/onToggleEnabled/onEdit/onViewDetails/onDelete) recebem ticketId em vez de exigir que o consumidor monte 5 callbacks fechados por ticket manualmente — KanbanBoard já faz esse fechamento (closure) internamente ao passar pra cada TicketCard, poupando repetição óbvia de quem consome um board inteiro (diferente de reimplementar toda a lógica de menu, que continua 100% dentro do TicketCard).",
+    "Contador do cabeçalho reaproveita Badge (variant='neutral', count=tickets.length) — nenhum componente/token novo criado só pra esse número.",
+    "Coluna vazia mostra um texto simples ('Nenhum ticket'), não o componente EmptyState — EmptyState foi desenhado pra ocupar uma área de destaque (ícone extraLarge + título + ação), pesado demais pra uma coluna estreita de 280px; aqui é só um texto de apoio (texto-inativo), mesmo racional de peso visual proporcional ao espaço disponível já aplicado em outros contratos.",
+    "Board tem scroll horizontal nativo (overflow-x: auto) com colunas de largura fixa (280px) — mesmo padrão visual de um Kanban tradicional, sem quebrar colunas em várias linhas.",
+    "BUG REAL corrigido em teste no navegador — .board (flex item dentro do wrapper de demo, também flex) não tinha width:100%/min-width:0, então o próprio flex item crescia até a largura do conteúdo (soma das colunas) em vez de respeitar o espaço do pai; o overflow-x:auto declarado nunca engatava (scrollWidth==clientWidth do próprio board) e quem escondia o excesso era o ancestral mais acima, cortando a primeira coluna e centralizando o corte dos dois lados. Mesma classe de bug já documentada no ProgressList (item 3.1 do roadmap) — root de um componente que precisa preencher o container sempre precisa de width:100% explícito quando vive dentro de flex; aqui, adicionalmente, min-width:0 pra permitir que o próprio flex item ENCOLHA abaixo do min-content e ative seu scroll interno, em vez de só crescer."
+  ],
+  "references": { "tokensFile": "tokens/tokens.json — Cores Semânticas (Fundos, Textos), Estrutural (raio-pp, espaco-xp/p), Tipografia Estilo (texto-m-forte, texto-p)" }
+}

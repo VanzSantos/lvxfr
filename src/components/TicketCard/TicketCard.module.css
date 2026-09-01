@@ -1,0 +1,125 @@
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-p);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.overflowButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: none;
+  border: none;
+  border-radius: var(--raio-xp);
+  cursor: pointer;
+}
+
+.overflowButton:hover {
+  background: var(--fundo-secundario);
+}
+
+.overflowButton:focus-visible {
+  outline: var(--foco-espessura) solid var(--borda-foco);
+  outline-offset: 1px;
+}
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  min-width: 180px;
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-xp);
+  padding: var(--espaco-pp) var(--espaco-p);
+  border: none;
+  background: none;
+  border-radius: var(--raio-xp);
+  color: var(--texto-primario);
+  font-family: var(--texto-p-family);
+  font-size: var(--texto-p-size);
+  line-height: var(--texto-p-line-height);
+  text-align: left;
+  cursor: pointer;
+}
+
+.menuItem:hover {
+  background: var(--fundo-secundario);
+}
+
+.menuItem:focus-visible {
+  outline: var(--foco-espessura) solid var(--borda-foco);
+  outline-offset: -2px;
+}
+
+.menuItemDestructive {
+  color: var(--texto-erro);
+}
+
+.title {
+  display: block;
+  color: var(--texto-primario);
+  font-family: var(--texto-m-forte-family);
+  font-size: var(--texto-m-forte-size);
+  font-weight: var(--texto-m-forte-weight);
+  line-height: var(--texto-m-forte-line-height);
+}
+
+.deadline {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espaco-xp);
+  width: fit-content;
+  color: var(--texto-secundario);
+  font-family: var(--texto-micro-family);
+  font-size: var(--texto-micro-size);
+  font-weight: var(--texto-micro-weight);
+}
+
+.metadata {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-xp);
+}
+
+.metadataRow {
+  display: flex;
+  align-items: baseline;
+  gap: var(--espaco-xp);
+  font-family: var(--texto-p-family);
+  font-size: var(--texto-p-size);
+  line-height: var(--texto-p-line-height);
+}
+
+.metadataLabel {
+  color: var(--texto-secundario);
+}
+
+.metadataValue {
+  color: var(--texto-primario);
+  font-weight: 700;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-xp);
+  margin-top: var(--espaco-xp);
+}
+
+.assigneeName {
+  color: var(--texto-secundario);
+  font-family: var(--texto-p-family);
+  font-size: var(--texto-p-size);
+  line-height: var(--texto-p-line-height);
+}

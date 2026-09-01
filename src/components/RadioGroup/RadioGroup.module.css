@@ -1,0 +1,37 @@
+.fieldset {
+  border: none;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+.legend {
+  padding: 0;
+  margin-bottom: var(--espaco-pp);
+  font-family: var(--texto-rotulo-campo-family);
+  font-size: var(--texto-rotulo-campo-size);
+  font-weight: var(--texto-rotulo-campo-weight);
+  line-height: var(--texto-rotulo-campo-line-height);
+  color: var(--texto-primario);
+}
+
+.required {
+  color: var(--texto-obrigatorio);
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-xp);
+}
+
+.optionsHorizontal {
+  flex-direction: row;
+  flex-wrap: wrap;
+  column-gap: var(--espaco-m);
+  row-gap: var(--espaco-pp);
+}
+
+.helperTextWrapper {
+  margin-top: var(--espaco-xp);
+}

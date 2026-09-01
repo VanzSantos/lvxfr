@@ -1,0 +1,167 @@
+{
+  "name": "Otp",
+  "originalName": "CodigoDeVerificacao",
+  "oneLiner": "Um campo por dígito pra digitar um código de verificação (ex.: 2FA, confirmação de e-mail/SMS) — foco avança sozinho, cola o código inteiro de uma vez.",
+  "category": "data-entry",
+  "status": "draft",
+  "whenToUse": "Capturar um código curto e numérico enviado por SMS/e-mail/app autenticador (2FA, confirmação de cadastro) — o padrão visual de 'uma caixa por dígito' já é reconhecido pelo usuário como esse tipo de campo especificamente.",
+  "whenNotToUse": "Qualquer texto/número livre sem um formato fixo de N dígitos (isso é TextField); senha (tem seu próprio padrão de mascaramento em TextField type='password', não é um código de uso único).",
+  "anatomy": [
+    "Grupo (role=group) de N caixas de input, uma por dígito — cada uma aceita só 1 caractere numérico",
+    "FieldLabel opcional acima do grupo, HelperText opcional abaixo (erro/apoio)"
+  ],
+  "dependencies": [
+    "FieldLabel",
+    "HelperText"
+  ],
+  "props": [
+    {
+      "name": "length",
+      "type": "number",
+      "required": false,
+      "default": 6,
+      "description": "Quantidade de dígitos/caixas. Determina o tamanho máximo de value."
+    },
+    {
+      "name": "value",
+      "type": "string",
+      "required": true,
+      "description": "String só com os dígitos já preenchidos (ex.: '123', '123456'), tamanho entre 0 e length. 100% controlado, mesmo padrão de TextField."
+    },
+    {
+      "name": "onChange",
+      "type": "function",
+      "required": true,
+      "description": "Assinatura (value: string) => void, chamado a cada dígito digitado, apagado ou colado — sempre com a string completa resultante."
+    },
+    {
+      "name": "onComplete",
+      "type": "function",
+      "required": false,
+      "description": "Assinatura (value: string) => void, chamado uma vez quando value atinge length dígitos, já com o valor completo como argumento — não só (), especificamente pra evitar que quem consome precise ler seu próprio state (ex.: um value de fora ainda não re-renderizado no mesmo tick que o onChange que acabou de disparar, ver decisions)."
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "required": false,
+      "description": "Rótulo do grupo inteiro."
+    },
+    {
+      "name": "state",
+      "type": "enum",
+      "enum": [
+        "default",
+        "error",
+        "disabled"
+      ],
+      "default": "default",
+      "required": false,
+      "description": "Mesmo enum de TextField (sem 'focus'/'readOnly' — não fazem sentido aqui: foco é local por caixa, e todo Otp já é sempre editável quando não disabled)."
+    },
+    {
+      "name": "helperText",
+      "type": "string",
+      "required": false,
+      "description": "Texto de apoio/erro abaixo do grupo."
+    },
+    {
+      "name": "accessibleLabel",
+      "type": "string",
+      "required": false,
+      "default": "Código de verificação",
+      "description": "Nome acessível do role=group quando não há label visível."
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "required": false,
+      "description": "Nome pra integração com formulários nativos (value combinado enviado como um campo só)."
+    }
+  ],
+  "variants": [],
+  "states": [
+    "default",
+    "filled",
+    "error",
+    "disabled"
+  ],
+  "tokensAllowed": {
+    "background": [
+      "semantic.fundo-superficie",
+      "semantic.fundo-secundario",
+      "semantic.fundo-campo"
+    ],
+    "border": [
+      "semantic.borda-base",
+      "semantic.borda-erro",
+      "semantic.borda-inativo",
+      "semantic.borda-foco"
+    ],
+    "text": [
+      "semantic.texto-primario",
+      "semantic.texto-inativo"
+    ],
+    "radius": [
+      "structural.raio-pp"
+    ],
+    "focusRing": [
+      "structural.foco-espessura"
+    ],
+    "spacing": [
+      "structural.espaco-xp",
+      "structural.espaco-pp"
+    ],
+    "typography": [
+      "type-style.texto-g-forte"
+    ]
+  },
+  "a11y": {
+    "role": "group (aria-label=accessibleLabel, ou aria-labelledby quando label visível está presente) envolvendo as N caixas — cada caixa é um <input> normal (type='text' inputMode='numeric' pattern='[0-9]*' maxLength=1).",
+    "requiredAria": [
+      "aria-label em cada caixa individual (ex.: 'Dígito 3 de 6')",
+      "aria-invalid nas caixas quando state='error'",
+      "aria-describedby apontando pro HelperText quando presente"
+    ],
+    "keyboard": [
+      "digitar um dígito preenche a caixa focada e avança o foco pra próxima automaticamente",
+      "Backspace numa caixa vazia apaga o dígito da caixa anterior e move o foco pra ela (mesmo padrão universal desse tipo de campo)",
+      "setas esquerda/direita movem o foco entre caixas sem apagar nada",
+      "colar (Ctrl/Cmd+V) uma string de N dígitos na PRIMEIRA caixa focada preenche todas as caixas de uma vez e move o foco pra última preenchida (ou pra a próxima vazia, se colar menos dígitos que length)"
+    ],
+    "contrastMin": "AAA (7:1) pro dígito preenchido, mesma régua do resto do harness.",
+    "notes": "Cada caixa tem só 1 caractere visível — o código completo nunca aparece 'mascarado' tipo senha, o padrão em si já comunica que é um código temporário, não um segredo permanente."
+  },
+  "events": {
+    "status": "não definido no contrato original"
+  },
+  "composition": {
+    "canContain": [],
+    "canBeContainedBy": [
+      "formulários",
+      "páginas (ex.: tela de verificação em 2 fatores)"
+    ],
+    "doNotCombine": [
+      "Otp dentro de Otp",
+      "usar Otp pra qualquer código que não seja estritamente numérico de tamanho fixo — nesse caso é TextField"
+    ]
+  },
+  "forbidden": [
+    "value com mais caracteres que length",
+    "value com caractere não-numérico chegando via onChange (a própria digitação já filtra, mas colar texto misto deve descartar os não-dígitos antes de aplicar)",
+    "abrir mais de uma caixa focável ao mesmo tempo — sempre exatamente uma caixa (ou nenhuma) com foco",
+    "cor fora da whitelist de tokensAllowed"
+  ],
+  "decisions": [
+    "length é uma prop numérica simples (default 6, o tamanho mais comum de OTP), não um array de configuração por caixa — todas as caixas são idênticas, não há necessidade real de customizar uma caixa individualmente.",
+    "onComplete é opcional e separado de onChange — onChange já entrega a string completa a cada mudança (inclusive quando bate length), mas nomear a intenção 'terminou de digitar, pode validar agora' evita o consumidor comparar value.length === length toda vez manualmente. Mesmo espírito de ter uma prop dedicada em vez de forçar lógica repetida em quem consome (parecido com onExport do Datatable já receber os dados prontos em vez de o consumidor recalcular).",
+    "Colar preenche todas as caixas de uma vez a partir da primeira caixa focada, ignorando caracteres não-numéricos da string colada — comportamento padrão de mercado (a maioria dos apps de 2FA envia um SMS tipo 'Seu código é: 123456', colar a mensagem inteira ainda deveria funcionar, então a filtragem de não-dígitos é obrigatória, não opcional).",
+    "Backspace em caixa vazia apaga e volta pra caixa anterior (padrão universal já estabelecido por outros produtos) — sem essa regra, apagar um código inteiro exigiria clicar em cada caixa manualmente.",
+    "Sem estado 'focus' nem 'readOnly' no enum de state (diferente de TextField) — foco é uma propriedade de cada caixa individual, não do grupo inteiro, e readOnly não tem um caso de uso real pra um código de verificação (ou o campo está editável, ou está disabled).",
+    "Tipografia texto-g-forte (maior, negrito) pro dígito dentro da caixa — mesmo racional visual já usado em outros contextos de 'poucos caracteres importantes' do harness, prioriza legibilidade de um código curto sobre a densidade de texto normal.",
+    "BUG REAL corrigido em uso real (TwoFactorScreen) — onComplete originalmente disparava sem argumento (assinatura () => void), então quem consome precisava ler seu PRÓPRIO state (ex.: um value espelhado via useState) dentro do handler. Como onComplete é chamado SINCRONAMENTE logo depois de onChange (mesmo tick, antes do componente pai re-renderizar), esse state ainda estava com o valor ANTERIOR (closure obsoleta) — colar um código válido de 6 dígitos disparava onComplete, mas o handler via o value antigo (vazio) e reportava 'código inválido' incorretamente. Corrigido passando o value completo como argumento de onComplete (agora (value: string) => void) — quem consome usa o argumento recebido, nunca precisa depender do próprio state estar sincronizado a tempo.",
+    "AJUSTADO a pedido do usuário — fundo do campo trocado de semantic.fundo-superficie pra semantic.fundo-campo (token novo): 'o fundo dos inputs de forma geral, devem ser levemente mais escuros que a cor de fundo da página onde estão, para destacar melhor'. No modo claro fundo-campo é idêntico a fundo-superficie (sem mudança visual, branco com borda já bastava) — só no modo escuro os dois valores divergem (fundo-campo um degrau mais escuro que a página), porque era só ali que o campo ficava indistinguível da própria página por trás."
+  ],
+  "references": {
+    "tokensFile": "tokens/tokens.json — Cores Semânticas (Fundos, Bordas, Textos), Estrutural (raio-pp, foco-espessura, espaco-xp/pp), Tipografia Estilo (texto-g-forte)"
+  }
+}

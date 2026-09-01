@@ -1,0 +1,58 @@
+{
+  "name": "AvatarGroup",
+  "originalName": "GrupoDeAvatares",
+  "oneLiner": "Pilha de Avatars sobrepostos, com indicador '+N' quando a lista excede o limite visível — ex.: responsáveis por um item, participantes de uma conversa.",
+  "category": "display",
+  "status": "draft",
+  "whenToUse": "Mostrar rapidamente QUEM está associado a um item (responsáveis, participantes, revisores) sem gastar o espaço de uma lista vertical — a sobreposição comunica 'grupo' antes mesmo de identificar cada pessoa.",
+  "whenNotToUse": "Só uma pessoa (use o átomo Avatar direto, sem o grupo); a identidade de cada pessoa importa mais que a visão de conjunto (nesse caso, uma lista normal com nome ao lado é mais clara que avatares sobrepostos).",
+  "anatomy": [
+    "Sequência de Avatar sobrepostos (margem negativa), até `max` visíveis, cada um com um leve contorno (borda na cor do fundo) pra separar visualmente um do outro",
+    "Indicador '+N' — mesmo tamanho/formato dos Avatars, aparece só quando avatars.length > max, soma exatamente quantos ficaram de fora"
+  ],
+  "dependencies": ["Avatar"],
+  "props": [
+    { "name": "avatars", "type": "array", "required": true, "description": "Array de { src?: string, name?: string, accessibleLabel?: string } — mesma forma de dados aceita pelo átomo Avatar, um item por pessoa." },
+    { "name": "max", "type": "number", "required": false, "default": 5, "description": "Quantos avatares mostrar antes de agrupar o resto no indicador '+N'." },
+    { "name": "size", "type": "enum", "enum": ["small", "medium", "large", "xlarge"], "default": "medium", "required": false, "description": "Repassado pra todos os Avatar do grupo — mesmo enum de AvatarSize, todos do mesmo tamanho." },
+    { "name": "accessibleLabel", "type": "string", "required": false, "default": "Participantes", "description": "Nome acessível do grupo inteiro (role=group)." }
+  ],
+  "variants": [],
+  "states": ["static"],
+  "tokensAllowed": {
+    "background": ["semantic.fundo-secundario"],
+    "border": ["semantic.fundo-superficie"],
+    "text": ["semantic.texto-secundario"],
+    "radius": ["structural.raio-circular"],
+    "spacing": ["structural.espaco-pp"],
+    "typography": ["type-style.texto-micro"]
+  },
+  "a11y": {
+    "role": "group (aria-label=accessibleLabel) envolvendo os Avatar — cada Avatar já carrega seu próprio nome acessível (herdado do átomo, sem reimplementar). O indicador '+N' tem aria-label próprio (ex.: 'e mais 3 pessoas'), nunca só o texto visual '+3' sozinho.",
+    "requiredAria": ["aria-label no group", "aria-label descritivo no indicador '+N' (não só o texto '+N' cru)"],
+    "keyboard": ["nenhuma interação própria — grupo é só apresentação, mesmo racional de Card (sem onClick no container)"],
+    "contrastMin": "AAA (7:1) pro texto do indicador '+N', mesma régua de Avatar (iniciais).",
+    "notes": "A borda entre avatares sobrepostos usa semantic.fundo-superficie (a cor do fundo por trás, não uma borda 'de verdade') — é o truque visual padrão pra separar avatares sobrepostos sem token de borda dedicado."
+  },
+  "events": { "status": "não definido no contrato original" },
+  "composition": {
+    "canContain": ["Avatar"],
+    "canBeContainedBy": ["cards", "linhas de tabela (ex.: coluna 'Responsáveis' da Datatable)", "cabeçalhos de página"],
+    "doNotCombine": ["AvatarGroup dentro de AvatarGroup", "usar pra mostrar 1 avatar só — nesse caso é só Avatar"]
+  },
+  "forbidden": [
+    "menos de 1 item em avatars",
+    "indicador '+N' sem aria-label descritivo (só o texto visual '+N')",
+    "renderizar mais avatares visíveis que max quando avatars.length > max",
+    "reimplementar Avatar inline em vez de reaproveitar o átomo",
+    "cor fora da whitelist de tokensAllowed"
+  ],
+  "decisions": [
+    "Avatares mais à ESQUERDA ficam por cima (z-index decrescente da esquerda pra direita) — convenção visual já estabelecida em várias ferramentas (Figma, Google Docs) pra esse padrão de pilha sobreposta; não há uma razão funcional forte pra escolher o sentido oposto, só consistência com o que o usuário já reconhece desse padrão.",
+    "'Contorno' entre avatares é a cor do fundo (semantic.fundo-superficie) aplicada como borda, não uma borda de cor própria — separa visualmente um avatar do outro sem introduzir um token de borda novo só pra esse efeito.",
+    "max com default 5 — número que cabe confortavelmente na maioria dos contextos (célula de tabela, cabeçalho de card) sem virar uma fileira longa demais; configurável quando o espaço disponível for maior/menor.",
+    "avatars é a mesma forma de dado do átomo Avatar (src/name/accessibleLabel), não um tipo próprio — evita duplicar a lógica de fallback (iniciais/ícone genérico) que o Avatar já resolve; AvatarGroup só orquestra quantos mostrar e a sobreposição.",
+    "Indicador '+N' NUNCA é clicável nesta v1 (ex.: abrir um popover com a lista completa) — não foi pedido; se aparecer um caso real, é decisão nova (provavelmente reaproveitando o átomo Popover, já disponível no harness)."
+  ],
+  "references": { "tokensFile": "tokens/tokens.json — Cores Semânticas (Fundos, Textos), Estrutural (raio-circular), Tipografia Estilo (texto-micro)" }
+}

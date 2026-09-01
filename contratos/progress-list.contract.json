@@ -1,0 +1,53 @@
+{
+  "name": "ProgressList",
+  "originalName": "ListaDeProgresso",
+  "oneLiner": "Lista de barras de progresso rotuladas, cada uma com um rótulo em cima e a barra + contagem numérica ao lado embaixo — pra listar categorias de prioridade/status comparáveis lado a lado (ex.: 'No prazo — 50', 'Atrasado — 25').",
+  "category": "display",
+  "status": "draft",
+  "whenToUse": "Mostrar várias categorias comparáveis (prioridade, status, tipo de atendimento) cada uma com um valor proporcional e uma contagem, dentro de um painel de indicadores/dashboard — ex.: 'Prioridade' (No prazo/Atenção/Urgente/Atrasado) ou 'Rede de atendimento' num dashboard. Padrão identificado na análise de sistemas legados (analise-sistemas-legados.md, item 1.7), repetido em múltiplos blocos do mesmo dashboard.",
+  "whenNotToUse": "Uma única barra de progresso isolada (isso é ProgressBar direto, sem a lista); gráfico com proporção relativa entre categorias que precisa somar 100% visualmente (isso seria um gráfico de pizza/rosca, explicitamente fora de escopo do harness — ver ROADMAP.md); lista de itens sem noção de progresso/proporção (isso é uma lista comum).",
+  "anatomy": [
+    "Lista (<ul>) — um item por linha, sem marcador visual",
+    "Por item: rótulo (linha de cima, texto-secundario) + linha de baixo com ProgressBar (flex, ocupa o espaço disponível) + contagem numérica (texto-primario, negrito, alinhada à direita, largura mínima fixa pra não pular quando o número muda de dígitos)"
+  ],
+  "dependencies": ["ProgressBar"],
+  "props": [
+    { "name": "items", "type": "array", "required": true, "description": "Array de { label: string, value: number, max?: number, count: string, variant?: ProgressBarVariant }. label é o rótulo da categoria (ex.: 'No prazo'). value/max alimentam a largura da barra (mesmo cálculo do ProgressBar — max default 100). count é o texto exibido ao lado da barra (ex.: '50 Qt', '25'), sempre uma string pronta pra exibição — ProgressList não formata número nenhum. variant (default 'primary', repassado direto pro ProgressBar) escolhe o tom da barra — normalmente neutral/warning/error/critical num bloco de prioridade." }
+  ],
+  "variants": [],
+  "states": ["static"],
+  "tokensAllowed": {
+    "text": ["semantic.texto-secundario", "semantic.texto-primario"],
+    "spacing": ["structural.espaco-xp", "structural.espaco-pp", "structural.espaco-p"],
+    "typography": ["type-style.texto-p"]
+  },
+  "a11y": {
+    "role": "<ul>/<li> nativos — lista simples, sem role customizada. Cada ProgressBar interno já carrega seu próprio role=\"progressbar\" com aria-label derivado de `${label}: ${count}` (ver decisions) — leitor de tela navega item a item já com o contexto completo, sem precisar de nada adicional no <li>.",
+    "requiredAria": ["cada ProgressBar interno herda os aria-valuenow/min/max/label já definidos em progress-bar.contract.json, não redefinidos aqui"],
+    "keyboard": ["nenhuma — lista puramente informativa, mesmo padrão do ProgressBar isolado (não focável)"],
+    "contrastMin": "Herda os números já validados em progress-bar.contract.json pra cada variant de barra; rótulo (texto-secundario) e contagem (texto-primario) seguem a mesma régua AA/AAA já usada em StackedText/DataField.",
+    "notes": "A contagem (count) é sempre texto visível ao lado da barra — nunca só a largura da barra comunica o valor, reforçando pra quem enxerga a régua sem precisar comparar proporções visualmente."
+  },
+  "events": { "status": "não definido no contrato original" },
+  "composition": {
+    "canContain": ["ProgressBar"],
+    "canBeContainedBy": ["cards", "painéis de dashboard", "StatCard (como conteúdo expandido, se necessário)"],
+    "doNotCombine": ["ProgressList dentro de ProgressList", "usar ProgressList quando as categorias precisam somar visualmente 100% (isso é gráfico de pizza/rosca, fora de escopo)"]
+  },
+  "forbidden": [
+    "items vazio ([]) — nada pra listar",
+    "formatar/calcular o texto de count internamente — ProgressList só exibe a string recebida, cálculo é responsabilidade de quem consome",
+    "reimplementar a barra inline em vez de reaproveitar o átomo ProgressBar",
+    "cor fora da whitelist de tokensAllowed (as cores de barra em si são responsabilidade do ProgressBar, já validadas no contrato dele)"
+  ],
+  "decisions": [
+    "Nasceu da análise de sistemas legados (analise-sistemas-legados.md, item 1.7) — o padrão 'rótulo — barra colorida — contagem' aparecia repetido 4 vezes só no dashboard do Credenciamento (Prioridade, Tempo médio por status, Rede de atendimento, Regime de atendimento), sempre remontado na mão.",
+    "accessibleLabel de cada ProgressBar interno é derivado automaticamente como `${label}: ${count}` — ProgressList não expõe uma prop accessibleLabel por item pro consumidor preencher, porque label+count já formam a descrição completa sozinhos (mesmo racional de DataField não precisar de aria-label extra: a relação rótulo→valor já está no DOM). Reduz a chance de esquecer de preencher o accessibleLabel obrigatório do ProgressBar em cada item de uma lista longa.",
+    "count é sempre uma STRING pronta (não um number formatado pelo componente) — mesmo racional de DataField.value: ProgressList não sabe se o consumidor quer '50', '50 Qt', '50%' ou '50 registros', então não assume formato nenhum.",
+    "variant é opcional por item (default 'primary', do próprio ProgressBar) — pensado especificamente pra listas de prioridade/severidade usarem neutral/warning/error/critical (variantes que ProgressBar ganhou nesta mesma leva de mudanças, ver contratos/progress-bar.contract.json decisions) mas não é obrigatório: uma lista de categorias sem conotação de severidade (ex.: 'Rede de atendimento') pode deixar todo item com o primary padrão ou passar 'success' pra todos.",
+    "Sem prop de título/cabeçalho do bloco inteiro (ex.: 'Prioridade') — ProgressList é só a lista em si; o título do bloco é responsabilidade de quem consome (ex.: um <h3> ou StatCard por fora), mesmo racional de Timeline não ter título embutido.",
+    "Layout de 2 linhas por item (rótulo em cima, barra+contagem embaixo) em vez de 1 linha só (rótulo — barra — contagem lado a lado) — reflete fielmente o padrão visual observado nos prints legados, e dá mais espaço horizontal pra barra em rótulos longos sem espremer a barra.",
+    "BUG REAL corrigido em teste no navegador — a raiz do componente (<ul class='list'>) não tinha width:100%. Como o Playground usa um wrapper de demo com `align-items: center` (que faz filhos flex SEM largura explícita encolherem ao próprio conteúdo, em vez de esticar), a lista inteira colapsava pra poucos pixels de largura, e cada ProgressBar interno virava um pontinho quase invisível em vez de uma barra proporcional. `flex: 1` no wrapper da barra (dentro de `.row`) não bastava sozinho, porque o problema começava um nível acima: sem uma largura de referência na raiz, não havia espaço nenhum pra distribuir entre os itens de `.row`. Corrigido adicionando `width: 100%` em `.list` — mesma técnica que o próprio ProgressBar já usa na raiz do seu wrapper (contratos/progress-bar.contract.json não documentava isso explicitamente porque nunca tinha quebrado antes; ProgressList herdou o mesmo raciocínio agora, documentado aqui pra não se perder de novo). Lição pro harness: qualquer componente cuja raiz precisa ocupar a largura do container (não só encolher ao conteúdo) precisa de width:100% explícito na raiz — não é suficiente só os filhos internos terem flex:1, sem uma largura de referência acima deles."
+  ],
+  "references": { "tokensFile": "tokens/tokens.json — Cores Semânticas (Textos), Estrutural (espaco-xp/pp/p), Tipografia Estilo (texto-p)" }
+}

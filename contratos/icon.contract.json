@@ -1,0 +1,151 @@
+{
+  "name": "Icon",
+  "originalName": "Icone",
+  "oneLiner": "Renderiza um ícone da biblioteca do sistema (Phosphor), dimensionado e colorido por tokens.",
+  "category": "display",
+  "status": "draft",
+  "whenToUse": "Sempre que precisar de um ícone — é a única porta de entrada para a biblioteca Phosphor; nenhum outro componente importa Phosphor diretamente.",
+  "whenNotToUse": "Não é interativo por si só. Se o ícone precisa reagir a clique/hover, quem cuida disso é o componente que o contém (ex.: Button), não o Icon.",
+  "anatomy": [
+    "Glifo SVG único, sem container próprio"
+  ],
+  "dependencies": [],
+  "props": [
+    {
+      "name": "name",
+      "type": "string",
+      "required": true,
+      "description": "Nome do ícone, resolvido contra um registro fechado (implementação web importa cada ícone do Phosphor individualmente; cresce sob demanda de um consumidor real, nunca especulativamente)."
+    },
+    {
+      "name": "size",
+      "type": "enum",
+      "enum": [
+        "small",
+        "medium",
+        "large",
+        "extraLarge"
+      ],
+      "default": "medium",
+      "required": false
+    },
+    {
+      "name": "color",
+      "type": "string",
+      "required": true,
+      "description": "Token semântico de cor. Sempre explícito — o ícone NÃO herda cor do contexto (trade-off: mais verboso, em troca de previsibilidade total)."
+    },
+    {
+      "name": "weight",
+      "type": "enum",
+      "enum": [
+        "thin",
+        "light",
+        "regular",
+        "bold",
+        "fill",
+        "duotone"
+      ],
+      "default": "regular",
+      "required": false,
+      "description": "Peso do traço (recurso nativo do Phosphor). Existe também para viabilizar um futuro tema Sênior sem gancho especial."
+    },
+    {
+      "name": "decorative",
+      "type": "boolean",
+      "default": true,
+      "required": false,
+      "description": "true = decorativo, escondido do leitor de tela. false = semântico."
+    },
+    {
+      "name": "accessibleLabel",
+      "type": "string",
+      "required": false,
+      "requiredWhen": "decorative = false",
+      "description": "Texto para leitor de tela. Ausência quando decorative=false deve ser tratada como ERRO em tempo de execução, não falha silenciosa."
+    }
+  ],
+  "variants": [
+    "thin",
+    "light",
+    "regular",
+    "bold",
+    "fill",
+    "duotone"
+  ],
+  "states": [
+    "default"
+  ],
+  "tokensAllowed": {
+    "color": [
+      "semantic.texto-primario",
+      "semantic.texto-secundario",
+      "semantic.texto-invertido",
+      "semantic.icone-secundario",
+      "semantic.icone-inativo",
+      "semantic.icone-sucesso",
+      "semantic.icone-erro",
+      "semantic.icone-aviso",
+      "semantic.icone-info",
+      "semantic.icone-apoio-1",
+      "semantic.icone-apoio-2",
+      "semantic.icone-apoio-3",
+      "semantic.acao-primaria",
+      "semantic.acao-primaria-texto",
+      "semantic.acao-secundaria-texto",
+      "semantic.acao-neutra-texto",
+      "semantic.acao-sutil-texto",
+      "semantic.acao-destrutiva-texto",
+      "semantic.acao-inativa-texto",
+      "semantic.acao-carregando-texto",
+      "semantic.acao-link-texto"
+    ],
+    "size": [
+      "structural.icone-pequeno",
+      "structural.icone-medio",
+      "structural.icone-grande",
+      "structural.icone-extra-grande"
+    ]
+  },
+  "a11y": {
+    "role": "img (implícito, sem role explícita quando decorativo)",
+    "requiredAria": [
+      "aria-hidden quando decorative = true"
+    ],
+    "keyboard": [],
+    "contrastMin": "WCAG AA (4.5:1) quando semântico e transmitindo estado/informação; garantido por herdar sempre um token semântico.",
+    "notes": "Grupo 'color' inclui tanto o grupo dedicado Ícones/* quanto os tokens *-texto de Ações/*, porque o contrato do Button exige passar ao ícone o mesmo token de cor do rótulo (nunca podem divergir)."
+  },
+  "events": {
+    "status": "não definido no contrato original — Icon não é interativo, então provavelmente não precisa de evento próprio"
+  },
+  "composition": {
+    "canContain": [],
+    "canBeContainedBy": [
+      "Button",
+      "FieldLabel",
+      "TextField"
+    ],
+    "doNotCombine": []
+  },
+  "forbidden": [
+    "cor herdada do contexto (CSS currentColor implícito) — sempre explícita via prop",
+    "importar Phosphor diretamente em qualquer componente que não seja este",
+    "tornar o próprio Icon clicável/focável"
+  ],
+  "decisions": [
+    "Biblioteca Phosphor isolada atrás deste componente; troca de biblioteca no futuro acontece só aqui.",
+    "Cor sempre explícita, nunca herdada — consumidor é responsável por manter ícone e texto sincronizados quando relevante (ver Button).",
+    "Tamanhos fechados em 16/20/24/32px, mesma escala de 4px de raio/espaço — sem escala nova.",
+    "decorative=false sem accessibleLabel lança erro em tempo de execução, não falha silenciosa.",
+    "Registro de nomes de ícone é fechado e cresce sob demanda real, nunca especulativamente.",
+    "REVISADO — auditoria de contratos (2026-08-28) encontrou 4 tokens fantasma na whitelist de cor (semantic.icone-primario, semantic.icone-invertido, semantic.acao-apoio-1-texto, semantic.acao-apoio-2-texto): nenhum dos 4 existe em tokens.css nem é usado em nenhum componente real do harness. Removidos e substituídos pelos tokens que a base de código REALMENTE usa pra essas mesmas cores de ícone (confirmado via grep em src/components/*/*.tsx): semantic.texto-invertido (6 usos reais, ex.: CallControlBar/Badge dark), semantic.texto-secundario (3 usos) e semantic.acao-primaria (2 usos) entraram na whitelist; semantic.icone-apoio-3 também foi adicionado (existia em tokens.css mas faltava na lista, ao lado de apoio-1/apoio-2 que já estavam).",
+    "EXTENSÃO — novo ícone \"bell\" (Phosphor Bell) adicionado ao registro fechado, sob demanda real: BackofficeTemplate (novo template, screens/BackofficeTemplate) precisa de um ícone de notificação na barra superior (sino com Badge de contagem ancorado, mesmo padrão já documentado em badge.contract.json pra \"pontinho/contador no canto\"). Sem ícone de sino equivalente em nenhum nome já existente no registro.",
+    "EXTENSÃO — dois ícones novos no registro fechado, sob demanda real do NotificationCenter (novo componente, contratos/notification-center.contract.json): \"envelope\" (Phosphor EnvelopeSimple, fechado) e \"envelope-open\" (Phosphor EnvelopeOpen). Usados como o próprio indicador+gatilho de leitura de cada notificação — envelope fechado = não lida, aberto = lida; clicar alterna o estado, sem precisar de um ícone separado só pra indicar status (mesmo ícone serve como indicador visual E como botão de ação, reduz ruído visual na lista).",
+    "REVERTIDO — os ícones \"envelope\"/\"envelope-open\" (adicionados na rodada anterior pro NotificationCenter) foram removidos do registro. O usuário ajustou o design do NotificationCenter logo em seguida: \"as mensagens não precisam de ícone de envelope\" — o indicador de lida/não lida passou a ser só o peso da fonte do título (negrito=não lida) mais um link de texto (\"Marcar como lida\"/\"...como não lida\"), sem nenhum ícone. Sem mais nenhum consumidor real, os dois nomes saíram do registro fechado — mantém a regra de \"cresce sob demanda real, nunca especulativamente\" também no sentido inverso: um ícone sem consumidor não fica no registro só por já ter existido.",
+    "AJUSTADO a pedido do usuário (2026-09-01) — símbolo da marca trocado de \"leaf\" pra \"sparkle\": os 3 consumidores reais (AppShell.tsx/LogoIcon, LoginScreen.tsx, SideNavDemo.tsx/WorkspaceLogoIcon) foram atualizados juntos. \"leaf\" removido do registro (Sparkle importado no lugar de Leaf em Icon.tsx) por não ter mais nenhum consumidor real — mesmo padrão já usado quando envelope/envelope-open foram removidos."
+  ],
+  "references": {
+    "tokensFile": "tokens/tokens.json — coleções Cores Semânticas (grupo Ícones) e Estrutural (grupo Ícones)"
+  }
+}

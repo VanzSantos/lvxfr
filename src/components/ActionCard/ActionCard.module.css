@@ -1,0 +1,118 @@
+.content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--espaco-p);
+}
+
+.iconCircle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--raio-circular);
+}
+
+.iconCircleDefault {
+  background: var(--acao-primaria-transparente);
+}
+
+.iconCircleDestructive {
+  background: var(--acao-destrutiva-transparente);
+}
+
+.iconCircleNeutral {
+  background: var(--fundo-secundario);
+}
+
+.utilities {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-xp);
+}
+
+.utilityButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: none;
+  border: none;
+  border-radius: var(--raio-xp);
+  cursor: pointer;
+}
+
+.utilityButton:hover {
+  background: var(--fundo-secundario);
+}
+
+.utilityButton:focus-visible {
+  outline: var(--foco-espessura) solid var(--borda-foco);
+  outline-offset: 1px;
+}
+
+.title {
+  display: block;
+  margin-bottom: var(--espaco-xp);
+  color: var(--texto-primario);
+  font-family: var(--texto-m-forte-family);
+  font-size: var(--texto-m-forte-size);
+  font-weight: var(--texto-m-forte-weight);
+  line-height: var(--texto-m-forte-line-height);
+}
+
+.description {
+  display: block;
+  color: var(--texto-secundario);
+  font-family: var(--texto-p-family);
+  font-size: var(--texto-p-size);
+  font-weight: var(--texto-p-weight);
+  line-height: var(--texto-p-line-height);
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-xp);
+  margin-top: var(--espaco-p);
+}
+
+.statusDot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--raio-circular);
+  background: var(--icone-inativo);
+}
+
+.statusActive {
+  background: var(--acao-primaria);
+}
+
+.statusLabel {
+  color: var(--texto-secundario);
+  font-family: var(--texto-p-family);
+  font-size: var(--texto-p-size);
+  font-weight: var(--texto-p-weight);
+  line-height: var(--texto-p-line-height);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-p);
+  /* margin-top: auto (em vez de um valor fixo) empurra as ações pro fim do card sempre
+     que o card for esticado além do necessário pro próprio conteúdo (ex.: grid com
+     align-items: stretch e cards vizinhos mais altos) — cria o espaço em branco entre o
+     texto e o(s) botão(ões) em vez de deixá-lo sobrar embaixo dos botões. */
+  margin-top: auto;
+  padding-top: var(--espaco-m);
+}

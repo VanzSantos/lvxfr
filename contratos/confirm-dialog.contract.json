@@ -1,0 +1,61 @@
+{
+  "name": "ConfirmDialog",
+  "originalName": "DialogoDeConfirmacao",
+  "oneLiner": "Formaliza o padrão de Modal pequeno com título + texto + Cancelar/Confirmar que Datatable e o exemplo de Drawer já reimplementam ad hoc — mesmo desenho visual, agora como componente reaproveitável.",
+  "category": "overlay",
+  "status": "draft",
+  "whenToUse": "Confirmar uma ação antes de executá-la de verdade — especialmente destrutiva ou difícil de desfazer (excluir, desativar, sobrescrever) — mas também confirmações neutras (salvar alterações), reaproveitando o mesmo desenho visual em vez de cada tela montar seu próprio Modal de confirmação.",
+  "whenNotToUse": "Confirmação embutida no próprio fluxo sem precisar de um overlay (ex.: um botão que já muda de estado ao segurar/clicar duas vezes); a ação não precisa de confirmação nenhuma (maioria das ações reversíveis/triviais)."
+  ,
+  "anatomy": [
+    "Reaproveita o Modal (size='small') — título + texto de corpo livre (description) + rodapé com Button 'Cancelar' (neutral outlined) e Button de confirmação (variant configurável, default 'primary')"
+  ],
+  "dependencies": ["Modal", "Button"],
+  "props": [
+    { "name": "open", "type": "boolean", "required": true, "description": "Repassado direto pro Modal interno." },
+    { "name": "onCancel", "type": "function", "required": true, "description": "Assinatura () => void — clique em 'Cancelar', Esc, ou clique fora (mesmo dismissible do Modal). Sempre fecha sem executar a ação." },
+    { "name": "onConfirm", "type": "function", "required": true, "description": "Assinatura () => void — clique no botão de confirmação. ConfirmDialog não fecha sozinho depois: quem consome decide (ex.: fechar só depois que uma chamada assíncrona terminar) — ver decisions." },
+    { "name": "title", "type": "string", "required": true, "description": "Título do Modal (ex.: 'Excluir registro?')." },
+    { "name": "description", "type": "string", "required": true, "description": "Texto do corpo explicando a consequência da ação (ex.: 'Esta ação não pode ser desfeita.')." },
+    { "name": "confirmLabel", "type": "string", "required": false, "default": "Confirmar", "description": "Texto do botão de confirmação." },
+    { "name": "cancelLabel", "type": "string", "required": false, "default": "Cancelar", "description": "Texto do botão de cancelamento." },
+    { "name": "confirmVariant", "type": "enum", "enum": ["primary", "destructive"], "default": "primary", "required": false, "description": "'destructive' pra ações irreversíveis (excluir) — reaproveita a variant já existente do Button, sem inventar uma nova." },
+    { "name": "confirmState", "type": "enum", "enum": ["default", "loading"], "default": "default", "required": false, "description": "'loading' repassa pro Button de confirmação (spinner + desabilitado) — usado enquanto onConfirm ainda está em andamento (ex.: aguardando resposta de rede); Cancelar continua desabilitado junto (ver decisions)." }
+  ],
+  "variants": ["primary", "destructive"],
+  "states": ["closed", "open", "confirming"],
+  "tokensAllowed": {
+    "background": ["semantic.fundo-superficie", "semantic.fundo-sobreposicao"],
+    "text": ["semantic.texto-primario", "semantic.texto-secundario"],
+    "spacing": ["structural.espaco-p", "structural.espaco-m"],
+    "typography": ["type-style.texto-p"]
+  },
+  "a11y": {
+    "role": "herdado do Modal (dialog nativo) — título vira o nome acessível automaticamente (mesmo mecanismo do Modal).",
+    "requiredAria": ["mesmos requisitos do Modal (foco preso, Esc fecha via onCancel, foco devolvido ao gatilho que abriu)"],
+    "keyboard": ["Esc aciona onCancel (nunca onConfirm) — mesmo racional de dismissible do Modal: fechar sem confirmar é sempre a ação 'segura' por padrão", "Tab circula entre Cancelar e Confirmar (foco preso no dialog, herdado do Modal)"],
+    "contrastMin": "Herdado do Modal/Button, já validado nos respectivos contratos.",
+    "notes": "Botão de confirmação NUNCA recebe foco automático ao abrir — mesmo racional de segurança usado em confirmações destrutivas de mercado (evita confirmar sem querer com um Enter acidental logo após o dialog abrir); o foco inicial vai pro Cancelar ou pro título, nunca direto pro Confirmar."
+  },
+  "events": { "status": "não definido no contrato original" },
+  "composition": {
+    "canContain": ["Modal", "Button"],
+    "canBeContainedBy": ["qualquer tela/componente que precise confirmar uma ação (ex.: Datatable, DrawerDemo, FilterBar 'Limpar tudo' se um dia precisar de confirmação)"],
+    "doNotCombine": ["ConfirmDialog dentro de ConfirmDialog", "usar pra formulários/conteúdo livre maior que uma confirmação simples — isso é Modal direto, não ConfirmDialog"]
+  },
+  "forbidden": [
+    "onConfirm disparar automaticamente sem clique explícito no botão de confirmação",
+    "foco inicial no botão de confirmação ao abrir (ver a11y notes)",
+    "fechar sozinho depois de onConfirm — quem consome decide quando fechar (ver decisions)",
+    "cor fora da whitelist de tokensAllowed",
+    "reimplementar o Modal/Button inline em vez de reaproveitar os átomos/organismos existentes"
+  ],
+  "decisions": [
+    "ConfirmDialog NÃO fecha sozinho depois de onConfirm — mesmo padrão já usado no Modal de confirmação da Datatable (setConfirmation(null) só acontece depois que a ação de verdade termina). Isso evita fechar o dialog e já esconder o Modal antes de uma chamada assíncrona (ex.: excluir via API) confirmar sucesso — quem consome controla open e decide fechar no momento certo (sucesso, erro, ou imediatamente se a ação for síncrona).",
+    "confirmVariant só tem 'primary'/'destructive' (não todas as variants do Button) — uma confirmação é sempre 'a ação principal que vai acontecer' (primary) ou 'uma ação que remove/destrói algo' (destructive); as outras variants do Button (secondary, subtle, link) não fazem sentido semântico pra um botão de confirmação final.",
+    "confirmState='loading' desabilita TAMBÉM o Cancelar, não só trava o Confirmar — evita fechar o dialog no meio de uma ação já em andamento (ex.: cancelar visualmente enquanto a exclusão já está sendo processada no servidor), mesmo racional de não deixar o usuário 'perder o rastro' de uma ação que já começou.",
+    "Foco inicial nunca vai pro botão de confirmação — decisão de segurança consolidada em confirmações destrutivas de mercado (um Enter reflexo logo após abrir o dialog não deveria disparar a ação); o Modal por baixo já cuida do foco preso, ConfirmDialog só garante que o alvo inicial não é o botão perigoso.",
+    "Reaproveita Modal (size='small') e Button diretamente, sem declarar overlay/borda/sombra próprios — ConfirmDialog é uma composição específica de dois átomos/organismos já existentes e testados, não uma superfície nova."
+  ],
+  "references": { "tokensFile": "tokens/tokens.json — Cores Semânticas (Fundos, Textos), Estrutural (espaco-p/m), Tipografia Estilo (texto-p)" }
+}

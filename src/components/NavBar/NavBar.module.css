@@ -1,0 +1,219 @@
+.nav {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-g);
+  padding: var(--espaco-p) var(--espaco-g);
+  background: var(--fundo-superficie);
+  border-bottom: 1px solid var(--borda-base);
+  box-sizing: border-box;
+}
+
+.sticky {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* Desktop: lista horizontal visível acima de 768px, escondida abaixo (o
+   hambúrguer assume o lugar dela — contratos/navbar.contract.json, anatomy). */
+.desktopList {
+  flex: 1;
+  min-width: 0;
+}
+
+.list {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-m);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+}
+
+.itemButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espaco-xp);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: var(--texto-primario);
+  font-family: var(--texto-rotulo-botao-family);
+  font-size: var(--texto-rotulo-botao-size);
+  font-weight: var(--texto-rotulo-botao-weight);
+}
+
+.itemButton.active {
+  color: var(--acao-primaria);
+}
+
+.itemButton:focus-visible {
+  outline: var(--foco-espessura) solid var(--borda-foco);
+  outline-offset: 2px;
+}
+
+/* AJUSTADO a pedido do usuário — item de navegação em repouso usa
+   texto-primario (branco no modo escuro, onde o fundo já é escuro; tom
+   neutro escuro no modo claro, onde branco puro sumiria contra o fundo
+   claro) em vez das cores de Link (acao-link-texto/-sobreposto); ativo usa
+   acao-primaria (verde) — mesma cor nos dois temas. Os itens que são Link de
+   verdade (sem filhos) têm essa cor sobrescrita via seletor de maior
+   especificidade abaixo (`.nav a`), sem alterar o átomo Link em si — Link
+   continua 100% intacto (href, foco, aria-current, hover nativo), só a COR
+   visual é reaplicada pelo contexto do NavBar (mesmo racional já usado no
+   ajuste de fonte do popover do Breadcrumb: o contexto ao redor pode
+   precisar reafirmar um estilo que o átomo não assume sozinho). */
+.nav a {
+  color: var(--texto-primario);
+}
+
+.nav a:hover {
+  color: var(--acao-primaria);
+}
+
+.nav a[aria-current="page"] {
+  color: var(--acao-primaria);
+}
+
+.dropdown {
+  background: var(--fundo-superficie);
+  border: 1px solid var(--borda-base);
+  border-radius: var(--raio-pp);
+  box-shadow: var(--sombra-p);
+  padding: var(--espaco-pp);
+  min-width: 200px;
+  box-sizing: border-box;
+  font-family: var(--texto-p-family);
+  font-size: var(--texto-p-size);
+}
+
+.dropdown a {
+  color: var(--texto-primario);
+}
+
+.dropdown a:hover {
+  color: var(--acao-primaria);
+}
+
+.dropdown a[aria-current="page"] {
+  color: var(--acao-primaria);
+}
+
+.dropdownList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-xp);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dropdownItem {
+  display: flex;
+}
+
+.dropdownItem > * {
+  width: 100%;
+}
+
+.hamburger {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: none;
+  border: none;
+  border-radius: var(--raio-pp);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.hamburger:hover {
+  background: var(--fundo-secundario);
+}
+
+.hamburger:focus-visible {
+  outline: var(--foco-espessura) solid var(--borda-foco);
+  outline-offset: 2px;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-p);
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+/* Árvore vertical dentro do Drawer mobile — mesmo padrão do SideNav (grupo
+   expansível indentado por nível), não dropdown em cascata (não cabe num
+   painel estreito). */
+.mobileList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-xp);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--texto-p-family);
+  font-size: var(--texto-p-size);
+  color: var(--texto-primario);
+}
+
+.mobileGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.mobileGroupHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espaco-m);
+  width: 100%;
+  background: none;
+  border: none;
+  padding: var(--espaco-p) 0;
+  cursor: pointer;
+  text-align: left;
+  color: var(--texto-primario);
+  font-family: var(--texto-p-family);
+  font-size: var(--texto-p-size);
+}
+
+.mobileGroupHeader:focus-visible {
+  outline: var(--foco-espessura) solid var(--borda-foco);
+  outline-offset: -2px;
+}
+
+.caretOpen {
+  display: inline-flex;
+  transform: rotate(180deg);
+}
+
+.mobileGroupPanel {
+  padding-left: var(--espaco-m);
+}
+
+@media (max-width: 768px) {
+  .desktopList {
+    display: none;
+  }
+
+  .hamburger {
+    display: inline-flex;
+  }
+}

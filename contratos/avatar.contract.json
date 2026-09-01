@@ -1,0 +1,73 @@
+{
+  "name": "Avatar",
+  "originalName": "Avatar",
+  "oneLiner": "Representação visual de uma pessoa — foto, iniciais ou ícone genérico, nessa ordem de prioridade.",
+  "category": "display",
+  "status": "draft",
+  "whenToUse": "Identificar visualmente uma pessoa (autor de um comentário, membro de uma lista, usuário logado no header) com foto quando disponível, caindo pra iniciais e depois pra um ícone genérico quando não há foto/nome.",
+  "whenNotToUse": "Representar uma organização/marca com um logo (Avatar é sobre pessoas — iniciais derivadas de nome de pessoa, não de marca); grupo de vários avatares empilhados (composição de múltiplos Avatar por quem consome, não uma prop deste contrato).",
+  "anatomy": [
+    "Superfície circular ou quadrada arredondada (fundo, raio)",
+    "Conteúdo — imagem, OU iniciais (texto), OU Icon genérico de pessoa, nessa ordem de fallback",
+    "Indicador de presença (opcional, pontinho no canto inferior direito com anel de contraste)"
+  ],
+  "dependencies": ["Icon"],
+  "props": [
+    { "name": "src", "type": "string", "required": false, "description": "URL da imagem. Se falhar ao carregar (onError) ou não for fornecida, cai pra iniciais (se name existir) ou ícone genérico." },
+    { "name": "name", "type": "string", "required": false, "description": "Nome da pessoa. Fonte das iniciais (2 letras: primeira letra do primeiro nome + primeira letra do último, ou 1 letra se for uma palavra só — ver decisions) e do nome acessível padrão (alt/aria-label), quando accessibleLabel não é fornecido." },
+    { "name": "accessibleLabel", "type": "string", "required": false, "requiredWhen": "nem src com contexto de nome, nem name são suficientes pra identificar a imagem/o avatar (ver forbidden) — funciona como override do nome acessível, tem prioridade sobre name quando os dois existem.", "description": "Nome acessível explícito (alt da imagem / aria-label do fallback). Usa name como padrão quando omitido." },
+    { "name": "size", "type": "enum", "enum": ["small", "medium", "large", "xlarge"], "default": "medium", "required": false, "description": "small=24px (icone-grande), medium=32px (icone-extra-grande), large=48px (espaco-xg), xlarge=64px (espaco-xgg) — os 4 valores já existem como tokens estruturais, nenhum tamanho novo foi inventado." },
+    { "name": "shape", "type": "enum", "enum": ["circle", "square"], "default": "circle", "required": false, "description": "circle=raio-circular (padrão, pessoa). square=raio-p, cantos arredondados mas não uma pill — pensado pra diferenciar visualmente pessoa de organização/equipe no futuro, sem criar um componente novo agora." },
+    { "name": "status", "type": "enum", "enum": ["online", "away", "offline"], "required": false, "description": "Indicador de presença opcional, pontinho no canto inferior direito. Ausente (padrão) = sem indicador. Puramente decorativo pra leitor de tela (aria-hidden) — se o status precisa ser lido, é responsabilidade de quem consome expor isso em texto em outro lugar (ver decisions)." }
+  ],
+  "variants": ["circle", "square"],
+  "states": ["static"],
+  "tokensAllowed": {
+    "background": ["semantic.fundo-secundario", "semantic.borda-inativo"],
+    "text": ["semantic.texto-secundario"],
+    "border": ["semantic.fundo-superficie"],
+    "status": ["semantic.borda-sucesso", "semantic.borda-aviso", "semantic.borda-inativo"],
+    "radius": ["structural.raio-circular", "structural.raio-p"],
+    "size": ["structural.icone-grande", "structural.icone-extra-grande", "structural.espaco-xg", "structural.espaco-xgg"],
+    "iconSize": ["structural.icone-pequeno", "structural.icone-medio", "structural.icone-grande"],
+    "typography": ["type-style.texto-p", "type-style.texto-m", "type-style.texto-m-forte", "type-style.texto-g-forte"]
+  },
+  "a11y": {
+    "role": "img — <img> nativo quando src carrega com sucesso (alt = nome acessível); role=\"img\" com aria-label no container quando o fallback (iniciais ou ícone) está ativo, já que nem <span> de iniciais nem Icon sozinhos comunicam 'isto representa uma pessoa'.",
+    "requiredAria": ["alt no <img> sempre que src é usado (nome acessível = accessibleLabel ?? name — erro em tempo de execução se nenhum dos dois existir)", "aria-label no container do fallback (mesma regra: accessibleLabel ?? name, erro se nenhum existir)", "conteúdo de iniciais/Icon dentro do fallback marcado aria-hidden — o nome acessível já vem do container, duplicar seria redundante"],
+    "keyboard": ["nenhuma — Avatar não é focável, não é um controle interativo (mesmo padrão do Card/Badge)"],
+    "contrastMin": "AA (mínimo já validado) pro texto das iniciais (texto-secundario sobre fundo-secundario, 6.87:1) — mesmo par já usado no Badge neutral/HelperText.",
+    "notes": "Indicador de presença (status) é decorativo pro leitor de tela — a cor sozinha não é suficiente pra comunicar o estado pra quem não vê, então se presença for informação crítica em algum fluxo futuro, quem consome precisa expor isso em texto (ex.: um HelperText ou label ao lado), não confiar só no pontinho."
+  },
+  "events": { "status": "não definido no contrato original" },
+  "composition": {
+    "canContain": ["Icon"],
+    "canBeContainedBy": ["listas", "cards", "cabeçalhos", "comentários"],
+    "doNotCombine": ["Avatar dentro de Avatar"]
+  },
+  "forbidden": [
+    "src fornecido sem accessibleLabel nem name — imagem sem nome acessível, erro em tempo de execução",
+    "nem src, nem name, nem accessibleLabel — Avatar sem nenhuma forma de identificar a pessoa nem de nome acessível, erro em tempo de execução",
+    "usar Avatar pra logo de organização/marca — ver whenNotToUse",
+    "reimplementar o ícone genérico de pessoa fora do átomo Icon (SVG inline etc.)",
+    "cor fora da whitelist de tokensAllowed",
+    "tamanho ou raio fora da escala definida (size/shape) — não usar valor de pixel solto"
+  ],
+  "decisions": [
+    "RESOLVIDO com o usuário — cadeia de fallback de 3 níveis: imagem (src) → iniciais (derivadas de name) → ícone genérico de pessoa (Icon 'user', novo no registro fechado, adicionado agora porque Avatar é o primeiro consumidor real). Erro de carregamento da imagem (onError) também cai pro próximo nível da cadeia, não fica com um ícone de imagem quebrada do navegador.",
+    "RESOLVIDO com o usuário — shape suporta circle (padrão) E square (cantos arredondados, raio-p) — pensando em diferenciar pessoa de organização/equipe no futuro sem precisar de um componente novo agora.",
+    "RESOLVIDO com o usuário — cor de fundo das iniciais é neutra fixa (fundo-secundario/texto-secundario), não determinística por nome. Mais simples e consistente com o resto do harness (mesmo output sempre pro mesmo input, sem hash); reaproveita exatamente o par neutral já validado no Badge.",
+    "RESOLVIDO com o usuário — inclui indicador de presença (status: online/away/offline) já nesta primeira versão, mesmo sem caso de uso real hoje. 3 estados usam os tons já existentes da família Sinalização (borda-sucesso/aviso/inativo) — não foi criada uma família de cor 'presença' nova. Indicador é um pontinho no canto inferior direito com anel de 2px em fundo-superficie (branco), pra se destacar contra a imagem/cor de fundo por trás — mesma disciplina de 'constante não-tokenizada' (2px) já usada na borda do Checkbox/Radio.",
+    "ACHADO INCIDENTAL corrigido junto — structural.icone-grande (24px) e icone-extra-grande (32px) já eram usados pelo Icon.tsx só como valor de fallback cru dentro do var() (\"var(--icone-grande, 24px)\"), nunca tinham sido de fato adicionados a tokens.css. Isso violava a regra do SKILL.md de nunca duplicar o valor fora do token. Corrigido agora (tokens.css ganhou os dois valores reais, Icon.tsx parou de duplicar o fallback) porque Avatar precisa desses mesmos tokens pra escala de tamanho — não uma tarefa nova, só a correção de uma dívida que bloqueava usar os tokens corretamente aqui.",
+    "BUG REAL encontrado em teste no navegador — structural.raio-p (12px) também nunca tinha sido adicionado a tokens.css (só raio-xp/pp/circular existiam), então shape='square' renderizava com border-radius:0 (nenhum arredondamento) em vez de raio-p. Confirmado via medição de estilo computado no navegador (borderRadius retornava '0px'), corrigido adicionando --raio-p:12px a tokens.css, revalidado depois com screenshot mostrando o canto arredondado correto.",
+    "Escala de tamanho (small/medium/large/xlarge = 24/32/48/64px) reaproveita 4 tokens estruturais que já existiam no Figma (icone-grande, icone-extra-grande, espaco-xg, espaco-xgg) mas nunca tinham sido usados juntos como uma escala de tamanho de um componente — nenhum valor de pixel foi inventado.",
+    "Iniciais: 2 letras (primeira letra do primeiro nome + primeira letra do último nome) quando name tem mais de uma palavra; 1 letra (primeira do nome) quando é uma palavra só. Maiúsculas sempre. Mesmo algoritmo usado por Slack/GitHub/Google — não é uma prop customizável separada (não existe prop 'initials'), sempre derivado de name, pra manter Avatar 100% controlado a partir de uma única fonte de verdade (mesmo princípio de TextField/value).",
+    "accessibleLabel tem prioridade sobre name quando os dois existem — permite uma descrição acessível diferente do nome de exibição (ex.: 'Foto de perfil do usuário anônimo' quando name é usado só pra gerar iniciais mas não deve ser lido literalmente).",
+    "square usa raio-p (12px), fixo pra todos os tamanhos (não escala proporcionalmente por size) — decisão pragmática sem caso de uso real que peça proporção diferente por tamanho; revisar se surgir.",
+    "Tipografia das iniciais escala com size: small=texto-p (14px), medium=texto-m (16px), large=texto-m-forte (16px negrito), xlarge=texto-g-forte (18px negrito, novo em tokens.css — só texto-micro/micro-forte tinham sido trazidos até o Badge). Não é uma escala linear perfeita (large e medium têm o mesmo tamanho, só o peso muda) — suficiente pra diferenciar visualmente os 4 tamanhos sem inventar um valor de fonte fora da tabela de type-style existente.",
+    "Indicador de presença é aria-hidden (puramente visual) — cor sozinha não comunica estado pra quem não vê; se um fluxo real precisar que presença seja lida, é responsabilidade de quem consome adicionar texto em outro elemento, não deste contrato inventar uma frase tipo 'online' embutida (evita também problema de tradução/i18n dentro do componente).",
+    "AJUSTADO a pedido do usuário (modo escuro) — 'a cor de fundo do avatar com texto e com ícone está muito próxima da cor de fundo, deixe ela um pouquinho mais clara'. fundo-secundario ficou quase idêntico à página depois da rodada de escurecimento geral dos fundos (fundo-secundario é o mais claro dos 3 níveis, mas ainda próximo de fundo-superficie).",
+    "REVISADO a pedido do usuário — o primeiro fix trocou fundo-secundario por borda-inativo GLOBALMENTE (os dois temas), mas borda-inativo tem valores bem diferentes por tema: no escuro (#5c5b54) ficou correto, no claro (#9ca3af, bem mais saturado que o fundo-secundario original #f3f4f6) ficou escuro demais — 'apenas no modo claro, o fundo do círculo do avatar com letras e ícone está muito escuro'. Corrigido restringindo a troca só ao modo escuro, via seletor [data-theme=\"dark\"] .fallback no CSS — modo claro voltou pra fundo-secundario (correto desde sempre), modo escuro continua com borda-inativo (correto)."
+  ],
+  "references": { "tokensFile": "tokens/tokens.json — Cores Semânticas (Fundos e Superfícies, Textos, Bordas/Sinalização), Estrutural (raio-circular, raio-p, icone-grande, icone-extra-grande, espaco-xg, espaco-xgg), Tipografia Estilo (texto-p, texto-m, texto-m-forte)" }
+}

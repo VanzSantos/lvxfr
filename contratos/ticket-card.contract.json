@@ -1,0 +1,77 @@
+{
+  "name": "TicketCard",
+  "originalName": "CartaoDeTicket",
+  "oneLiner": "Cartão de item de fila/atendimento — badge de prioridade com bandeira, prazo com ampulheta, título, linhas de metadado (rótulo + valor) e responsável (avatar + nome). Pensado pra viver dentro de um Kanban Board, mas reaproveitável isolado.",
+  "category": "display",
+  "status": "draft",
+  "whenToUse": "Representar um item de trabalho com SLA (chamado, ticket, protocolo, tarefa) numa lista ou board — quando prioridade/prazo/responsável são informações centrais de decisão de quem está triando a fila. Visto no módulo de Tickets do Credenciamento (analise-sistemas-legados.md, item 1.5).",
+  "whenNotToUse": "Ação administrativa isolada sem noção de fila/SLA (isso é ActionCard); cartão de seleção de plano/produto (isso é SelectableCard); qualquer conteúdo sem prioridade/prazo — nesses casos, Card genérico já resolve.",
+  "anatomy": [
+    "Cabeçalho: Badge de prioridade (ícone de bandeira + rótulo fixo por prioridade) à esquerda, botão de menu de overflow (···) opcional à direita — abre um Popover (role='menu') com até 5 itens fixos: Duplicar, Habilitar/Desabilitar (rótulo dinâmico conforme enabled), Editar, Ver detalhes, Apagar (destrutivo, texto-erro). Cada item só aparece se o callback correspondente for fornecido; menu não aparece se nenhum callback for passado.",
+    "Título",
+    "Prazo opcional: ícone de ampulheta + texto livre (ex.: '2 dias', 'Vence hoje')",
+    "Linhas de metadado opcionais (rótulo + valor, uma por linha)",
+    "Rodapé opcional: avatar pequeno + nome do responsável"
+  ],
+  "dependencies": ["Card", "Badge", "Avatar", "Icon", "Popover"],
+  "props": [
+    { "name": "title", "type": "string", "required": true },
+    { "name": "priority", "type": "enum", "enum": ["atrasado", "urgente", "atencao", "no-prazo"], "required": true, "description": "Enum fechado, mapeado internamente pra variant do Badge (atrasado=critical, urgente=error, atencao=warning, no-prazo=success) e pra um rótulo fixo em português — não é customizável por fora (mesmo racional de estado fechado do Stepper), porque é exatamente o vocabulário de SLA visto nos 4 sistemas legados analisados." },
+    { "name": "deadlineLabel", "type": "string", "required": false, "description": "Texto livre do prazo (ex.: '2 dias', 'Vence hoje', 'Sem prazo definido') — deliberadamente string livre, não um número + pluralização automática, pra não reinventar regra de plural ou formatos de data variados que o consumidor já resolve melhor." },
+    { "name": "metadata", "type": "array", "required": false, "description": "Array de { label: string, value: string } — linhas simples de rótulo+valor (ex.: 'Solicitante: João Silva', 'Protocolo: 33561420'), sem caixa/borda (diferente de DataField, que é um campo isolado com fundo próprio — aqui são várias linhas dentro do mesmo card)." },
+    { "name": "assignee", "type": "object", "required": false, "description": "{ name: string, avatarSrc?: string } — renderiza Avatar (size='small') + nome no rodapé do card." },
+    { "name": "enabled", "type": "boolean", "default": true, "required": false, "description": "Estado atual do ticket — usado só pra decidir o rótulo/ícone do item Habilitar/Desabilitar do menu (enabled=true mostra 'Desabilitar', enabled=false mostra 'Habilitar'). Sem efeito nenhum se onToggleEnabled não for fornecido." },
+    { "name": "onDuplicate", "type": "function", "required": false, "description": "Assinatura () => void. Presença ativa o item 'Duplicar' no menu." },
+    { "name": "onToggleEnabled", "type": "function", "required": false, "description": "Assinatura () => void. Presença ativa o item 'Desabilitar'/'Habilitar' (rótulo conforme enabled) no menu — TicketCard não alterna o próprio estado sozinho, só avisa a intenção; quem consome decide o novo valor de enabled." },
+    { "name": "onEdit", "type": "function", "required": false, "description": "Assinatura () => void. Presença ativa o item 'Editar' no menu." },
+    { "name": "onViewDetails", "type": "function", "required": false, "description": "Assinatura () => void. Presença ativa o item 'Ver detalhes' no menu." },
+    { "name": "onDelete", "type": "function", "required": false, "description": "Assinatura () => void. Presença ativa o item 'Apagar' no menu, estilizado em texto-erro (única ação destrutiva do menu) — TicketCard não pede confirmação sozinho antes de chamar, mesmo racional de onHangUp do CallControlBar: a confirmação (se houver) é responsabilidade de quem consome." }
+  ],
+  "variants": [],
+  "states": ["static"],
+  "tokensAllowed": {
+    "background": ["semantic.fundo-superficie", "semantic.fundo-secundario"],
+    "border": ["semantic.borda-base", "semantic.borda-foco"],
+    "text": ["semantic.texto-primario", "semantic.texto-secundario", "semantic.texto-erro"],
+    "iconColor": ["semantic.icone-secundario"],
+    "iconSize": ["structural.icone-pequeno"],
+    "focusRing": ["structural.foco-espessura"],
+    "radius": ["structural.raio-pp", "structural.raio-xp"],
+    "spacing": ["structural.espaco-xp", "structural.espaco-p"],
+    "typography": ["type-style.texto-m-forte", "type-style.texto-p", "type-style.texto-micro"]
+  },
+  "a11y": {
+    "role": "nenhum role customizado — é um Card com conteúdo textual comum, sem semântica de lista/item própria (isso é responsabilidade de quem compõe, ex.: o Kanban Board colocando cada TicketCard dentro de um <li>).",
+    "requiredAria": ["aria-label dinâmico no botão de overflow ('Mais opções para {title}') — botão ícone-only precisa de nome acessível", "aria-expanded/aria-haspopup no gatilho (aplicados pelo próprio Popover via cloneElement) refletindo o estado aberto/fechado do menu"],
+    "keyboard": ["Tab alcança o botão de overflow quando presente; Enter/Espaço abre o menu (comportamento nativo de <button> + Popover role='menu')", "Esc fecha o menu e devolve o foco pro gatilho (useDismiss do Popover)", "cada item do menu é um <button> nativo, alcançável por Tab dentro do painel; Enter/Espaço seleciona e fecha o menu", "sem outra interação própria no card em si — não é focável/clicável nesta v1 (ver decisions)"],
+    "contrastMin": "Badge de prioridade já validado no próprio contrato do Badge (contratos/badge.contract.json). texto-primario (título/valores) AAA, texto-secundario (rótulos/prazo/nome) segue a régua padrão de texto de apoio do harness.",
+    "notes": "Prioridade nunca é só cor — o Badge sempre carrega o rótulo textual (Atrasado/Urgente/Atenção/No prazo) junto do ícone de bandeira, nunca só a cor de fundo."
+  },
+  "events": { "status": "não definido no contrato original" },
+  "composition": {
+    "canContain": ["Card", "Badge", "Avatar", "Icon", "Popover"],
+    "canBeContainedBy": ["Kanban Board (coluna)", "listas simples de tickets/chamados"],
+    "doNotCombine": ["TicketCard dentro de TicketCard"]
+  },
+  "forbidden": [
+    "priority fora do enum fechado de 4 valores",
+    "cor de prioridade sem o rótulo textual do Badge junto",
+    "reimplementar Card/Badge/Avatar/Icon/Popover inline",
+    "cor fora da whitelist de tokensAllowed",
+    "onDelete/qualquer callback do menu executando sem passar primeiro pelo fechamento do menu (setMenuOpen(false) sempre antes de chamar o callback)",
+    "itens do menu além dos 5 fixos (Duplicar/Habilitar-Desabilitar/Editar/Ver detalhes/Apagar) — se um novo caso real pedir mais um item, é decisão nova, não um children/slot livre no menu"
+  ],
+  "decisions": [
+    "Nasceu da análise de sistemas legados (analise-sistemas-legados.md, item 1.5) — módulo de Tickets do Credenciamento, pensado desde já pra ser a peça reaproveitável dentro do Kanban Board (item 5.2 do roadmap), mas funcional isolado numa lista simples.",
+    "priority é um enum fechado de 4 valores (atrasado/urgente/atencao/no-prazo), cada um mapeado a uma variant fixa do Badge e um rótulo fixo em português — não expõe variant/label customizáveis por fora, porque é exatamente o vocabulário de SLA observado nos prints legados (4 variantes de cor: Atrasado/Urgente/Atenção/No prazo), sem necessidade de generalizar além disso ainda.",
+    "deadlineLabel é string livre (não um número de dias + pluralização automática) — o texto real varia demais entre sistemas ('2 dias', 'Vence hoje', 'Atrasado há 3 dias') pra caber num formato só; se um padrão de formatação recorrente aparecer em mais casos reais, é decisão nova.",
+    "metadata renderiza linhas simples (rótulo + valor inline), sem caixa/fundo próprio — diferente de DataField, que é um campo isolado com fundo (contratos/data-field.contract.json). Aqui múltiplas linhas convivem dentro do mesmo card, uma caixa por linha ficaria visualmente pesado demais pro padrão visto nos prints (linhas de metadado simples, sem borda).",
+    "2 novos ícones adicionados ao registro do Icon (flag, hourglass) — nenhum ícone existente cobria bandeira de prioridade nem ampulheta de prazo; TicketCard é o primeiro consumidor real dos dois.",
+    "Card usado com padding='small' (não 'medium'/'large' como ActionCard) — TicketCards vivem em colunas estreitas de um Kanban Board, precisam de menos respiro interno que um card de ação isolado.",
+    "AJUSTADO a pedido do usuário — onOverflowMenu genérico substituído por um menu fixo de 5 ações reais (Duplicar, Habilitar/Desabilitar, Editar, Ver detalhes, Apagar), aberto via Popover (role='menu', placement='bottom-end') em vez de deixar o menu inteiro por conta de quem consome. Cada item é um callback próprio (onDuplicate/onToggleEnabled/onEdit/onViewDetails/onDelete), só aparece se fornecido — mesmo racional de onInfo/onSettings do ActionCard, mas agora com o menu de verdade construído dentro do TicketCard, não delegado. Botão de overflow só renderiza se pelo menos um callback for passado.",
+    "Habilitar/Desabilitar usa ícones check-circle/x-circle (não um segundo uso do ícone eye, reservado pra 'Ver detalhes') — rótulo E ícone trocam juntos conforme a prop enabled, nunca só um dos dois.",
+    "Apagar é o único item destrutivo (texto-erro) e não pede confirmação por dentro do TicketCard — mesmo racional já estabelecido em onHangUp do CallControlBar: se o caso de uso pedir confirmação (ex.: via ConfirmDialog), é responsabilidade de quem consome, chamado depois do onDelete.",
+    "Menu sempre fecha (setMenuOpen(false)) ANTES de chamar o callback do item selecionado — usa a extensão open/onOpenChange recém-adicionada ao contrato do Popover (contratos/popover.contract.json) especificamente pra este caso real; sem isso, o painel ficaria aberto até um clique fora ou Esc, UX ruim pra um menu de ações que já executou."
+  ],
+  "references": { "tokensFile": "tokens/tokens.json — Cores Semânticas (Textos, Ícones, Fundos), Estrutural (raio-pp/xp, foco-espessura, espaco-xp/p), Tipografia Estilo (texto-m-forte, texto-p, texto-micro)" }
+}

@@ -1,0 +1,44 @@
+{
+  "name": "StackedText",
+  "originalName": "TextoEmpilhado",
+  "oneLiner": "Duas linhas de texto na mesma célula/área — um texto principal em cima e um complementar embaixo, mesmo alinhamento horizontal.",
+  "category": "display",
+  "status": "draft",
+  "whenToUse": "Mostrar um valor principal junto de um dado secundário que o identifica/complementa sem precisar de duas colunas separadas — ex.: nome do usuário em cima, e-mail embaixo, dentro da mesma célula de uma Datatable.",
+  "whenNotToUse": "Título + descrição de um bloco maior de conteúdo (Card, EmptyState) — esses já têm sua própria tipografia de título; texto principal e secundário sem relação direta entre si (isso são dois elementos separados, não um StackedText); mais de 2 linhas de informação (esse é outro tipo de composição, fora de escopo aqui).",
+  "anatomy": ["Texto principal (linha de cima)", "Texto secundário (linha de baixo)"],
+  "dependencies": [],
+  "props": [
+    { "name": "primaryText", "type": "string", "required": true },
+    { "name": "secondaryText", "type": "string", "required": true, "description": "Sempre obrigatório — se não há texto secundário, não use StackedText, use um texto simples direto (ver whenNotToUse)." },
+    { "name": "align", "type": "enum", "enum": ["left", "center", "right"], "default": "left", "required": false, "description": "Alinhamento horizontal das duas linhas — precisa bater com o align da coluna, quando usado dentro de uma célula de Datatable." }
+  ],
+  "variants": [],
+  "states": ["static"],
+  "tokensAllowed": {
+    "text": ["semantic.texto-primario", "semantic.texto-secundario"],
+    "spacing": ["structural.espaco-xp"],
+    "typography": ["type-style.texto-p", "type-style.texto-micro"]
+  },
+  "a11y": {
+    "role": "none — duas linhas de texto simples, sem role própria",
+    "requiredAria": [],
+    "keyboard": [],
+    "contrastMin": "AAA (7:1) pro texto principal (texto-primario), AA (4.5:1) mínimo pro secundário (texto-secundario) — mesma régua já usada em texto-secundario nos outros contratos deste harness.",
+    "notes": "As duas linhas formam uma unidade visual só — quando lido por leitor de tela dentro de uma célula de tabela, a ordem natural do DOM (principal antes de secundário) já basta, sem precisar de aria-label combinando os dois textos artificialmente."
+  },
+  "events": { "status": "não definido no contrato original — componente estático" },
+  "composition": { "canContain": [], "canBeContainedBy": ["Datatable (célula de coluna)", "listas", "qualquer container de layout"], "doNotCombine": [] },
+  "forbidden": [
+    "renderizar só 1 linha (primaryText ou secondaryText vazio) — pra 1 linha só, não use este átomo",
+    "usar pra título + parágrafo longo — StackedText é pra duas linhas curtas de dado, não pra um bloco de texto",
+    "cor fora da whitelist de tokensAllowed"
+  ],
+  "decisions": [
+    "Nasceu como necessidade real da Datatable (célula 'Nome do usuário' em cima + 'E-mail' embaixo, contratos/datatable.contract.json), mas ganhou contrato próprio em vez de ficar como helper interno — segue a regra do harness de que todo componente reaproveitável tem contrato, evita reimplementação divergente se outro componente precisar do mesmo padrão depois.",
+    "secondaryText é obrigatório (não opcional) — um StackedText com só uma linha não tem razão de existir enquanto componente próprio; usar texto simples nesse caso.",
+    "Sem ícone, avatar ou outro slot — é estritamente texto+texto. Um caso real de 'linha 1 + linha 2 + avatar' vira uma composição de StackedText com Avatar ao lado, não um prop novo aqui.",
+    "type-style.texto-micro (12px) pro secundário em vez de texto-secundario/texto-p (14px, usado em outros textos secundários do harness) — motivo: dentro de uma célula de tabela já densa, igualar o tamanho do texto principal e do secundário reduz a hierarquia visual que é o motivo de existir do componente; texto-micro é o menor estilo com peso 'regular' já catalogado em Tipografia Estilo."
+  ],
+  "references": { "tokensFile": "tokens/tokens.json — Cores Semânticas (Textos/texto-primario, texto-secundario), Estrutural (espaco-xp), Tipografia Estilo (texto-p, texto-micro)" }
+}

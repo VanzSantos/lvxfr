@@ -69,6 +69,22 @@ pros outros — você precisaria reaplicar manualmente ou reclonar.
 
 Comece pela primeira opção; migre pra clones separados só quando um caso real pedir.
 
+## Tudo que você mexer é commitado e enviado sozinho
+
+Enquanto `npm run dev` está de pé, um processo em segundo plano
+(`scripts/autosync.mjs`) observa `contratos/`, `tokens/` e `src/` inteiros — ou seja,
+**qualquer** contrato de componente novo/ajustado, token novo/ajustado, componente
+novo/ajustado, ou protótipo novo/ajustado — e, ~20 segundos depois da última mudança,
+**commita e dá push automaticamente**, sem você precisar lembrar de rodar `git add`/
+`git commit`/`git push`. É assim que quem administra o repositório principal consegue
+ver o progresso de qualquer Product Designer sem depender de lembrete manual — a
+curadoria de o que entra de fato no projeto principal acontece depois, na revisão do
+seu PR (ver "Contribuindo" abaixo), não aqui.
+
+Ele nunca usa `--force`; se o push falhar (histórico divergente), só avisa no
+terminal, sem tentar resolver sozinho — nesse caso, dê um `git pull` manual. Pra
+desligar essa automação numa sessão específica: `AUTOSYNC=0 npm run dev`.
+
 ## ProtoTable — quem criou/atualizou o quê
 
 Além do DS Playground, o app tem uma segunda aba no topo chamada **ProtoTable** —
@@ -76,15 +92,8 @@ deliberadamente uma tela separada, não misturada com a vitrine de componentes: 
 índice dos protótipos reais (não dos componentes), mostrando quem criou cada um, quem
 atualizou por último, quando, e o histórico completo de commits. Nada disso é digitado
 à mão — vem direto do histórico git de cada pasta em `src/interface/screens/`
-registrada em `src/interface/prototable/registry.ts`.
-
-**Isso implica em uma automação que roda por padrão:** enquanto `npm run dev` está de
-pé, um processo em segundo plano (`scripts/proto-autosync.mjs`) observa as pastas de
-protótipo registradas e, ~20 segundos depois da última mudança, **commita e dá push
-automaticamente** — pra que quem gerencia o repositório veja o progresso de qualquer
-pessoa sem depender de lembrete manual. Ele nunca usa `--force`; se o push falhar
-(histórico divergente), só avisa no terminal, sem tentar resolver sozinho. Pra
-desligar essa automação numa sessão específica: `PROTO_AUTOSYNC=0 npm run dev`.
+registrada em `src/interface/prototable/registry.ts` (a mesma automação acima é quem
+garante que esse histórico existe de verdade no repositório remoto).
 
 ## Contribuindo
 

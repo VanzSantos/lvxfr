@@ -1,6 +1,6 @@
-// Orquestra `vite` + `proto-autosync.mjs` juntos pra `npm run dev` — sem
-// depender de um pacote novo tipo `concurrently`, só child_process da stdlib.
-// PROTO_AUTOSYNC=0 pula o watcher (sobe só o Vite, como antes desta feature).
+// Orquestra `vite` + `autosync.mjs` juntos pra `npm run dev` — sem depender
+// de um pacote novo tipo `concurrently`, só child_process da stdlib.
+// AUTOSYNC=0 pula o watcher (sobe só o Vite, como antes desta feature).
 
 import { spawn } from "node:child_process";
 import { dirname, join } from "node:path";
@@ -8,7 +8,7 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(__dirname, "..");
-const autosyncEnabled = process.env.PROTO_AUTOSYNC !== "0";
+const autosyncEnabled = process.env.AUTOSYNC !== "0";
 
 const children = [];
 
@@ -26,9 +26,9 @@ function spawnChild(command, args, label) {
 spawnChild("npx", ["vite"], "vite");
 
 if (autosyncEnabled) {
-  spawnChild("node", [join(__dirname, "proto-autosync.mjs")], "proto-autosync");
+  spawnChild("node", [join(__dirname, "autosync.mjs")], "autosync");
 } else {
-  console.log("[dev] PROTO_AUTOSYNC=0 — autosync de protótipos desligado.");
+  console.log("[dev] AUTOSYNC=0 — autosync desligado.");
 }
 
 function shutdown() {

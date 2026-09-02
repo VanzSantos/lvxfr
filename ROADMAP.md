@@ -3481,3 +3481,37 @@ Verificado no navegador via `getComputedStyle(...).fontFamily` em cada um dos 6
 componentes (Card, NavBar, FilterBar, Wizard) + reteste visual do ProtoTable (leafCard e
 Drawer de histórico) — todos retornando `"Roboto, sans-serif"` agora, nenhum mais caindo
 pro serif padrão do navegador. Build limpo.
+
+### Autosync ampliado — de "só protótipos registrados" pra "contratos/tokens/src inteiros" (2026-09-02)
+
+Pedido explícito do usuário: TODA alteração feita por qualquer Product Designer usando
+este repo (contrato de componente novo/ajustado, token novo/ajustado, componente
+novo/ajustado, protótipo novo/ajustado) deve ser commitada e enviada (push)
+automaticamente, sem exceção — quem decide o que entra no projeto principal continua
+sendo o dono do repositório, na revisão do PR, não o autosync. O script antigo
+(`scripts/proto-autosync.mjs`) só observava as pastas listadas em `PROTOTYPES`/`SCREENS`
+de `src/interface/prototable/registry.ts` — cobria protótipos, não contratos/tokens/
+componentes.
+
+Substituído por `scripts/autosync.mjs` (script antigo removido, não só descontinuado):
+observa `contratos/`, `tokens/` e `src/` inteiros via `fs.watch` (cobre contratos,
+tokens, `src/components`, e `src/interface` — Playground, ProtoTable e telas/protótipos
+— tudo de uma vez). Simplificação de propósito em relação ao script antigo: um debounce
+GLOBAL único (20s, `AUTOSYNC_DEBOUNCE_MS`) em vez de um timer por pasta de protótipo —
+faz mais sentido agora que o escopo é amplo (uma sessão de edição real costuma tocar
+vários arquivos relacionados ao mesmo tempo — ex.: um componente novo mexe em `.tsx` +
+`.module.css` + o próprio contrato — e isso deve virar UM commit coerente, não vários
+picados por pasta). `git add` continua escopado às 3 pastas observadas (nunca `git add
+-A` solto). Mensagem de commit passou a resumir os grupos de path alterados (ex.: `auto:
+sync (contratos, src/components) — <timestamp>`) em vez de citar uma pasta de protótipo
+só. `scripts/dev-with-autosync.mjs` atualizado pra apontar pro script novo; variável de
+opt-out renomeada de `PROTO_AUTOSYNC` pra `AUTOSYNC` (mais precisa, já que não é mais
+"só protótipo"). `README.md`/`CONTRIBUTING.md` atualizados; `CONTRIBUTING.md` também
+corrigido pra não dizer mais "repositório privado" (desatualizado desde que o repo virou
+público).
+
+Verificado: editada uma entrada de teste em `contratos/badge.contract.json` (fora do
+escopo do script antigo) com o novo `npm run dev` rodando — autosync detectou, esperou o
+debounce, e gerou um commit `auto: sync (contratos) — <timestamp>` enviado sozinho pro
+`origin/main`, confirmado comparando `git log` local com `git fetch origin main`. Entrada
+de teste revertida antes de finalizar, não ficou no contrato. Build limpo.

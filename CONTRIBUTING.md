@@ -1,7 +1,8 @@
 # Contribuindo com o LVXFR
 
-Este repositório é privado e compartilhado com um grupo pequeno de testadores. O fluxo
-abaixo existe pra que qualquer ajuste feito no seu fork seja fácil de revisar e,
+Este repositório é compartilhado com um grupo de Product Designers testando o
+harness. O fluxo abaixo existe pra que qualquer ajuste feito no seu fork — contrato de
+componente, token, implementação de componente, ou protótipo — seja fácil de revisar e,
 eventualmente, incorporar de volta no projeto base — sem perder o histórico de por que
 cada mudança foi feita.
 
@@ -23,18 +24,24 @@ cada mudança foi feita.
 Ninguém precisa de permissão de escrita no repositório original pra abrir um PR de fork —
 é o modelo padrão do GitHub.
 
-## Seus commits de protótipo são automáticos (e públicos pra quem tem acesso ao repo)
+## Todo o seu trabalho é commitado e enviado sozinho — sem exceção
 
-Se a pasta do seu protótipo estiver registrada em `src/interface/prototable/
-registry.ts`, rodar `npm run dev` normalmente já dispara commit + push automáticos
-(`scripts/proto-autosync.mjs`, ~20s depois da última mudança de arquivo) — não é
-preciso lembrar de dar push manualmente pro seu trabalho aparecer no ProtoTable de
-quem administra o repositório. Ver `README.md` pra detalhes e como desligar
-(`PROTO_AUTOSYNC=0 npm run dev`) se preferir controlar os commits você mesmo.
+Rodar `npm run dev` normalmente já dispara commit + push automáticos
+(`scripts/autosync.mjs`, ~20s depois da última mudança de arquivo) pra **qualquer**
+alteração dentro de `contratos/`, `tokens/` ou `src/` — contrato de componente novo ou
+ajustado, token novo ou ajustado, implementação de componente, ou protótipo. Não é
+preciso lembrar de dar `git add`/`commit`/`push` manualmente em nenhum desses casos; o
+trabalho fica registrado no seu fork automaticamente, mesmo incompleto/em progresso —
+a curadoria de o que é uma mudança boa o suficiente pra virar PR (ou o que entra no
+projeto principal) é sua e/ou de quem administra o repositório, feita depois, não algo
+que o autosync decide. Ver `README.md` pra detalhes e como desligar
+(`AUTOSYNC=0 npm run dev`) se preferir controlar os commits você mesmo numa sessão.
 
 Registrar um novo protótipo no ProtoTable é um passo A MAIS além de registrá-lo no
 Playground (`stories/registry.ts`) — adicione a entrada em `prototable/registry.ts`
-também, com `screenPath` apontando pra pasta real da tela.
+também, com `screenPath` apontando pra pasta real da tela. O autosync não depende
+desse registro pra funcionar — ele já commita a pasta assim que ela existe dentro de
+`src/`; o registro só controla se ela aparece navegável no ProtoTable/Playground.
 
 ## Regra obrigatória: documentar mudanças de contrato/token no próprio contrato
 

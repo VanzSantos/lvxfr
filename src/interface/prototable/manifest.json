@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-02T19:35:55.376Z",
+  "generatedAt": "2026-09-02T19:37:32.698Z",
   "projects": [
     {
       "key": "lvxfr-referencia",
@@ -244,6 +244,63 @@
                       "message": "Initial commit — LVXFR design system harness"
                     }
                   ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "portal-cliente-web",
+      "title": "Portal do Cliente (Web)",
+      "description": "Protótipos de produto reais construídos sobre o harness — sem contrato próprio, não aparecem no DS Playground (ver ARCHITECTURE.md).",
+      "uncommitted": true,
+      "createdBy": null,
+      "createdAt": null,
+      "lastUpdatedBy": null,
+      "lastUpdatedAt": null,
+      "commitCount": 0,
+      "history": [],
+      "modules": [
+        {
+          "key": "autorizacoes",
+          "projectKey": "portal-cliente-web",
+          "title": "Autorizações",
+          "uncommitted": true,
+          "createdBy": null,
+          "createdAt": null,
+          "lastUpdatedBy": null,
+          "lastUpdatedAt": null,
+          "commitCount": 0,
+          "history": [],
+          "flows": [
+            {
+              "key": "extracao-ocr-autorizacao",
+              "moduleKey": "autorizacoes",
+              "title": "Extração OCR e Validação de Dados na Solicitação de Autorização",
+              "uncommitted": true,
+              "createdBy": null,
+              "createdAt": null,
+              "lastUpdatedBy": null,
+              "lastUpdatedAt": null,
+              "commitCount": 0,
+              "history": [],
+              "screens": [
+                {
+                  "key": "autorizacao-ocr-screen",
+                  "flowKey": "extracao-ocr-autorizacao",
+                  "title": "AutorizacaoOCRScreen",
+                  "screenPath": "src/interface/screens/AutorizacaoOCRScreen",
+                  "standaloneStoryId": "autorizacao-ocr-screen",
+                  "description": "Protótipo da US 'Extração OCR e Validação de Dados na Solicitação de Autorização pelo App' — upload de pedidos médicos, conferência dos dados extraídos por OCR (simulado) agrupada por médico, e bypass direto pro protocolo quando há mais de 5 procedimentos.",
+                  "uncommitted": true,
+                  "createdBy": null,
+                  "createdAt": null,
+                  "lastUpdatedBy": null,
+                  "lastUpdatedAt": null,
+                  "commitCount": 0,
+                  "history": []
                 }
               ]
             }

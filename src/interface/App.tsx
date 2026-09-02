@@ -4,6 +4,7 @@ import { STORIES } from "./stories/registry";
 import { StoryDetail } from "./stories/StoryDetail";
 import { IconLibrary } from "./stories/IconLibrary";
 import { ProtoTablePage } from "./prototable/ProtoTablePage";
+import { SCREENS } from "./prototable/registry";
 import { useTheme } from "./theme/useTheme";
 import styles from "./App.module.css";
 
@@ -36,6 +37,12 @@ export function App() {
   const [standaloneId] = useState<string | null>(readStandaloneId);
 
   const standaloneStory = standaloneId ? STORIES.find((item) => item.id === standaloneId) : undefined;
+  /* Protótipos ProtoTable-only (sem entrada em stories/registry.ts — pedido
+     explícito do usuário: US de produto real não deve aparecer no Playground
+     nem ganhar contrato) resolvem o standalone pelo próprio ScreenEntry.Demo
+     em vez de um STORY, ver prototable/registry.ts (campo Demo). */
+  const standaloneScreen = standaloneId && !standaloneStory ? SCREENS.find((item) => item.standaloneStoryId === standaloneId && item.Demo) : undefined;
+  const StandaloneDemo = standaloneStory?.Demo ?? standaloneScreen?.Demo;
 
   /* Sinaliza o modo standalone no <html> — usado por LoginScreenDemo.module.css
      pra fazer o `.frame` (que nos outros Demos de Templates/Páginas leva uma
@@ -50,7 +57,7 @@ export function App() {
   if (standaloneId) {
     return (
       <div className={styles.standalone}>
-        {standaloneStory ? <standaloneStory.Demo /> : <p>Story "{standaloneId}" não encontrado.</p>}
+        {StandaloneDemo ? <StandaloneDemo /> : <p>Story "{standaloneId}" não encontrado.</p>}
       </div>
     );
   }

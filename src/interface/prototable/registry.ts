@@ -20,6 +20,9 @@
     virar uma tabela de "1 item" na UI — ProtoTablePage pula direto pro
     filho; não existe "nível de menos" aqui, a UI que decide o que mostrar. */
 
+import type { ComponentType } from "react";
+import { AutorizacaoOCRScreen } from "../screens/AutorizacaoOCRScreen/AutorizacaoOCRScreen";
+
 export interface ProjectEntry {
   key: string;
   title: string;
@@ -47,9 +50,20 @@ export interface ScreenEntry {
   /** Caminho relativo à raiz do repo, usado pelo scripts/prototable-manifest.mjs
       pra rodar `git log` — precisa ser a pasta real em src/interface/screens/. */
   screenPath: string;
-  /** id correspondente em stories/registry.ts (STORIES), usado só pra montar o
-      link "Abrir" via ?standalone=<id> — ProtoTable não duplica o Demo/rota. */
+  /** id usado pra montar o link "Abrir" via ?standalone=<id>. Pra telas que
+      TAMBÉM existem no Playground (stories/registry.ts) — telas de
+      referência do harness, ver ARCHITECTURE.md — use o id do STORY de lá.
+      Pra protótipos de produto reais (US de negócio, sem contrato, que NÃO
+      devem aparecer no Playground — pedido explícito do usuário), use
+      qualquer id único aqui e informe `Demo` abaixo; App.tsx resolve o
+      standalone por Demo quando o id não é encontrado em STORIES. */
   standaloneStoryId: string;
+  /** Só necessário quando a tela NÃO está registrada em stories/registry.ts
+      (protótipo ProtoTable-only). Componente sem props obrigatórias — a
+      própria tela de src/interface/screens/<Nome> serve direto aqui, já que
+      seu `embedded` é opcional e o padrão (false) já ocupa a viewport
+      inteira, do jeito que o standalone precisa. */
+  Demo?: ComponentType;
   description?: string;
 }
 
@@ -59,6 +73,11 @@ export const PROJECTS: ProjectEntry[] = [
     title: "LVXFR — telas de referência",
     description: "Telas de exemplo que já vêm com o harness, semente inicial do ProtoTable.",
   },
+  {
+    key: "portal-cliente-web",
+    title: "Portal do Cliente (Web)",
+    description: "Protótipos de produto reais construídos sobre o harness — sem contrato próprio, não aparecem no DS Playground (ver ARCHITECTURE.md).",
+  },
 ];
 
 export const MODULES: ModuleEntry[] = [
@@ -67,6 +86,11 @@ export const MODULES: ModuleEntry[] = [
     projectKey: "lvxfr-referencia",
     title: "Referência",
   },
+  {
+    key: "autorizacoes",
+    projectKey: "portal-cliente-web",
+    title: "Autorizações",
+  },
 ];
 
 export const FLOWS: FlowEntry[] = [
@@ -74,6 +98,11 @@ export const FLOWS: FlowEntry[] = [
   { key: "crud-template", moduleKey: "referencia", title: "CrudTemplate" },
   { key: "login-screen", moduleKey: "referencia", title: "LoginScreen" },
   { key: "onboarding-screen", moduleKey: "referencia", title: "OnboardingScreen" },
+  {
+    key: "extracao-ocr-autorizacao",
+    moduleKey: "autorizacoes",
+    title: "Extração OCR e Validação de Dados na Solicitação de Autorização",
+  },
 ];
 
 export const SCREENS: ScreenEntry[] = [
@@ -106,5 +135,14 @@ export const SCREENS: ScreenEntry[] = [
     title: "OnboardingScreen",
     screenPath: "src/interface/screens/OnboardingScreen",
     standaloneStoryId: "onboarding-screen",
+  },
+  {
+    key: "autorizacao-ocr-screen",
+    flowKey: "extracao-ocr-autorizacao",
+    title: "AutorizacaoOCRScreen",
+    screenPath: "src/interface/screens/AutorizacaoOCRScreen",
+    standaloneStoryId: "autorizacao-ocr-screen",
+    Demo: AutorizacaoOCRScreen,
+    description: "Protótipo da US 'Extração OCR e Validação de Dados na Solicitação de Autorização pelo App' — upload de pedidos médicos, conferência dos dados extraídos por OCR (simulado) agrupada por médico, e bypass direto pro protocolo quando há mais de 5 procedimentos.",
   },
 ];

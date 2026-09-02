@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-02T18:07:05.608Z",
+  "generatedAt": "2026-09-02T18:18:54.908Z",
   "projects": [
     {
       "key": "lvxfr-referencia",
@@ -242,6 +242,123 @@
                       "author": "Vanz Santos",
                       "date": "2026-09-01T18:15:36-03:00",
                       "message": "Initial commit — LVXFR design system harness"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "portal-cliente-web",
+      "title": "Portal do Cliente (Web)",
+      "description": "Protótipos de produto reais construídos sobre o harness — sem contrato próprio, não aparecem no DS Playground (ver ARCHITECTURE.md).",
+      "uncommitted": false,
+      "createdBy": "Vanz Santos",
+      "createdAt": "2026-09-02T15:05:30-03:00",
+      "lastUpdatedBy": "Vanz Santos",
+      "lastUpdatedAt": "2026-09-02T15:16:34-03:00",
+      "commitCount": 2,
+      "history": [
+        {
+          "hash": "be069f8320edfb857f5a52cebdd78b424904fdcc",
+          "shortHash": "be069f8",
+          "author": "Vanz Santos",
+          "date": "2026-09-02T15:16:34-03:00",
+          "message": "auto: sync (src/interface) — 2026-09-02T18:16:34.248Z"
+        },
+        {
+          "hash": "3a3105101c984b2e3778a9d3dda95eb95a61443f",
+          "shortHash": "3a31051",
+          "author": "Vanz Santos",
+          "date": "2026-09-02T15:05:30-03:00",
+          "message": "auto: sync (src/interface) — 2026-09-02T18:05:30.508Z"
+        }
+      ],
+      "modules": [
+        {
+          "key": "autorizacoes",
+          "projectKey": "portal-cliente-web",
+          "title": "Autorizações",
+          "uncommitted": false,
+          "createdBy": "Vanz Santos",
+          "createdAt": "2026-09-02T15:05:30-03:00",
+          "lastUpdatedBy": "Vanz Santos",
+          "lastUpdatedAt": "2026-09-02T15:16:34-03:00",
+          "commitCount": 2,
+          "history": [
+            {
+              "hash": "be069f8320edfb857f5a52cebdd78b424904fdcc",
+              "shortHash": "be069f8",
+              "author": "Vanz Santos",
+              "date": "2026-09-02T15:16:34-03:00",
+              "message": "auto: sync (src/interface) — 2026-09-02T18:16:34.248Z"
+            },
+            {
+              "hash": "3a3105101c984b2e3778a9d3dda95eb95a61443f",
+              "shortHash": "3a31051",
+              "author": "Vanz Santos",
+              "date": "2026-09-02T15:05:30-03:00",
+              "message": "auto: sync (src/interface) — 2026-09-02T18:05:30.508Z"
+            }
+          ],
+          "flows": [
+            {
+              "key": "extracao-ocr-autorizacao",
+              "moduleKey": "autorizacoes",
+              "title": "Extração OCR e Validação de Dados na Solicitação de Autorização",
+              "uncommitted": false,
+              "createdBy": "Vanz Santos",
+              "createdAt": "2026-09-02T15:05:30-03:00",
+              "lastUpdatedBy": "Vanz Santos",
+              "lastUpdatedAt": "2026-09-02T15:16:34-03:00",
+              "commitCount": 2,
+              "history": [
+                {
+                  "hash": "be069f8320edfb857f5a52cebdd78b424904fdcc",
+                  "shortHash": "be069f8",
+                  "author": "Vanz Santos",
+                  "date": "2026-09-02T15:16:34-03:00",
+                  "message": "auto: sync (src/interface) — 2026-09-02T18:16:34.248Z"
+                },
+                {
+                  "hash": "3a3105101c984b2e3778a9d3dda95eb95a61443f",
+                  "shortHash": "3a31051",
+                  "author": "Vanz Santos",
+                  "date": "2026-09-02T15:05:30-03:00",
+                  "message": "auto: sync (src/interface) — 2026-09-02T18:05:30.508Z"
+                }
+              ],
+              "screens": [
+                {
+                  "key": "autorizacao-ocr-screen",
+                  "flowKey": "extracao-ocr-autorizacao",
+                  "title": "AutorizacaoOCRScreen",
+                  "screenPath": "src/interface/screens/AutorizacaoOCRScreen",
+                  "standaloneStoryId": "autorizacao-ocr-screen",
+                  "description": "Protótipo da US 'Extração OCR e Validação de Dados na Solicitação de Autorização pelo App' — upload de pedidos médicos, conferência dos dados extraídos por OCR (simulado) agrupada por médico, e bypass direto pro protocolo quando há mais de 5 procedimentos.",
+                  "uncommitted": false,
+                  "createdBy": "Vanz Santos",
+                  "createdAt": "2026-09-02T15:05:30-03:00",
+                  "lastUpdatedBy": "Vanz Santos",
+                  "lastUpdatedAt": "2026-09-02T15:16:34-03:00",
+                  "commitCount": 2,
+                  "history": [
+                    {
+                      "hash": "be069f8320edfb857f5a52cebdd78b424904fdcc",
+                      "shortHash": "be069f8",
+                      "author": "Vanz Santos",
+                      "date": "2026-09-02T15:16:34-03:00",
+                      "message": "auto: sync (src/interface) — 2026-09-02T18:16:34.248Z"
+                    },
+                    {
+                      "hash": "3a3105101c984b2e3778a9d3dda95eb95a61443f",
+                      "shortHash": "3a31051",
+                      "author": "Vanz Santos",
+                      "date": "2026-09-02T15:05:30-03:00",
+                      "message": "auto: sync (src/interface) — 2026-09-02T18:05:30.508Z"
                     }
                   ]
                 }

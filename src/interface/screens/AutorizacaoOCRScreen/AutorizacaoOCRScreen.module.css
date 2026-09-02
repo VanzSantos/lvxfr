@@ -109,23 +109,40 @@
   display: grid;
   grid-template-columns: 2fr 1fr 1fr;
   gap: var(--espaco-p);
+  align-items: end;
+}
+
+.campoNome,
+.campoCrm,
+.campoUf {
+  min-width: 0;
 }
 
 .procedimentoItem {
-  display: flex;
-  flex-direction: column;
-  gap: var(--espaco-xp);
-}
-
-.procedimentoRow {
-  display: flex;
-  align-items: end;
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  grid-template-areas:
+    "combo qty delete"
+    "tuss tuss tuss";
   gap: var(--espaco-p);
+  align-items: end;
 }
 
-.procedimentoCombo {
-  flex: 1;
+.procCombo {
+  grid-area: combo;
   min-width: 0;
+}
+
+.procQty {
+  grid-area: qty;
+}
+
+.procDelete {
+  grid-area: delete;
+}
+
+.procTuss {
+  grid-area: tuss;
 }
 
 .grupoDivider {
@@ -154,15 +171,41 @@
 }
 
 @media (max-width: 640px) {
+  /* Nome do médico ocupa a linha inteira; CRM e UF dividem a linha de baixo
+     — UF só precisa de espaço pra 2 caracteres (sigla de estado), largura
+     fixa pequena em vez de dividir igual com o CRM. */
   .medicoFields {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 64px;
+    grid-template-areas:
+      "nome nome"
+      "crm uf";
   }
 
-  .procedimentoRow {
-    flex-wrap: wrap;
+  .campoNome {
+    grid-area: nome;
   }
 
-  .procedimentoCombo {
-    flex-basis: 100%;
+  .campoCrm {
+    grid-area: crm;
+  }
+
+  .campoUf {
+    grid-area: uf;
+  }
+
+  /* ComboBox ocupa a linha inteira, Código TUSS embaixo dele, e só então
+     quantidade (esquerda) + excluir (direita) numa última linha — pedido
+     explícito do usuário pro mobile (no desktop, quantidade/excluir ficam
+     ao lado do ComboBox, ver .procedimentoItem acima). */
+  .procedimentoItem {
+    grid-template-columns: auto 1fr;
+    grid-template-areas:
+      "combo combo"
+      "tuss tuss"
+      "qty delete";
+  }
+
+  .procDelete {
+    justify-self: end;
   }
 }

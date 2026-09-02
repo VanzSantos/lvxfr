@@ -336,42 +336,50 @@ export function AutorizacaoOCRScreen({ embedded = false }: AutorizacaoOCRScreenP
                       </div>
 
                       <div className={styles.medicoFields}>
-                        <TextField
-                          label="Nome do médico"
-                          value={grupo.nomeMedico}
-                          onChange={(nomeMedico) => atualizarGrupo(grupo.id, { nomeMedico })}
-                        />
-                        <TextField
-                          label="CRM"
-                          value={grupo.crm}
-                          onChange={(crm) => atualizarGrupo(grupo.id, { crm })}
-                        />
-                        <Select
-                          label="UF"
-                          options={UF_OPTIONS}
-                          value={grupo.uf}
-                          onChange={(uf) => atualizarGrupo(grupo.id, { uf })}
-                        />
+                        <div className={styles.campoNome}>
+                          <TextField
+                            label="Nome do médico"
+                            value={grupo.nomeMedico}
+                            onChange={(nomeMedico) => atualizarGrupo(grupo.id, { nomeMedico })}
+                          />
+                        </div>
+                        <div className={styles.campoCrm}>
+                          <TextField
+                            label="CRM"
+                            value={grupo.crm}
+                            onChange={(crm) => atualizarGrupo(grupo.id, { crm })}
+                          />
+                        </div>
+                        <div className={styles.campoUf}>
+                          <Select
+                            label="UF"
+                            options={UF_OPTIONS}
+                            value={grupo.uf}
+                            onChange={(uf) => atualizarGrupo(grupo.id, { uf })}
+                          />
+                        </div>
                       </div>
 
                       {grupo.procedimentos.map((proc) => (
                         <div key={proc.id} className={styles.procedimentoItem}>
-                          <div className={styles.procedimentoRow}>
-                            <div className={styles.procedimentoCombo}>
-                              <ComboBox
-                                label="Procedimento (busca por descrição)"
-                                options={TUSS_CATALOGO}
-                                value={proc.tussCode}
-                                onChange={(tussCode) => atualizarProcedimento(grupo.id, proc.id, { tussCode })}
-                                placeholder="Digite a descrição do procedimento"
-                              />
-                            </div>
+                          <div className={styles.procCombo}>
+                            <ComboBox
+                              label="Procedimento (busca por descrição)"
+                              options={TUSS_CATALOGO}
+                              value={proc.tussCode}
+                              onChange={(tussCode) => atualizarProcedimento(grupo.id, proc.id, { tussCode })}
+                              placeholder="Digite a descrição do procedimento"
+                            />
+                          </div>
+                          <div className={styles.procQty}>
                             <QuantitySelector
                               value={proc.quantidade}
                               min={1}
                               accessibleLabel={`Quantidade de ${tussLabel(proc.tussCode) || "procedimento"}`}
                               onChange={(quantidade) => atualizarProcedimento(grupo.id, proc.id, { quantidade })}
                             />
+                          </div>
+                          <div className={styles.procDelete}>
                             <Button
                               variant="link"
                               iconOnly
@@ -380,7 +388,9 @@ export function AutorizacaoOCRScreen({ embedded = false }: AutorizacaoOCRScreenP
                               onPress={() => removerProcedimento(grupo.id, proc.id)}
                             />
                           </div>
-                          <DataField label="Código TUSS" value={proc.tussCode ? `${proc.tussCode} — ${tussLabel(proc.tussCode)}` : "—"} />
+                          <div className={styles.procTuss}>
+                            <DataField label="Código TUSS" value={proc.tussCode ? `${proc.tussCode} — ${tussLabel(proc.tussCode)}` : "—"} />
+                          </div>
                         </div>
                       ))}
 

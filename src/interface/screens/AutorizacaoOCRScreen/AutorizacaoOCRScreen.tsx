@@ -355,30 +355,32 @@ export function AutorizacaoOCRScreen({ embedded = false }: AutorizacaoOCRScreenP
                       </div>
 
                       {grupo.procedimentos.map((proc) => (
-                        <div key={proc.id} className={styles.procedimentoRow}>
-                          <div className={styles.procedimentoTuss}>
-                            <ComboBox
-                              label="Procedimento (busca por descrição)"
-                              options={TUSS_CATALOGO}
-                              value={proc.tussCode}
-                              onChange={(tussCode) => atualizarProcedimento(grupo.id, proc.id, { tussCode })}
-                              placeholder="Digite a descrição do procedimento"
+                        <div key={proc.id} className={styles.procedimentoItem}>
+                          <div className={styles.procedimentoRow}>
+                            <div className={styles.procedimentoCombo}>
+                              <ComboBox
+                                label="Procedimento (busca por descrição)"
+                                options={TUSS_CATALOGO}
+                                value={proc.tussCode}
+                                onChange={(tussCode) => atualizarProcedimento(grupo.id, proc.id, { tussCode })}
+                                placeholder="Digite a descrição do procedimento"
+                              />
+                            </div>
+                            <QuantitySelector
+                              value={proc.quantidade}
+                              min={1}
+                              accessibleLabel={`Quantidade de ${tussLabel(proc.tussCode) || "procedimento"}`}
+                              onChange={(quantidade) => atualizarProcedimento(grupo.id, proc.id, { quantidade })}
+                            />
+                            <Button
+                              variant="link"
+                              iconOnly
+                              accessibleLabel="Remover procedimento"
+                              leftIcon="trash"
+                              onPress={() => removerProcedimento(grupo.id, proc.id)}
                             />
                           </div>
                           <DataField label="Código TUSS" value={proc.tussCode ? `${proc.tussCode} — ${tussLabel(proc.tussCode)}` : "—"} />
-                          <QuantitySelector
-                            value={proc.quantidade}
-                            min={1}
-                            accessibleLabel={`Quantidade de ${tussLabel(proc.tussCode) || "procedimento"}`}
-                            onChange={(quantidade) => atualizarProcedimento(grupo.id, proc.id, { quantidade })}
-                          />
-                          <Button
-                            variant="link"
-                            iconOnly
-                            accessibleLabel="Remover procedimento"
-                            leftIcon="trash"
-                            onPress={() => removerProcedimento(grupo.id, proc.id)}
-                          />
                         </div>
                       ))}
 

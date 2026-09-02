@@ -1,0 +1,155 @@
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--fundo-secundario);
+  font-family: var(--texto-m-family);
+}
+
+.pageEmbedded {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--fundo-secundario);
+  font-family: var(--texto-m-family);
+  overflow: hidden;
+}
+
+.body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  justify-content: center;
+  padding: var(--espaco-g);
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+.column {
+  width: 100%;
+  max-width: 720px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-m);
+}
+
+.contentCard {
+  width: 100%;
+  box-sizing: border-box;
+  padding: var(--espaco-g);
+  background: var(--fundo-superficie);
+  border-radius: var(--raio-p);
+}
+
+:root[data-theme="dark"] .contentCard {
+  background: var(--fundo-secundario);
+  border: 1px solid var(--borda-base);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-m);
+}
+
+.uploadHeader {
+  margin-bottom: var(--espaco-m);
+}
+
+.uploadHeader h1 {
+  margin: 0 0 var(--espaco-xp) 0;
+  font-family: var(--texto-g-forte-family);
+  font-size: var(--texto-g-forte-size);
+  font-weight: var(--texto-g-forte-weight);
+  color: var(--texto-primario);
+}
+
+.uploadHeader p {
+  margin: 0;
+  color: var(--texto-secundario);
+}
+
+.actionsRow {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--espaco-p);
+  margin-top: var(--espaco-p);
+}
+
+.processingWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--espaco-m);
+  padding: var(--espaco-gg) 0;
+  text-align: center;
+}
+
+.processingWrapper p {
+  margin: 0;
+  color: var(--texto-secundario);
+}
+
+.grupoMedico {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-m);
+}
+
+.grupoMedicoHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espaco-m);
+  flex-wrap: wrap;
+}
+
+.medicoFields {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: var(--espaco-p);
+}
+
+.procedimentoRow {
+  display: grid;
+  grid-template-columns: 2fr 1fr auto auto;
+  gap: var(--espaco-p);
+  align-items: end;
+}
+
+.procedimentoTuss {
+  min-width: 0;
+}
+
+.grupoDivider {
+  margin: var(--espaco-m) 0;
+}
+
+.addProcedimentoRow {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.protocolWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--espaco-m);
+  text-align: center;
+  padding: var(--espaco-g) 0;
+}
+
+.protocolNumber {
+  font-family: var(--texto-g-forte-family);
+  font-size: var(--texto-g-forte-size);
+  font-weight: var(--texto-g-forte-weight);
+  color: var(--acao-primaria);
+}
+
+@media (max-width: 640px) {
+  .medicoFields,
+  .procedimentoRow {
+    grid-template-columns: 1fr;
+  }
+}

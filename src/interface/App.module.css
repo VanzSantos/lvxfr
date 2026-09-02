@@ -1,43 +1,7 @@
-.root {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  overflow: hidden;
-}
-
-.modeBar {
-  display: flex;
-  gap: var(--espaco-xp);
-  padding: var(--espaco-pp) var(--espaco-g) 0;
-  background: var(--fundo-superficie);
-  border-bottom: 1px solid var(--borda-base);
-  flex-shrink: 0;
-}
-
-.modeButton {
-  padding: var(--espaco-pp) var(--espaco-p);
-  border: none;
-  border-bottom: 2px solid transparent;
-  background: none;
-  color: var(--texto-secundario);
-  font: inherit;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.modeButton:hover {
-  color: var(--texto-primario);
-}
-
-.modeButtonActive {
-  color: var(--acao-primaria);
-  border-bottom-color: var(--acao-primaria);
-}
-
 .shell {
   display: flex;
-  flex: 1;
-  min-height: 0;
+  height: 100vh;
+  overflow: hidden;
   background: var(--fundo-superficie);
 }
 

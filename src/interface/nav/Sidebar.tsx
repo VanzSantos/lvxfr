@@ -11,12 +11,19 @@ interface SidebarProps {
   onSelect: (id: string) => void;
   theme: Theme;
   onToggleTheme: () => void;
+  /** Navega pro módulo ProtoTable (índice de protótipos) — módulo irmão
+      deste, mesma estrutura visual, dados totalmente separados (ver
+      App.tsx). */
+  onNavigateToPrototable: () => void;
 }
 
-export function Sidebar({ selectedId, onSelect, theme, onToggleTheme }: SidebarProps) {
+export function Sidebar({ selectedId, onSelect, theme, onToggleTheme, onNavigateToPrototable }: SidebarProps) {
   return (
     <nav className={styles.sidebar} aria-label="Navegação de componentes">
       <div className={styles.brand}>DS Playground</div>
+      <button type="button" className={styles.moduleSwitch} onClick={onNavigateToPrototable}>
+        Ir para ProtoTable →
+      </button>
       <ThemeToggle theme={theme} onToggle={onToggleTheme} />
 
       {GROUP_ORDER.map((group) => {

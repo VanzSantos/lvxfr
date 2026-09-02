@@ -47,37 +47,25 @@ export function App() {
   const story = STORIES.find((item) => item.id === selectedId);
 
   return (
-    <div className={styles.root}>
+    <div className={styles.shell}>
       {/* Alterna entre o DS Playground (vitrine de componentes) e o ProtoTable
-          (índice de protótipos/produtos reais) — os dois são deliberadamente
-          telas distintas, sem Sidebar/dados compartilhados entre si (pedido
-          explícito do usuário: "não devem ser confundidos nem misturados"). */}
-      <div className={styles.modeBar} role="tablist" aria-label="Modo de visualização">
-        <button
-          type="button"
-          role="tab"
-          aria-selected={mode === "playground"}
-          className={`${styles.modeButton} ${mode === "playground" ? styles.modeButtonActive : ""}`}
-          onClick={() => setMode("playground")}
-        >
-          DS Playground
-        </button>
-        <button
-          type="button"
-          role="tab"
-          aria-selected={mode === "prototable"}
-          className={`${styles.modeButton} ${mode === "prototable" ? styles.modeButtonActive : ""}`}
-          onClick={() => setMode("prototable")}
-        >
-          ProtoTable
-        </button>
-      </div>
-
+          (índice de protótipos/produtos reais) — telas deliberadamente
+          distintas, sem Sidebar/dados compartilhados entre si (pedido
+          explícito do usuário), mas com a MESMA estrutura visual (painel
+          lateral + conteúdo, mesmos tokens de cor/fonte) pra lerem como dois
+          módulos do mesmo sistema — cada uma expõe um botão pra ir pra outra,
+          em vez de um seletor externo por cima das duas. */}
       {mode === "prototable" ? (
-        <ProtoTablePage />
+        <ProtoTablePage onNavigateToPlayground={() => setMode("playground")} />
       ) : (
-        <div className={styles.shell}>
-          <Sidebar selectedId={selectedId} onSelect={setSelectedId} theme={theme} onToggleTheme={toggleTheme} />
+        <>
+          <Sidebar
+            selectedId={selectedId}
+            onSelect={setSelectedId}
+            theme={theme}
+            onToggleTheme={toggleTheme}
+            onNavigateToPrototable={() => setMode("prototable")}
+          />
           <main className={styles.main}>
             {selectedId === ICON_LIBRARY_ID ? (
               <IconLibrary />
@@ -85,7 +73,7 @@ export function App() {
               <StoryDetail key={story.id} story={story} theme={theme} />
             ) : null}
           </main>
-        </div>
+        </>
       )}
     </div>
   );

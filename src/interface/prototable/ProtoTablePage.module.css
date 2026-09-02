@@ -1,30 +1,18 @@
-.page {
-  height: 100%;
-  overflow: auto;
-  padding: var(--espaco-g);
-  box-sizing: border-box;
-  background: var(--fundo-secundario);
-}
-
-:root[data-theme="dark"] .page {
+/* .main replica exatamente App.module.css .main (mesmo shell flex do
+   Playground) — os dois módulos ocupam a mesma estrutura de layout. */
+.main {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
   background: var(--fundo-superficie);
 }
 
-.header {
-  margin-bottom: var(--espaco-g);
-}
-
-.title {
-  margin: 0 0 var(--espaco-xp) 0;
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--texto-primario);
-}
-
-.subtitle {
-  margin: 0;
+.railDescription {
+  font-family: var(--texto-p-family);
+  font-size: 13px;
   color: var(--texto-secundario);
-  max-width: 640px;
+  margin: 0;
+  line-height: 1.5;
 }
 
 .rowActions {

@@ -14,7 +14,32 @@
   font-size: var(--texto-p-size);
   font-weight: 600;
   color: var(--texto-primario);
+  margin-bottom: var(--espaco-pp);
+}
+
+.moduleSwitch {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  border-radius: var(--raio-pp);
+  padding: var(--espaco-xp) 0;
   margin-bottom: var(--espaco-m);
+  font-family: var(--texto-p-family);
+  font-size: var(--texto-p-size);
+  font-weight: 600;
+  color: var(--acao-primaria);
+  cursor: pointer;
+}
+
+.moduleSwitch:hover {
+  text-decoration: underline;
+}
+
+.moduleSwitch:focus-visible {
+  outline: var(--foco-espessura) solid var(--borda-foco);
+  outline-offset: 2px;
 }
 
 .group {

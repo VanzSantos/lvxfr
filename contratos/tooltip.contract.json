@@ -40,6 +40,7 @@
     "recalcular a seta quando o balão é deslocado por 'shift' em viewports muito pequenas — aceito como leve desalinhamento nesta versão, não introduzir mais complexidade que o caso real pede"
   ],
   "decisions": [
+    "TESTE 2 — confirmando o fix do bug de sintaxe git show (2026-09-02): esta linha deve aparecer em 'Decisões novas' na mensagem de commit do autosync. Entrada removida logo em seguida.",
     "Motor de posicionamento: @floating-ui/react — resolve auto-ajuste (flip), manter na viewport (shift) e a seta (arrow), funciona em web e não antecipa a decisão em aberto de base de componentes.",
     "role='tooltip' adicionado (padrão WAI-ARIA) mesmo sem estar explícito no contrato original.",
     "children clonado via cloneElement (não getElementById, que não existe em React Native) — funciona nas duas plataformas.",

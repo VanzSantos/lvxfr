@@ -6,7 +6,7 @@ import { Icon } from "../../../components/Icon/Icon";
 import styles from "./LoginScreen.module.css";
 
 interface LoginScreenProps {
-  /** true quando a página é renderizada dentro de um contêiner de tamanho próprio (ex.: preview da DS Playground), em vez de ocupar a viewport inteira. */
+  /** true quando a página é renderizada dentro de um contêiner de tamanho próprio (ex.: preview da DS Playground), em vez de ocupar a viewport inteira (padrão). */
   embedded?: boolean;
 }
 

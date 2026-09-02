@@ -1,0 +1,64 @@
+.page {
+  height: 100%;
+  overflow: auto;
+  padding: var(--espaco-g);
+  box-sizing: border-box;
+  background: var(--fundo-secundario);
+}
+
+:root[data-theme="dark"] .page {
+  background: var(--fundo-superficie);
+}
+
+.header {
+  margin-bottom: var(--espaco-g);
+}
+
+.title {
+  margin: 0 0 var(--espaco-xp) 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--texto-primario);
+}
+
+.subtitle {
+  margin: 0;
+  color: var(--texto-secundario);
+  max-width: 640px;
+}
+
+.rowActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--espaco-xp);
+}
+
+.commitList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-p);
+}
+
+.commitItem {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-bottom: var(--espaco-p);
+  border-bottom: 1px solid var(--borda-base);
+}
+
+.commitItem:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.commitMessage {
+  color: var(--texto-primario);
+  font-weight: 600;
+}
+
+.commitMeta {
+  color: var(--texto-secundario);
+  font-size: 13px;
+}

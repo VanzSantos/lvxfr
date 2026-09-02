@@ -69,6 +69,23 @@ pros outros — você precisaria reaplicar manualmente ou reclonar.
 
 Comece pela primeira opção; migre pra clones separados só quando um caso real pedir.
 
+## ProtoTable — quem criou/atualizou o quê
+
+Além do DS Playground, o app tem uma segunda aba no topo chamada **ProtoTable** —
+deliberadamente uma tela separada, não misturada com a vitrine de componentes: é um
+índice dos protótipos reais (não dos componentes), mostrando quem criou cada um, quem
+atualizou por último, quando, e o histórico completo de commits. Nada disso é digitado
+à mão — vem direto do histórico git de cada pasta em `src/interface/screens/`
+registrada em `src/interface/prototable/registry.ts`.
+
+**Isso implica em uma automação que roda por padrão:** enquanto `npm run dev` está de
+pé, um processo em segundo plano (`scripts/proto-autosync.mjs`) observa as pastas de
+protótipo registradas e, ~20 segundos depois da última mudança, **commita e dá push
+automaticamente** — pra que quem gerencia o repositório veja o progresso de qualquer
+pessoa sem depender de lembrete manual. Ele nunca usa `--force`; se o push falhar
+(histórico divergente), só avisa no terminal, sem tentar resolver sozinho. Pra
+desligar essa automação numa sessão específica: `PROTO_AUTOSYNC=0 npm run dev`.
+
 ## Contribuindo
 
 Se você ajustar um componente, um token, ou corrigir algo no contrato/tokens durante os

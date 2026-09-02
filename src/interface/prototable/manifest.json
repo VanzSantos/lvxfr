@@ -1,0 +1,96 @@
+{
+  "generatedAt": "2026-09-02T16:17:10.282Z",
+  "prototypes": [
+    {
+      "key": "backoffice-template",
+      "title": "BackofficeTemplate",
+      "screenPath": "src/interface/screens/BackofficeTemplate",
+      "standaloneStoryId": "backoffice-template",
+      "uncommitted": false,
+      "createdBy": "Vanz Santos",
+      "createdAt": "2026-09-01T18:15:36-03:00",
+      "lastUpdatedBy": "Vanz Santos",
+      "lastUpdatedAt": "2026-09-01T18:15:36-03:00",
+      "commitCount": 1,
+      "history": [
+        {
+          "hash": "cd2ac458254515f47131f3a60cc1c01a2d4b2efb",
+          "shortHash": "cd2ac45",
+          "author": "Vanz Santos",
+          "date": "2026-09-01T18:15:36-03:00",
+          "message": "Initial commit — LVXFR design system harness"
+        }
+      ]
+    },
+    {
+      "key": "crud-template",
+      "title": "CrudTemplate",
+      "screenPath": "src/interface/screens/CrudTemplate",
+      "standaloneStoryId": "crud-template",
+      "uncommitted": false,
+      "createdBy": "Vanz Santos",
+      "createdAt": "2026-09-01T18:15:36-03:00",
+      "lastUpdatedBy": "Vanz Santos",
+      "lastUpdatedAt": "2026-09-01T18:15:36-03:00",
+      "commitCount": 1,
+      "history": [
+        {
+          "hash": "cd2ac458254515f47131f3a60cc1c01a2d4b2efb",
+          "shortHash": "cd2ac45",
+          "author": "Vanz Santos",
+          "date": "2026-09-01T18:15:36-03:00",
+          "message": "Initial commit — LVXFR design system harness"
+        }
+      ]
+    },
+    {
+      "key": "login-screen",
+      "title": "LoginScreen",
+      "screenPath": "src/interface/screens/LoginScreen",
+      "standaloneStoryId": "login-screen",
+      "uncommitted": false,
+      "createdBy": "Vanz Santos",
+      "createdAt": "2026-09-01T18:15:36-03:00",
+      "lastUpdatedBy": "Vanz Santos",
+      "lastUpdatedAt": "2026-09-02T13:15:26-03:00",
+      "commitCount": 2,
+      "history": [
+        {
+          "hash": "72a728413b47f80c3ed5eb877d3031edc72f1505",
+          "shortHash": "72a7284",
+          "author": "Vanz Santos",
+          "date": "2026-09-02T13:15:26-03:00",
+          "message": "auto: sync protótipo src/interface/screens/LoginScreen (2026-09-02T16:15:26.448Z)"
+        },
+        {
+          "hash": "cd2ac458254515f47131f3a60cc1c01a2d4b2efb",
+          "shortHash": "cd2ac45",
+          "author": "Vanz Santos",
+          "date": "2026-09-01T18:15:36-03:00",
+          "message": "Initial commit — LVXFR design system harness"
+        }
+      ]
+    },
+    {
+      "key": "onboarding-screen",
+      "title": "OnboardingScreen",
+      "screenPath": "src/interface/screens/OnboardingScreen",
+      "standaloneStoryId": "onboarding-screen",
+      "uncommitted": false,
+      "createdBy": "Vanz Santos",
+      "createdAt": "2026-09-01T18:15:36-03:00",
+      "lastUpdatedBy": "Vanz Santos",
+      "lastUpdatedAt": "2026-09-01T18:15:36-03:00",
+      "commitCount": 1,
+      "history": [
+        {
+          "hash": "cd2ac458254515f47131f3a60cc1c01a2d4b2efb",
+          "shortHash": "cd2ac45",
+          "author": "Vanz Santos",
+          "date": "2026-09-01T18:15:36-03:00",
+          "message": "Initial commit — LVXFR design system harness"
+        }
+      ]
+    }
+  ]
+}

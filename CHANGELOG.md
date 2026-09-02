@@ -4,7 +4,7 @@ Gerado automaticamente por `npm run changelog` a partir do array `decisions` de 
 arquivo em `contratos/*.contract.json` — não editar este arquivo à mão, ele é sobrescrito
 a cada execução. Editar as decisões na fonte (o contrato do componente).
 
-Gerado em: 2026-09-01
+Gerado em: 2026-09-02
 
 ## Decisões com data explícita, mais recentes primeiro
 

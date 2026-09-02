@@ -3295,3 +3295,77 @@ Build limpo ao final de cada fase (1, 2, 3). Próximo passo (fora desta
 entrada): preparar `README.md`, `CONTRIBUTING.md`, workflow de GitHub
 Actions e publicar o repositório privado — ver entrada seguinte quando
 concluído.
+
+### Repositório publicado + ícone da marca trocado pra sparkle (2026-09-01/02)
+
+Publicado como privado primeiro (`gh repo create lvxfr --private`), depois trocado
+pra público a pedido do usuário. `.claude/settings.local.json` deixado de fora do
+commit (pessoal/local, convenção do Claude Code) via `.gitignore`. Ícone da marca
+(LogoIcon em `AppShell.tsx`, `LoginScreen.tsx`, `SideNavDemo.tsx`) trocado de `leaf`
+pra `sparkle` — `leaf` removido do registro fechado do Icon por não ter mais consumidor
+real, mesmo padrão já usado quando envelope/envelope-open foram removidos. O primeiro
+push do workflow de CI falhou por o token do `gh` não ter o escopo `workflow`
+(rejeitado pelo GitHub); publicado o resto sem ele, usuário reautorizou o escopo
+(`gh auth refresh -s workflow`) e o workflow foi enviado num commit separado.
+
+### ProtoTable — índice de protótipos separado do Playground + auto-sync de git (2026-09-02)
+
+Pedido do usuário: como dono do repositório (agora público), ver todos os protótipos
+criados/atualizados por qualquer testador, com autoria/data/histórico de versão — sem
+misturar essa visão com o DS Playground (vitrine de componentes, não de produtos). Como
+o uso é interno a uma única empresa (vários produtos, todo mundo vendo tudo, sem
+preocupação de privacidade), o usuário topou automatizar commit+push dos protótipos por
+padrão, não só lembrar. Nome confirmado: **ProtoTable** (existe um produto homônimo,
+prototable.gg, prototipagem de jogos de cartas físicos — domínio sem relação, sem risco
+real de confusão).
+
+Peça central de design: como cada testador roda o projeto localmente sem backend, a
+única fonte de verdade sem duplicação é o próprio histórico git de cada pasta — mesma
+filosofia já usada em `scripts/changelog.mjs` (ler o que já existe, não manter um
+registro paralelo).
+
+Implementado:
+- `src/interface/prototable/registry.ts` — registro de protótipos PRÓPRIO, separado de
+  `stories/registry.ts` do Playground (mesmo que aponte pras mesmas pastas de
+  `src/interface/screens/` hoje) — registrar um protótipo aqui é um passo a mais,
+  documentado em CONTRIBUTING.md.
+- `scripts/prototable-manifest.mjs` — roda `git log --follow` em cada `screenPath`
+  registrado e monta criadoPor/criadoEm/atualizadoPor/atualizadoEm/histórico completo.
+  Exporta `buildManifest()` (reaproveitado pelo plugin do Vite, sem duplicar lógica) e
+  funciona também como CLI (`--out <path>` grava JSON estático).
+- `vite.config.ts` — plugin `prototableManifestPlugin` serve `GET
+  /__prototable-manifest` em dev, rodando o manifesto sob demanda a cada request (sem
+  precisar reiniciar o servidor pra refletir novos commits). Fora de dev, `npm run
+  build` roda `prebuild` gerando `src/interface/prototable/manifest.json` estático,
+  usado como fallback.
+- `src/interface/prototable/ProtoTablePage.tsx` — reaproveita o **Datatable** já
+  existente (não criou uma tabela do zero) pra listar os protótipos, com Drawer pro
+  histórico de commits de cada um. Ação "Abrir" linka pro `?standalone=<id>` já
+  existente no Playground (sem duplicar a rota).
+- `src/interface/App.tsx` — toggle de topo (2 abas, "DS Playground"/"ProtoTable") que
+  troca a árvore inteira renderizada — as duas telas não compartilham Sidebar/dados,
+  satisfazendo o pedido de não misturar.
+- `scripts/proto-autosync.mjs` — observa as pastas registradas (`fs.watch`, sem
+  dependência nova), debounce de 20s (configurável via
+  `PROTO_AUTOSYNC_DEBOUNCE_MS`), então `git add` escopado (nunca `-A`) + commit + push
+  (com `-u origin <branch>` se ainda não houver upstream). NUNCA `--force` — se o push
+  falhar (histórico divergente), só loga um aviso pra resolução manual. Log visível no
+  terminal a cada ação, automação não é silenciosa.
+- `scripts/dev-with-autosync.mjs` — orquestrador leve (só `child_process.spawn` da
+  stdlib) que sobe `vite` + `proto-autosync.mjs` juntos; `package.json` `"dev"` passa a
+  chamar esse orquestrador. Opt-out: `PROTO_AUTOSYNC=0 npm run dev` (só sobe o Vite).
+
+Verificado ponta a ponta no navegador e via terminal: ProtoTable carrega o manifesto
+real (autoria/data corretas pro histórico existente do repo), "Ver histórico" abre o
+Drawer com a lista de commits, link standalone testado direto por URL. Autosync testado
+de verdade: uma edição real em `LoginScreen.tsx` foi automaticamente commitada
+(`72a7284 auto: sync protótipo src/interface/screens/LoginScreen (...)`) e enviada pro
+`origin/main` do repositório público sem nenhuma ação manual — confirmado comparando
+`git log` local com `git fetch origin main`. Opt-out (`PROTO_AUTOSYNC=0`) testado
+separadamente, confirmando que só o Vite sobe nesse caso. Build limpo (`npm run build`,
+que já roda o `prebuild` do manifesto) em cada etapa.
+
+Limite documentado no README/CONTRIBUTING: o dono só vê o que foi de fato commitado E
+enviado (push) — trabalho só local nunca aparece, mesmo com a automação ligada, se o
+processo de dev nunca chegou a rodar (ex.: a pessoa só editou e nunca subiu `npm run
+dev`).

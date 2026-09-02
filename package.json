@@ -4,7 +4,9 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "node scripts/dev-with-autosync.mjs",
+    "dev:vite-only": "vite",
+    "prebuild": "node scripts/prototable-manifest.mjs --out src/interface/prototable/manifest.json",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "changelog": "node scripts/changelog.mjs > CHANGELOG.md"

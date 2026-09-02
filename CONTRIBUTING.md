@@ -23,6 +23,19 @@ cada mudança foi feita.
 Ninguém precisa de permissão de escrita no repositório original pra abrir um PR de fork —
 é o modelo padrão do GitHub.
 
+## Seus commits de protótipo são automáticos (e públicos pra quem tem acesso ao repo)
+
+Se a pasta do seu protótipo estiver registrada em `src/interface/prototable/
+registry.ts`, rodar `npm run dev` normalmente já dispara commit + push automáticos
+(`scripts/proto-autosync.mjs`, ~20s depois da última mudança de arquivo) — não é
+preciso lembrar de dar push manualmente pro seu trabalho aparecer no ProtoTable de
+quem administra o repositório. Ver `README.md` pra detalhes e como desligar
+(`PROTO_AUTOSYNC=0 npm run dev`) se preferir controlar os commits você mesmo.
+
+Registrar um novo protótipo no ProtoTable é um passo A MAIS além de registrá-lo no
+Playground (`stories/registry.ts`) — adicione a entrada em `prototable/registry.ts`
+também, com `screenPath` apontando pra pasta real da tela.
+
 ## Regra obrigatória: documentar mudanças de contrato/token no próprio contrato
 
 Se a sua mudança tocar em `contratos/*.contract.json` (uma prop nova, um token

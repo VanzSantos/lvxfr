@@ -3515,3 +3515,31 @@ escopo do script antigo) com o novo `npm run dev` rodando — autosync detectou,
 debounce, e gerou um commit `auto: sync (contratos) — <timestamp>` enviado sozinho pro
 `origin/main`, confirmado comparando `git log` local com `git fetch origin main`. Entrada
 de teste revertida antes de finalizar, não ficou no contrato. Build limpo.
+
+### Mensagem de commit do autosync passou a resumir o que mudou (2026-09-02)
+
+Pedido do usuário: o histórico gerado pelo autosync precisa deixar fácil entender o que
+foi feito, não só quais pastas mudaram.
+
+`buildCommitBody()` novo em `scripts/autosync.mjs`: lista os arquivos alterados (até 30,
+depois resume em "+N arquivo(s) a mais") e, pra cada `contratos/*.contract.json` tocado,
+extrai as entradas NOVAS do array `decisions` — reaproveitando a MESMA lógica já existente
+em `scripts/pr-decisions-diff.mjs` (o comentário automático de PR), só que rodando
+localmente a cada commit em vez de uma vez por PR. O corpo vira parte da mensagem de
+commit (`git commit -m <assunto> -m <corpo>`), o assunto continua o resumo curto de
+grupos de path que já existia.
+
+**BUG REAL pego testando de verdade** (não só lendo o código): a primeira versão lia o
+conteúdo staged via `readJsonAtRef(":", path)`, um helper genérico que monta `` `${ref}:${path}` ``
+— com `ref=":"` isso vira `::contratos/...json` (dois-pontos duplicado), sintaxe inválida
+de `git show`, que sempre falhava silenciosamente (capturado pelo try/catch) e retornava
+`null`. Resultado: a seção "Decisões novas" da mensagem de commit vinha sempre vazia,
+mesmo quando havia uma decision nova de verdade — só descoberto rodando o autosync ao
+vivo (`npm run dev`) e inspecionando `git log -1` do commit gerado, não pela leitura do
+código. Corrigido com uma função dedicada `readStagedJson(path)` usando a sintaxe certa
+(`:path`, um só dois-pontos, sem ref antes). Revalidado com um teste de ponta a ponta:
+uma decision nova adicionada a `contratos/tooltip.contract.json` apareceu corretamente na
+mensagem do commit gerado (`auto: sync (contratos/tooltip.contract.json) — ...` +
+"Decisões novas:" + o texto exato da decision). Entradas de teste todas revertidas —
+`tooltip.contract.json` confirmado byte-idêntico ao estado anterior via `git diff`
+contra o commit-base. Build limpo.

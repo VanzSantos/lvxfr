@@ -35,6 +35,16 @@
      preto). Precisa declarar explicitamente aqui, mesmo bug e mesmo fix já
      feitos em modal.contract.json/.dialog. */
   color: var(--texto-primario);
+  /* BUG REAL — mesma classe de bug do color acima, mas pra fonte: html/body
+     não define font-family nenhuma (ver base.css), então conteúdo livre
+     (children) sem tipografia própria caía pra fonte padrão do navegador
+     (serif) sempre que o Drawer não estivesse aninhado, por acidente, dentro
+     de algo que já definisse a fonte (ex.: .canvas da própria DS Playground
+     — funcionava lá só por coincidência de contexto, quebrava em qualquer
+     outro consumidor real, como o ProtoTable). Mesmo fix aplicado em
+     modal.contract.json/.dialog. */
+  font-family: var(--texto-p-family);
+  font-size: var(--texto-p-size);
 
   /* Anima entrada E saída nativamente via @starting-style + allow-discrete
      — evita coordenar setTimeout com a chamada real de close() (que

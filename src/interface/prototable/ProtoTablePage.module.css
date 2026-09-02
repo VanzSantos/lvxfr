@@ -75,6 +75,12 @@
   outline-offset: 1px;
 }
 
+/* font-family/color explícitos aqui — mesma classe de bug já documentada em
+   modal.contract.json/drawer.contract.json/popover.contract.json: html/body
+   não define font-family nenhuma (ver base.css), então conteúdo livre sem
+   tipografia própria cai pra fonte padrão do navegador (serif). .leafCard
+   fica solto direto em `main` (não dentro de um overlay que já resolva
+   isso), então precisa declarar a própria fonte, não só herdar. */
 .leafCard {
   display: flex;
   align-items: flex-start;
@@ -84,12 +90,20 @@
   border: 1px solid var(--borda-base);
   border-radius: var(--raio-pp);
   background: var(--fundo-superficie);
+  color: var(--texto-primario);
+  font-family: var(--texto-p-family);
+  font-size: var(--texto-p-size);
 }
 
+/* Renderizada dentro do Drawer (que agora também declara sua própria fonte,
+   ver drawer.contract.json) — mas mantém a declaração aqui também, mesma
+   convenção de "todo conteúdo livre se auto-declara" usada no resto do
+   harness, não depende de o container ancestral estar sempre certo. */
 .commitList {
   display: flex;
   flex-direction: column;
   gap: var(--espaco-p);
+  font-family: var(--texto-p-family);
 }
 
 .commitItem {

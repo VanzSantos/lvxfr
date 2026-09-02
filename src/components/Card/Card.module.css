@@ -1,8 +1,18 @@
+/* BUG REAL — mesma classe de bug já corrigida em modal.contract.json/
+   drawer.contract.json/popover.contract.json: html/body não define
+   font-family nenhuma (ver base.css), então o `children` livre do Card caía
+   pra fonte padrão do navegador (serif) sempre que o Card não estivesse
+   aninhado, por acidente, dentro de algo que já definisse a fonte (ex.:
+   .canvas da própria DS Playground). Card é o container de conteúdo livre
+   mais usado do harness — precisa declarar a própria fonte, não só herdar. */
 .card {
   background: var(--fundo-superficie);
   border: 1px solid var(--borda-base);
   border-radius: var(--raio-pp);
   box-sizing: border-box;
+  color: var(--texto-primario);
+  font-family: var(--texto-p-family);
+  font-size: var(--texto-p-size);
 }
 
 .small {

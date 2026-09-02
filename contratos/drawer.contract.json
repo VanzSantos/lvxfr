@@ -147,7 +147,8 @@
       "structural.icone-pequeno"
     ],
     "typography": [
-      "type-style.texto-m-forte"
+      "type-style.texto-m-forte",
+      "type-style.texto-p"
     ]
   },
   "a11y": {
@@ -188,6 +189,7 @@
     "animação de entrada/saída fora do mecanismo nativo (@starting-style + transition + allow-discrete) — nunca reimplementar via JS (setTimeout coordenando classes, etc.) enquanto o navegador suportar nativamente"
   ],
   "decisions": [
+    "CORRIGIDO — BUG REAL encontrado testando no navegador, fora do contexto da DS Playground (2026-09-02): .drawer declarava color mas não font-family — o conteúdo livre (children) caía pra fonte padrão do navegador (serif) sempre que o Drawer não estivesse aninhado, por acidente, dentro de algo que já definisse a fonte (ex.: .canvas da própria DS Playground — funcionava lá só por coincidência de contexto, quebrava em consumidores reais como o ProtoTable, onde o bug foi reportado pelo usuário). Adicionado font-family/font-size:texto-p em .drawer (typography ganhou texto-p na whitelist).",
     "CORRIGIDO — auditoria de contratos (2026-09-01): raio-xp, focusRing (foco-espessura) e borda-foco (border) adicionados — botão de fechar usa o mesmo anel de foco visível do Modal, tokensAllowed não declarava essas categorias.",
     "RESOLVIDO com o usuário — só desliza da borda DIREITA neste contrato (sem prop 'placement'). Esquerda/topo/base ficam de fora até um caso de uso real pedir — mesmo raciocínio já usado no Divider antes de ganhar a orientação vertical (só depois de pedido explícito).",
     "RESOLVIDO com o usuário — modal é uma prop configurável (true/false), não uma escolha fixa. Default TRUE (bloqueia, igual Modal) — decisão do agente dentro do espaço que ficou em aberto: a maioria dos casos reais de painel lateral neste tipo de produto é 'editar um item sem perder o contexto da lista' (temporário, deveria bloquear até resolver), não um painel permanentemente fixado ao lado do conteúdo (mais raro fora de apps estilo IDE). Se o padrão real do produto pedir o contrário, é só trocar o default, a prop já existe pros dois casos.",

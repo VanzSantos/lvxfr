@@ -3435,3 +3435,49 @@ linha); testado também com um 2º módulo temporário adicionado só pra confir
 tabela aparece quando HÁ escolha real (2+ filhos) — revertido antes de finalizar, não
 ficou no código. Deep link direto por URL testado (`?pt_project=...&pt_flow=...`) abrindo
 já no lugar certo. Build limpo em cada etapa.
+
+### Varredura de fonte quebrada (serif) — 6 componentes corrigidos (2026-09-02)
+
+Usuário reportou (com screenshots) que o card de tela única e parte do Drawer de
+histórico do ProtoTable estavam renderizando em fonte serifada, não a Roboto do
+harness, e pediu uma varredura contra TODAS as inconsistências desse tipo, não só o
+caso pontual.
+
+Causa raiz confirmada via `getComputedStyle`: `base.css` deliberadamente não define
+`font-family` em `html`/`body` (cada componente declara a própria — decisão já
+documentada ali). `popover.contract.json` já tinha um fix pra essa exata classe de bug
+("AJUSTADO a pedido do usuário — font-family/font-size explícitos aqui... html/body não
+define font-family nenhuma"), mas o fix nunca foi replicado pros outros componentes que
+recebem `children`/conteúdo livre — cada um dependia, por ACIDENTE, de estar aninhado
+dentro de algo que já resolvesse a fonte (no caso da DS Playground, `.canvas` em
+`StoryDetail.module.css`). Fora desse contexto (como o ProtoTable, que não usa
+`.canvas`), o gap virava bug visível de verdade.
+
+Varredura: cruzados os props tipo `"node"` de todo `contratos/*.contract.json` (Card,
+Datatable.toolbarActions, Drawer, FilterBar.filters, Modal, NavBar.brand/actions,
+Popover.children/content, SideNav.header/footer/etc., Tooltip.children) contra
+`font-family` presente no CSS do container raiz correspondente. Confirmados 6 gaps reais
+(SideNav, Popover, Select, ComboBox, DatePicker, Datatable e afins já estavam corretos):
+
+- **Modal** (`.dialog`) — tinha `color` (fix antigo do bug CanvasText) mas não
+  `font-family`.
+- **Drawer** (`.drawer`) — mesmo gap do Modal.
+- **Card** (`.card`) — nenhuma declaração de fonte, nenhuma. É o container de conteúdo
+  livre mais usado do harness.
+- **NavBar** (`.nav`) — slots `brand`/`actions` sem fonte própria.
+- **FilterBar** (`.bar`) — slot `filters` sem fonte própria.
+- **Wizard** (`.wizard`) — conteúdo de cada etapa (`steps[].content`) sem fonte própria.
+
+Fix igual nos 6: `color: var(--texto-primario)` (quando ainda não tinha) +
+`font-family/font-size: var(--texto-p-family/--texto-p-size)` no container raiz que
+recebe o conteúdo livre — mesmo padrão já validado em `popover.contract.json`.
+`tokensAllowed` de cada contrato atualizado onde faltava (Card e Wizard não tinham
+sequer as categorias `text`/`typography`; FilterBar não tinha `semantic.texto-primario`
+em `text`; Modal/Drawer não tinham `type-style.texto-p` em `typography`). `ProtoTablePage.
+module.css` também ganhou a declaração no `.leafCard`/`.commitList` (o caso
+originalmente reportado).
+
+Verificado no navegador via `getComputedStyle(...).fontFamily` em cada um dos 6
+componentes (Card, NavBar, FilterBar, Wizard) + reteste visual do ProtoTable (leafCard e
+Drawer de histórico) — todos retornando `"Roboto, sans-serif"` agora, nenhum mais caindo
+pro serif padrão do navegador. Build limpo.

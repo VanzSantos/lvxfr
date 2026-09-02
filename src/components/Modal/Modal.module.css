@@ -1,3 +1,11 @@
+/* BUG REAL — mesma classe de bug já corrigida em popover.contract.json:
+   html/body não define font-family nenhuma (cada componente declara a
+   própria, ver base.css), então conteúdo livre (children) que dependesse só
+   de herança caía pra fonte padrão do navegador (serif) sempre que o Modal
+   não estivesse aninhado dentro de algo que já definisse a fonte por
+   acidente (ex.: .canvas da própria DS Playground — funcionava lá só por
+   coincidência de contexto, quebrava em qualquer outro consumidor real, como
+   o ProtoTable). Precisa de font-family explícito aqui, não só color. */
 .dialog {
   padding: 0;
   border: 1px solid var(--borda-base);
@@ -7,6 +15,8 @@
   overflow: hidden;
   background: var(--fundo-superficie);
   color: var(--texto-primario);
+  font-family: var(--texto-p-family);
+  font-size: var(--texto-p-size);
 }
 
 /* display só entra quando o <dialog> está de fato aberto (atributo [open],

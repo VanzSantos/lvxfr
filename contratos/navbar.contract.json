@@ -144,6 +144,7 @@
     "reimplementar o painel do Drawer mobile com uma div/position:fixed própria — reaproveita o componente Drawer existente"
   ],
   "decisions": [
+    "CORRIGIDO — BUG REAL encontrado testando no navegador (2026-09-02): .nav não declarava font-family/color nenhum — os slots livres brand/actions caíam pra fonte padrão do navegador (serif) sem um ancestral que já resolvesse isso por acidente (mesma classe de bug já corrigida em card.contract.json/modal.contract.json/drawer.contract.json). Adicionado color:texto-primario + font-family/font-size:texto-p em .nav — tokens já estavam na whitelist, só a declaração no CSS estava faltando.",
     "CORRIGIDO — auditoria de A11y (2026-09-01): BUG REAL, os dropdowns de item com children usavam floating-ui cru (useClick/useDismiss/useRole) sem FloatingFocusManager — sem foco preso/devolvido de verdade, o mesmo problema documentado em popover.contract.json. Corrigido envolvendo cada painel em <FloatingFocusManager context={context} modal={false}>.",
     "CORRIGIDO — auditoria de contratos (2026-09-01): borda-foco (border) e focusRing (foco-espessura) adicionados — anel de foco visível dos links/botões de navegação, categoria que não estava declarada.",
     "Agnóstico de biblioteca de roteamento — items[].active é sempre calculado e passado pelo consumidor (comparando a rota atual com o href de cada item, em qualquer nível), NavBar não importa react-router nem nenhuma lib de rotas. Mesmo racional já usado em Link/Breadcrumb.",

@@ -18,9 +18,20 @@ function readStandaloneId(): string | null {
   return new URLSearchParams(window.location.search).get("standalone");
 }
 
+/* Reload de página (F5, link colado, ou o próprio Breadcrumb do ProtoTable
+   quando o clique não é interceptado — ex.: Cmd/Ctrl-clique abrindo em nova
+   aba) precisa continuar no módulo certo — sem isso, qualquer pt_* na URL
+   ficaria "preso" atrás de um mode local que sempre reinicia em
+   "playground". */
+function readInitialMode(): AppMode {
+  if (typeof window === "undefined") return "playground";
+  const params = new URLSearchParams(window.location.search);
+  return params.has("pt_project") || params.has("pt_module") || params.has("pt_flow") ? "prototable" : "playground";
+}
+
 export function App() {
   const [selectedId, setSelectedId] = useState<string>(STORIES[0].id);
-  const [mode, setMode] = useState<AppMode>("playground");
+  const [mode, setMode] = useState<AppMode>(readInitialMode);
   const { theme, toggleTheme } = useTheme();
   const [standaloneId] = useState<string | null>(readStandaloneId);
 
@@ -56,7 +67,20 @@ export function App() {
           módulos do mesmo sistema — cada uma expõe um botão pra ir pra outra,
           em vez de um seletor externo por cima das duas. */}
       {mode === "prototable" ? (
-        <ProtoTablePage onNavigateToPlayground={() => setMode("playground")} />
+        <ProtoTablePage
+          onNavigateToPlayground={() => {
+            // Limpa o caminho do ProtoTable da URL — sem isso, um reload
+            // futuro (readInitialMode) voltaria pro ProtoTable mesmo depois
+            // da pessoa escolher voltar explicitamente pro Playground.
+            const params = new URLSearchParams(window.location.search);
+            params.delete("pt_project");
+            params.delete("pt_module");
+            params.delete("pt_flow");
+            const query = params.toString();
+            window.history.pushState({}, "", `${window.location.pathname}${query ? `?${query}` : ""}`);
+            setMode("playground");
+          }}
+        />
       ) : (
         <>
           <Sidebar

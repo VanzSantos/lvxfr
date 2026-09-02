@@ -7,12 +7,8 @@
   background: var(--fundo-superficie);
 }
 
-.railDescription {
-  font-family: var(--texto-p-family);
-  font-size: 13px;
-  color: var(--texto-secundario);
-  margin: 0;
-  line-height: 1.5;
+.breadcrumbRow {
+  margin-bottom: var(--espaco-pp);
 }
 
 .rowActions {
@@ -20,6 +16,74 @@
   align-items: center;
   justify-content: flex-end;
   gap: var(--espaco-xp);
+}
+
+.rowLink {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: var(--texto-primario);
+  font: inherit;
+}
+
+.rowLink:hover strong {
+  text-decoration: underline;
+}
+
+.rowLink:focus-visible {
+  outline: var(--foco-espessura) solid var(--borda-foco);
+  outline-offset: 2px;
+}
+
+.rowDescription {
+  font-size: 13px;
+  color: var(--texto-secundario);
+  margin: 2px 0 0;
+}
+
+/* Botão "Abrir" como <a target="_blank"> real (não window.open) — suporta
+   Cmd/Ctrl-clique e "abrir em nova aba" do menu de contexto, mesma régua de
+   acessibilidade do resto do harness. Estilo replica Button variant="neutral"
+   outlined sem reimportar o componente pra um <a>, que precisa ser um link
+   de verdade aqui (não um <button>). */
+.openButton {
+  display: inline-flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 var(--espaco-p);
+  border: 1px solid var(--borda-base);
+  border-radius: var(--raio-pp);
+  background: var(--fundo-superficie);
+  color: var(--texto-primario);
+  font-family: var(--texto-p-family);
+  font-size: var(--texto-p-size);
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.openButton:hover {
+  background: var(--fundo-secundario);
+}
+
+.openButton:focus-visible {
+  outline: var(--foco-espessura) solid var(--borda-foco);
+  outline-offset: 1px;
+}
+
+.leafCard {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--espaco-m);
+  padding: var(--espaco-m);
+  border: 1px solid var(--borda-base);
+  border-radius: var(--raio-pp);
+  background: var(--fundo-superficie);
 }
 
 .commitList {

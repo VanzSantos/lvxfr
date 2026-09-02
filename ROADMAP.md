@@ -3369,3 +3369,69 @@ Limite documentado no README/CONTRIBUTING: o dono só vê o que foi de fato comm
 enviado (push) — trabalho só local nunca aparece, mesmo com a automação ligada, se o
 processo de dev nunca chegou a rodar (ex.: a pessoa só editou e nunca subiu `npm run
 dev`).
+
+### ProtoTable — hierarquia Projeto > Módulo > Fluxo > Tela + navegação por Breadcrumb (2026-09-02)
+
+Pedido do usuário: organizar o ProtoTable (até então uma lista achatada de 4 telas) numa
+hierarquia real — Projeto (sistema fechado) > Módulo (área/grupo) > Fluxo (jornada
+dentro do módulo, só ganha sentido quando o módulo tem mais de um) > Tela (unidade
+atômica). Antes de implementar, uma conversa só de arquitetura (usuário pediu
+explicitamente "não modifique nada por enquanto") cobriu 5 pontos, todos com
+recomendação dada e depois confirmada ("concordo com todas as recomendações"):
+
+1. Tela continua obrigatória como unidade atômica no MODELO DE DADOS, mas um nível com
+   exatamente 1 filho não devia forçar uma tabela de "1 item" na UI.
+2. Um mecanismo de navegação só — Sidebar mostra só os Projetos, Breadcrumb (componente
+   já existente do DS) cuida do resto do caminho — em vez de árvore no menu lateral E
+   tabela ao mesmo tempo brigando por "onde estou".
+3. Protótipo interativo de um Projeto/Módulo INTEIRO (telas de verdade conectadas) fica
+   de fora desta rodada — escopo maior (precisaria de um "player" tipo Wizard/Stepper ou
+   navegação real dentro de cada tela), tratado como opt-in futuro.
+4. Botão "Abrir" sempre `_blank`.
+
+Implementado:
+- `src/interface/prototable/registry.ts` — `PROTOTYPES` (lista achatada) virou 4 arrays
+  flat com referência ao pai: `PROJECTS`, `MODULES` (`projectKey`), `FLOWS`
+  (`moduleKey`), `SCREENS` (`flowKey`, mesmo shape de antes). Flat-com-referência
+  escolhido em vez de aninhado à mão — mais fácil de editar e de agregar no script.
+  Semente: 1 Projeto > 1 Módulo > 4 Fluxos de 1 Tela cada (as 4 telas que já existiam),
+  provando o auto-colapso antes de haver dados reais de vários projetos.
+- `scripts/prototable-manifest.mjs` — só Telas (folha) rodam `git log`, como antes;
+  Fluxo/Módulo/Projeto agregam de baixo pra cima (`aggregateFromChildren`): união do
+  histórico dos filhos DEDUPLICADA POR HASH (um commit que tocou 2 telas do mesmo fluxo
+  não conta 2x — testado de propósito, o commit `72a7284` do autosync aparece só 1 vez
+  nos agregados de Módulo/Projeto mesmo pertencendo à árvore inteira). Saída virou árvore
+  aninhada (`projects[].modules[].flows[].screens[]`) em vez de lista achatada.
+- **Peça técnica não prevista originalmente**: `Breadcrumb` (`contratos/
+  breadcrumb.contract.json`) só aceita `href` real, sem `onClick` — pra reaproveitá-lo
+  sem reimplementar, o caminho de navegação (Projeto/Módulo/Fluxo atuais) precisou sair
+  de `useState` solto e ir pra query params da URL (`pt_project`/`pt_module`/`pt_flow`),
+  novo hook `src/interface/prototable/useProtoTablePath.ts` (`URLSearchParams` +
+  `history.pushState`, sem adicionar react-router). Ganho de brinde: URL
+  compartilhável/deep-linkável e back/forward do navegador funcionando.
+- `ProtoTablePage.tsx` reescrito: auto-colapso via `useEffect` (nível com 1 filho só
+  empurra o path direto pro filho, sem tabela intermediária), `Datatable` reaproveitado
+  em cada nível com 2+ filhos, `Breadcrumb` no topo montado a partir do path atual, botão
+  "Abrir" virou `<a target="_blank" rel="noopener noreferrer">` real (era
+  `window.open()`) — suporta Cmd/Ctrl-clique e abrir-em-nova-aba do botão direito.
+
+**BUG REAL encontrado e corrigido durante a verificação no navegador** (não hipotético —
+apareceu testando o clique de verdade, não só lendo o código): clicar num crumb do
+Breadcrumb (`<a href>` real) disparava reload de página — e o `mode` do `App.tsx`
+("playground" vs "prototable") era só `useState` local, sempre reiniciando em
+"playground" no reload, jogando a pessoa de volta pro Playground mesmo tendo clicado
+dentro do ProtoTable. Duas camadas de correção: (1) clique no Breadcrumb agora é
+interceptado (`preventDefault` + navegação via `pushState`, sem reload) exceto quando é
+Cmd/Ctrl/Shift/Alt-clique ou botão do meio (mesmo guard-clause que SPA routers usam,
+preserva "abrir em nova aba"); (2) defesa em profundidade — `App.tsx` agora deriva o
+`mode` inicial da presença de `pt_project`/`pt_module`/`pt_flow` na URL
+(`readInitialMode()`), então mesmo um reload de verdade (F5, link colado) volta pro
+módulo certo. "Voltar pro DS Playground" limpa esses parâmetros da URL, senão um reload
+seguinte voltaria pro ProtoTable mesmo depois da pessoa escolher sair de lá.
+
+Verificado no navegador: auto-colapso (Projeto→Módulo pulam sozinhos, tabela de Fluxos
+aparece por ter 4 itens, fluxo de 1 tela só cai direto no card da tela sem tabela de 1
+linha); testado também com um 2º módulo temporário adicionado só pra confirmar que a
+tabela aparece quando HÁ escolha real (2+ filhos) — revertido antes de finalizar, não
+ficou no código. Deep link direto por URL testado (`?pt_project=...&pt_flow=...`) abrindo
+já no lugar certo. Build limpo em cada etapa.

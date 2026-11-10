@@ -23,6 +23,11 @@
 
 button.label {
   cursor: pointer;
+  /* o botão ocupa a altura toda do chip (alvo ≥ 24px), não só a linha de texto */
+  align-self: stretch;
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
 }
 
 .label:focus-visible {

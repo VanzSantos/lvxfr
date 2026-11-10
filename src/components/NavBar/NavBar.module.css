@@ -56,6 +56,7 @@
   background: none;
   border: none;
   padding: 0;
+  min-height: 24px;
   cursor: pointer;
   color: var(--texto-primario);
   font-family: var(--texto-rotulo-botao-family);
@@ -84,6 +85,9 @@
    ajuste de fonte do popover do Breadcrumb: o contexto ao redor pode
    precisar reafirmar um estilo que o átomo não assume sozinho). */
 .nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
   color: var(--texto-primario);
 }
 

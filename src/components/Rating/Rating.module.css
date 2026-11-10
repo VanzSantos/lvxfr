@@ -1,6 +1,7 @@
 .rating {
   display: inline-flex;
   align-items: center;
+  min-height: 24px;
   gap: var(--espaco-xp);
 }
 

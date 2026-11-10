@@ -22,6 +22,11 @@
   gap: var(--espaco-xp);
 }
 
+/* alvo mínimo de 24px de altura pros links (WCAG 2.5.8) */
+.item a {
+  min-height: 24px;
+}
+
 .current {
   font-family: var(--texto-p-family);
   font-size: var(--texto-p-size);

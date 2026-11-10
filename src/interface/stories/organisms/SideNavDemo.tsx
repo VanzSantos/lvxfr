@@ -90,7 +90,7 @@ function ProfileFooter() {
         </div>
       }
     >
-      <UserCard name="Tuhel Rana" secondaryText="tuhelrana@gmail.com" accessibleLabel="Menu da conta de Tuhel Rana" />
+      <UserCard name="Tuhel Rana" secondaryText="tuhelrana@gmail.com" accessibleLabel="Menu da conta" />
     </Popover>
   );
 }

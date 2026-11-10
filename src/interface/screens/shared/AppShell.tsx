@@ -86,7 +86,7 @@ function ProfileFooter() {
       <UserCard
         name="Nome do Operador"
         secondaryText="operador@selenesdk.com"
-        accessibleLabel="Menu da conta de Nome do Operador"
+        accessibleLabel="Menu da conta"
       />
     </Popover>
   );
@@ -104,7 +104,7 @@ function ProfileFooterMobile() {
       <UserCard
         name="Nome do Operador"
         secondaryText="operador@selenesdk.com"
-        accessibleLabel="Menu da conta de Nome do Operador"
+        accessibleLabel="Menu da conta"
         caretDirection={open ? "up" : "down"}
         aria-expanded={open}
         onClick={() => setOpen((prev) => !prev)}

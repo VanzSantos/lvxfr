@@ -127,3 +127,16 @@ button.step {
   line-height: var(--texto-micro-line-height);
   color: var(--texto-secundario);
 }
+
+/* Texto só pra leitor de tela (estado da etapa, anexado ao nome acessível do botão). */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}

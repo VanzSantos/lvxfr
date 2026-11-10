@@ -39,7 +39,7 @@ export const UserCard = forwardRef<HTMLButtonElement, UserCardProps>(function Us
       type="button"
       ref={ref}
       className={className ? `${styles.card} ${className}` : styles.card}
-      aria-label={accessibleLabel}
+      aria-label={[name, secondaryText, accessibleLabel].filter(Boolean).join(", ")}
       {...rest}
     >
       <span className={styles.identity}>

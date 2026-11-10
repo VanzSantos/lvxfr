@@ -5,6 +5,10 @@ import { Badge } from "../../components/Badge/Badge";
 import { Drawer } from "../../components/Drawer/Drawer";
 import { EmptyState } from "../../components/EmptyState/EmptyState";
 import { Breadcrumb, type BreadcrumbItem } from "../../components/Breadcrumb/Breadcrumb";
+import { Icon } from "../../components/Icon/Icon";
+import { GroupSection, ModuleLink } from "../nav/Sidebar";
+import { ThemeToggle } from "../theme/ThemeToggle";
+import type { ThemePreference } from "../theme/useTheme";
 import { useProtoTablePath } from "./useProtoTablePath";
 import staticManifest from "./manifest.json";
 import sidebarStyles from "../nav/Sidebar.module.css";
@@ -149,6 +153,8 @@ interface ProtoTablePageProps {
   /** Navega de volta pro módulo DS Playground — módulo irmão deste, mesma
       estrutura visual, dados totalmente separados (ver App.tsx). */
   onNavigateToPlayground: () => void;
+  themePreference: ThemePreference;
+  onThemePreferenceChange: (preference: ThemePreference) => void;
 }
 
 /** Índice de PROTÓTIPOS organizados em hierarquia Projeto > Módulo > Fluxo >
@@ -162,7 +168,8 @@ interface ProtoTablePageProps {
     módulos do mesmo sistema, mesmo com dados 100% separados. Metadados de
     autoria/data/histórico vêm 100% do git real de cada Tela, agregados pra
     cima (ver scripts/prototable-manifest.mjs) — nunca digitados à mão. */
-export function ProtoTablePage({ onNavigateToPlayground }: ProtoTablePageProps) {
+export function ProtoTablePage({ onNavigateToPlayground, themePreference, onThemePreferenceChange }: ProtoTablePageProps) {
+  const [projectsExpanded, setProjectsExpanded] = useState(true);
   const [manifest, setManifest] = useState<Manifest>(staticManifest as unknown as Manifest);
   const [historyTarget, setHistoryTarget] = useState<HistoryTarget>(null);
   const { path, navigate, hrefFor } = useProtoTablePath();
@@ -318,30 +325,42 @@ export function ProtoTablePage({ onNavigateToPlayground }: ProtoTablePageProps) 
   return (
     <>
       <nav className={sidebarStyles.sidebar} aria-label="Navegação de protótipos">
-        <div className={sidebarStyles.brand}>ProtoTable</div>
-        <button type="button" className={sidebarStyles.moduleSwitch} onClick={onNavigateToPlayground}>
-          ← Voltar pro SeleneSDK
-        </button>
-        <div className={sidebarStyles.group}>
-          <span className={sidebarStyles.groupTitle}>Projetos</span>
-          {manifest.projects.length === 0 ? (
-            <span className={sidebarStyles.empty}>Nenhum projeto ainda</span>
-          ) : (
-            <ul className={sidebarStyles.list}>
-              {manifest.projects.map((project) => (
-                <li key={project.key}>
-                  <button
-                    type="button"
-                    className={`${sidebarStyles.item} ${currentProject?.key === project.key ? sidebarStyles.itemActive : ""}`}
-                    onClick={() => navigate({ project: project.key, module: null, flow: null })}
-                    aria-current={currentProject?.key === project.key ? "page" : undefined}
-                  >
-                    {project.title}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
+        <div className={sidebarStyles.brand}>
+          <Icon name="pencil-ruler" size="medium" color="var(--texto-primario)" weight="fill" decorative />
+          ProtoTable
+        </div>
+
+        <div className={sidebarStyles.scroll}>
+          <GroupSection title="Projetos" expanded={projectsExpanded} onToggle={() => setProjectsExpanded((value) => !value)}>
+            {manifest.projects.length === 0 ? (
+              <span className={sidebarStyles.empty}>Nenhum projeto ainda</span>
+            ) : (
+              <ul className={sidebarStyles.list}>
+                {manifest.projects.map((project) => (
+                  <li key={project.key}>
+                    <button
+                      type="button"
+                      className={`${sidebarStyles.item} ${currentProject?.key === project.key ? sidebarStyles.itemActive : ""}`}
+                      onClick={() => navigate({ project: project.key, module: null, flow: null })}
+                      aria-current={currentProject?.key === project.key ? "page" : undefined}
+                    >
+                      {project.title}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </GroupSection>
+        </div>
+
+        <div className={sidebarStyles.footer}>
+          <ThemeToggle preference={themePreference} onChange={onThemePreferenceChange} />
+          <ModuleLink
+            icon="moon"
+            title="SeleneSDK"
+            description="Voltar para os componentes"
+            onClick={onNavigateToPlayground}
+          />
         </div>
       </nav>
 

@@ -68,6 +68,8 @@ export function App() {
           em vez de um seletor externo por cima das duas. */}
       {mode === "prototable" ? (
         <ProtoTablePage
+          themePreference={preference}
+          onThemePreferenceChange={setPreference}
           onNavigateToPlayground={() => {
             // Limpa o caminho do ProtoTable da URL — sem isso, um reload
             // futuro (readInitialMode) voltaria pro ProtoTable mesmo depois

@@ -21,14 +21,14 @@ interface SidebarProps {
   onNavigateToPrototable: () => void;
 }
 
-interface GroupSectionProps {
+export interface GroupSectionProps {
   title: string;
   expanded: boolean;
   onToggle: () => void;
   children: React.ReactNode;
 }
 
-function GroupSection({ title, expanded, onToggle, children }: GroupSectionProps) {
+export function GroupSection({ title, expanded, onToggle, children }: GroupSectionProps) {
   const panelId = `sidebar-group-${title.replace(/\s+/g, "-").toLowerCase()}`;
   return (
     <div className={styles.group}>
@@ -49,6 +49,29 @@ function GroupSection({ title, expanded, onToggle, children }: GroupSectionProps
       </button>
       {expanded && <div id={panelId}>{children}</div>}
     </div>
+  );
+}
+
+interface ModuleLinkProps {
+  icon: "moon" | "pencil-ruler";
+  title: string;
+  description: string;
+  onClick: () => void;
+}
+
+/** Cartão de navegação entre módulos (SeleneSDK <-> ProtoTable), usado no rodapé fixo das duas sidebars. */
+export function ModuleLink({ icon, title, description, onClick }: ModuleLinkProps) {
+  return (
+    <button type="button" className={styles.moduleCard} onClick={onClick}>
+      <span className={styles.moduleIcon}>
+        <Icon name={icon} size="medium" color="var(--acao-primaria)" decorative />
+      </span>
+      <span className={styles.moduleText}>
+        <span className={styles.moduleTitle}>{title}</span>
+        <span className={styles.moduleDescription}>{description}</span>
+      </span>
+      <Icon name="arrow-right" size="small" color="var(--texto-secundario)" decorative />
+    </button>
   );
 }
 
@@ -122,16 +145,12 @@ export function Sidebar({ selectedId, onSelect, themePreference, onThemePreferen
       {/* Rodapé fixo — fora da área rolável, sempre visível. */}
       <div className={styles.footer}>
         <ThemeToggle preference={themePreference} onChange={onThemePreferenceChange} />
-        <button type="button" className={styles.moduleCard} onClick={onNavigateToPrototable}>
-          <span className={styles.moduleIcon}>
-            <Icon name="desktop" size="medium" color="var(--acao-primaria)" decorative />
-          </span>
-          <span className={styles.moduleText}>
-            <span className={styles.moduleTitle}>ProtoTable</span>
-            <span className={styles.moduleDescription}>Protótipos e telas de produto</span>
-          </span>
-          <Icon name="arrow-right" size="small" color="var(--texto-secundario)" decorative />
-        </button>
+        <ModuleLink
+          icon="pencil-ruler"
+          title="ProtoTable"
+          description="Protótipos e telas de produto"
+          onClick={onNavigateToPrototable}
+        />
       </div>
     </nav>
   );

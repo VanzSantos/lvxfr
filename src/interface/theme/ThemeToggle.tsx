@@ -15,11 +15,8 @@ interface ThemeToggleProps {
 /** Seletor de modo de cor — "Padrão do sistema" herda o prefers-color-scheme do SO. */
 export function ThemeToggle({ preference, onChange }: ThemeToggleProps) {
   return (
-    <Select
-      label="Modo de cor"
-      options={OPTIONS}
-      value={preference}
-      onChange={(value) => onChange(value as ThemePreference)}
-    />
+    <div role="group" aria-label="Modo de cor">
+      <Select options={OPTIONS} value={preference} onChange={(value) => onChange(value as ThemePreference)} />
+    </div>
   );
 }

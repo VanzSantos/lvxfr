@@ -55,6 +55,7 @@ import {
   Bell,
   CornersOut,
   CornersIn,
+  PencilRuler,
 } from "@phosphor-icons/react";
 import type { Icon as PhosphorIcon } from "@phosphor-icons/react";
 
@@ -119,6 +120,7 @@ const REGISTRY: Record<string, PhosphorIcon> = {
   bell: Bell,
   "corners-out": CornersOut,
   "corners-in": CornersIn,
+  "pencil-ruler": PencilRuler,
 };
 
 export type IconName = keyof typeof REGISTRY;

@@ -27,3 +27,31 @@
   overflow: auto;
   background: var(--fundo-superficie);
 }
+
+/* Link "Pular para o conteúdo": fora da tela até receber foco por teclado. */
+.skipLink {
+  position: absolute;
+  top: var(--espaco-pp);
+  left: var(--espaco-pp);
+  z-index: 1000;
+  padding: var(--espaco-pp) var(--espaco-m);
+  border-radius: var(--raio-pp);
+  background: var(--fundo-superficie);
+  color: var(--acao-link-texto);
+  font-family: var(--texto-p-family);
+  font-size: var(--texto-p-size);
+  font-weight: 600;
+  text-decoration: none;
+  transform: translateY(-200%);
+}
+
+.skipLink:focus-visible {
+  transform: none;
+  outline: var(--foco-espessura) solid var(--borda-foco);
+  outline-offset: 2px;
+}
+
+/* <main> recebe foco só por programação (skip link) — sem anel de foco. */
+.main:focus {
+  outline: none;
+}

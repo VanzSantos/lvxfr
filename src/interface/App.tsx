@@ -56,6 +56,15 @@ export function App() {
   }, []);
 
   const standaloneStory = standaloneId ? STORIES.find((item) => item.id === standaloneId) : undefined;
+  const story = STORIES.find((item) => item.id === selectedId);
+
+  // Título da aba por tela (WCAG 2.4.2) — antes era "SeleneSDK" fixo em todas.
+  useEffect(() => {
+    if (standaloneId) return;
+    const screen =
+      mode === "prototable" ? "ProtoTable" : selectedId === ICON_LIBRARY_ID ? "Ícones (Phosphor)" : story?.title;
+    document.title = screen ? `${screen} · SeleneSDK` : "SeleneSDK";
+  }, [standaloneId, mode, selectedId, story?.title]);
   /* Protótipos ProtoTable-only (sem entrada em stories/registry.ts — pedido
      explícito do usuário: US de produto real não deve aparecer no Playground
      nem ganhar contrato) resolvem o standalone pelo próprio ScreenEntry.Demo
@@ -81,10 +90,22 @@ export function App() {
     );
   }
 
-  const story = STORIES.find((item) => item.id === selectedId);
+  /* "Pular para o conteúdo" (WCAG 2.4.1) — o menu tem ~90 itens focáveis antes do
+     <main>. Não dá pra usar href="#conteudo": a hash da URL é a rota do Playground
+     ("#/radio"), então o clique move o foco por JS e deixa a URL como está. */
+  function skipToContent(event: React.MouseEvent<HTMLAnchorElement>) {
+    event.preventDefault();
+    const main = document.querySelector("main");
+    if (!main) return;
+    main.setAttribute("tabindex", "-1");
+    main.focus();
+  }
 
   return (
     <div className={styles.shell}>
+      <a href={window.location.hash || "#"} className={styles.skipLink} onClick={skipToContent}>
+        Pular para o conteúdo
+      </a>
       {/* Alterna entre o DS Playground (vitrine de componentes) e o ProtoTable
           (índice de protótipos/produtos reais) — telas deliberadamente
           distintas, sem Sidebar/dados compartilhados entre si (pedido

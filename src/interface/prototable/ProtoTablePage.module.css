@@ -103,3 +103,7 @@
   color: var(--texto-secundario);
   font-size: 13px;
 }
+
+.main:focus {
+  outline: none;
+}

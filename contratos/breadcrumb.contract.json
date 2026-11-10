@@ -13,32 +13,84 @@
     "Reticências clicáveis (só quando items.length > collapseThreshold) — botão com ícone 'dots-three', abre um popover (menu) listando os itens intermediários ocultos, cada um como Link real",
     "Separador entre itens (ícone caret-right, decorativo)"
   ],
-  "dependencies": ["Link", "Icon"],
+  "dependencies": [
+    "Link",
+    "Icon"
+  ],
   "props": [
-    { "name": "items", "type": "array", "required": true, "description": "Array de { label: string, href?: string }, na ordem hierárquica (do mais geral pro mais específico). O ÚLTIMO item é sempre tratado como página atual — mesmo que tenha href, ele é ignorado e o item renderiza como texto, não link (ver decisions)." },
-    { "name": "firstItemIcon", "type": "string", "required": false, "description": "Nome de ícone (IconName) mostrado antes do label do PRIMEIRO item da trilha (ex.: 'house'). Sem valor fixo/obrigatório — o dev escolhe qual ícone faz sentido pro contexto (não precisa ser uma casinha)." },
-    { "name": "collapseThreshold", "type": "number", "default": 3, "required": false, "description": "A partir de quantos items a trilha colapsa. Com items.length > collapseThreshold, mostra sempre: primeiro item + reticências clicáveis (com os itens do meio) + últimos 2 itens (pai imediato + página atual). Com items.length <= collapseThreshold, mostra tudo sem colapsar. Default 3 = colapsa a partir de 4 níveis (ver decisions)." }
+    {
+      "name": "items",
+      "type": "array",
+      "required": true,
+      "description": "Array de { label: string, href?: string }, na ordem hierárquica (do mais geral pro mais específico). O ÚLTIMO item é sempre tratado como página atual — mesmo que tenha href, ele é ignorado e o item renderiza como texto, não link (ver decisions)."
+    },
+    {
+      "name": "firstItemIcon",
+      "type": "string",
+      "required": false,
+      "description": "Nome de ícone (IconName) mostrado antes do label do PRIMEIRO item da trilha (ex.: 'house'). Sem valor fixo/obrigatório — o dev escolhe qual ícone faz sentido pro contexto (não precisa ser uma casinha)."
+    },
+    {
+      "name": "collapseThreshold",
+      "type": "number",
+      "default": 3,
+      "required": false,
+      "description": "A partir de quantos items a trilha colapsa. Com items.length > collapseThreshold, mostra sempre: primeiro item + reticências clicáveis (com os itens do meio) + últimos 2 itens (pai imediato + página atual). Com items.length <= collapseThreshold, mostra tudo sem colapsar. Default 3 = colapsa a partir de 4 níveis (ver decisions)."
+    }
   ],
   "variants": [],
-  "states": ["static"],
+  "states": [
+    "static"
+  ],
   "tokensAllowed": {
-    "text": ["semantic.acao-link-texto", "semantic.acao-link-texto-sobreposto", "semantic.texto-secundario", "semantic.texto-primario"],
-    "separatorColor": ["semantic.icone-secundario"],
-    "spacing": ["structural.espaco-xp"],
-    "iconSize": ["structural.icone-pequeno"],
-    "typography": ["type-style.texto-p"]
+    "text": [
+      "semantic.acao-link-texto",
+      "semantic.acao-link-texto-sobreposto",
+      "semantic.texto-secundario",
+      "semantic.texto-primario"
+    ],
+    "separatorColor": [
+      "semantic.icone-secundario"
+    ],
+    "spacing": [
+      "structural.espaco-xp"
+    ],
+    "iconSize": [
+      "structural.icone-pequeno"
+    ],
+    "typography": [
+      "type-style.texto-p"
+    ]
   },
   "a11y": {
     "role": "nav com aria-label=\"trilha de navegação\" envolvendo um <ol> — lista ordenada porque a hierarquia importa (não é uma lista de itens intercambiáveis). Cada item intermediário é um Link real (<a href>); o último é <span aria-current=\"page\">, nunca um link.",
-    "requiredAria": ["aria-label no <nav>", "aria-current=\"page\" no último item", "aria-hidden no ícone separador (puramente decorativo, a ordem do DOM já comunica a hierarquia)", "aria-label='Mostrar caminhos intermediários' + aria-haspopup='menu' + aria-expanded no botão de reticências, quando colapsado"],
-    "keyboard": ["Tab navega entre os links (comportamento nativo de <a>, via Link — não reimplementado)", "Enter/Espaço no botão de reticências abre o popover com os itens ocultos; Esc fecha e devolve o foco pro botão (mesmo padrão de popover já usado em Select/Datatable, via @floating-ui/react)"],
+    "requiredAria": [
+      "aria-label no <nav>",
+      "aria-current=\"page\" no último item",
+      "aria-hidden no ícone separador (puramente decorativo, a ordem do DOM já comunica a hierarquia)",
+      "aria-label='Mostrar caminhos intermediários' + aria-haspopup='menu' + aria-expanded no botão de reticências, quando colapsado"
+    ],
+    "keyboard": [
+      "Tab navega entre os links (comportamento nativo de <a>, via Link — não reimplementado)",
+      "Enter/Espaço no botão de reticências abre o popover com os itens ocultos; Esc fecha e devolve o foco pro botão (mesmo padrão de popover já usado em Select/Datatable, via @floating-ui/react)"
+    ],
     "contrastMin": "Herda os números já validados em link.contract.json pros itens navegáveis (7.13:1 AAA); o item atual usa texto-primario (mesmo par de alto contraste do resto do harness)."
   },
-  "events": { "status": "não definido no contrato original" },
+  "events": {
+    "status": "não definido no contrato original"
+  },
   "composition": {
-    "canContain": ["Link", "Icon"],
-    "canBeContainedBy": ["cabeçalhos de página", "páginas com hierarquia de navegação"],
-    "doNotCombine": ["Breadcrumb com só 1 item — não há hierarquia pra mostrar, ver whenNotToUse"]
+    "canContain": [
+      "Link",
+      "Icon"
+    ],
+    "canBeContainedBy": [
+      "cabeçalhos de página",
+      "páginas com hierarquia de navegação"
+    ],
+    "doNotCombine": [
+      "Breadcrumb com só 1 item — não há hierarquia pra mostrar, ver whenNotToUse"
+    ]
   },
   "forbidden": [
     "menos de 2 items — sem hierarquia real",
@@ -58,7 +110,10 @@
     "RESOLVIDO — bug real reportado: texto dos itens dentro do popover de reticências não herdava a fonte do harness (caía no padrão do navegador). Causa: FloatingPortal renderiza o popover fora da árvore de .list (escapa do <nav>), e Link não tem tipografia própria — depende inteiramente de herdar font-family/size do contexto (ver link.contract.json). Corrigido declarando type-style.texto-p explicitamente em .menu, já que o contexto herdado real (fora do portal) não é mais o do Breadcrumb.",
     "Sempre mostra EXATAMENTE 2 itens depois das reticências (pai imediato + atual), não 1 — dá contexto de onde a página atual está aninhada sem precisar abrir o popover pra descobrir. Mostrar só a página atual sozinha depois de '...' perderia informação útil que cabe tranquilamente no espaço.",
     "firstItemIcon é uma prop de nome de ícone (IconName), não fixada em 'house' — pedido explícito do usuário ('pode ser uma casinha ou outro que o usuário escolha'). Sem valor default: a maioria das trilhas não precisa de ícone no primeiro item, forçar um ícone fixo (mesmo que 'house') seria decidir por produtos que talvez não usem esse padrão visual.",
-    "<ol> em vez de <ul> — a ordem dos itens carrega significado hierárquico real (não é uma lista de opções intercambiáveis), mesma lógica que já rege outras decisões de semântica HTML no harness (ex.: Divider usa role=separator explícito em vez de depender de estilo)."
+    "<ol> em vez de <ul> — a ordem dos itens carrega significado hierárquico real (não é uma lista de opções intercambiáveis), mesma lógica que já rege outras decisões de semântica HTML no harness (ex.: Divider usa role=separator explícito em vez de depender de estilo).",
+    "CORRIGIDO — auditoria de acessibilidade (2026-11-10, perfil padrão, WCAG 2.5.8 — alvo mínimo de 24×24 px): os links tinham 19–20px de altura; ganharam min-height de 24px."
   ],
-  "references": { "tokensFile": "tokens/tokens.json — Cores Semânticas (Ações/Link, Textos), Estrutural (espaco-xp, icone-pequeno), Tipografia Estilo (texto-p)" }
+  "references": {
+    "tokensFile": "tokens/tokens.json — Cores Semânticas (Ações/Link, Textos), Estrutural (espaco-xp, icone-pequeno), Tipografia Estilo (texto-p)"
+  }
 }

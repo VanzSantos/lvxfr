@@ -33,9 +33,14 @@ jobs:
 
       - name: Comentar resumo no PR
         uses: actions/github-script@v7
+        env:
+          # Via variável de ambiente, NUNCA interpolado no script: o resumo vem de
+          # texto de contrato (pode ter crase, `${` ou aspas, que quebram o JS — foi o
+          # que reprovou o PR #1 — e, num PR de fork, seria injeção de script).
+          SUMMARY: ${{ steps.decisions.outputs.summary }}
         with:
           script: |
-            const summary = `${{ steps.decisions.outputs.summary }}`.trim();
+            const summary = (process.env.SUMMARY || "").trim();
             if (!summary) return;
             const marker = "<!-- selenesdk-contract-summary -->";
             const body = `${marker}\n${summary}`;

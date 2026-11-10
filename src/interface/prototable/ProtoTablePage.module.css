@@ -4,6 +4,11 @@
   flex: 1;
   min-width: 0;
   overflow-y: auto;
+  /* mesmo par de fundos do App.module.css: página mais escura que o SideNav */
+  background: var(--fundo-secundario);
+}
+
+:root[data-theme="dark"] .main {
   background: var(--fundo-superficie);
 }
 

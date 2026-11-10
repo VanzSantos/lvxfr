@@ -97,7 +97,9 @@
 .code {
   margin: 0;
   padding: var(--espaco-m);
-  background: var(--fundo-secundario);
+  /* a página ao redor é fundo-secundario no claro (ver App.module.css), então o
+     bloco sobe pra superfície; no escuro a página é a superfície e o bloco desce. */
+  background: var(--fundo-superficie);
   border: 1px solid var(--borda-base);
   border-radius: var(--raio-pp);
   overflow-x: auto;
@@ -138,3 +140,7 @@
 
 
 
+
+:root[data-theme="dark"] .code {
+  background: var(--fundo-secundario);
+}

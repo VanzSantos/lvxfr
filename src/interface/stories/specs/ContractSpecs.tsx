@@ -173,7 +173,9 @@ function TokenVisual({ token }: { token: ResolvedToken }) {
     );
   }
 
-  return <code>{token.light ?? "não encontrado em tokens.css"}</code>;
+  if (token.light) return <code>{token.light}</code>;
+  // Sem namespace.nome = palavra-chave CSS (ex.: currentColor), não um token.
+  return <span className={styles.muted}>palavra-chave CSS, não é um token</span>;
 }
 
 function TokenGroup({ groupKey, paths }: { groupKey: string; paths: string[] }) {

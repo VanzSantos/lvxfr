@@ -83,15 +83,15 @@ button.step {
   border-radius: var(--raio-circular);
   border: 2px solid var(--borda-base);
   background: var(--fundo-superficie);
-  color: var(--texto-inativo);
+  color: var(--texto-secundario);
   font-family: var(--texto-rotulo-botao-family);
   font-size: var(--texto-rotulo-botao-size);
   font-weight: var(--texto-rotulo-botao-weight);
 }
 
 .marker.current {
-  border-color: var(--acao-primaria);
-  color: var(--acao-primaria);
+  border-color: var(--acao-link-texto);
+  color: var(--acao-link-texto);
 }
 
 .marker.completed {

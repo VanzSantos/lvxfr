@@ -28,7 +28,7 @@
 }
 
 .code {
-  color: var(--texto-inativo);
+  color: var(--texto-secundario);
   font-family: var(--texto-g-forte-family);
   font-size: 40px;
   font-weight: 700;

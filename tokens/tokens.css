@@ -13,10 +13,10 @@
 
   /* Ações / Secundárias */
   --acao-secundaria: #95c11f;
-  --acao-secundaria-sobreposta: #759b15;
-  --acao-secundaria-pressionada: #587615;
+  --acao-secundaria-sobreposta: #86ad1a;
+  --acao-secundaria-pressionada: #779a16;
   --acao-secundaria-transparente: #95c11f1a;
-  --acao-secundaria-texto: #00401e;
+  --acao-secundaria-texto: #06240f;
 
   /* Ações / Neutras */
   --acao-neutra: #111827;
@@ -111,6 +111,7 @@
 
   /* Bordas */
   --borda-base: #d1d5db;
+  --borda-campo: #6b7280;
   --borda-foco: #0d8f4f;
   --borda-erro: #eb5757;
   --borda-inativo: #9ca3af;
@@ -264,8 +265,8 @@
 
   /* Ações / Secundárias */
   --acao-secundaria: #a8d43e;
-  --acao-secundaria-sobreposta: #8bb52e;
-  --acao-secundaria-pressionada: #6d9522;
+  --acao-secundaria-sobreposta: #98c235;
+  --acao-secundaria-pressionada: #86ad2d;
   --acao-secundaria-transparente: #a8d43e26;
   --acao-secundaria-texto: #0d2b12;
 
@@ -337,16 +338,17 @@
      escura; aviso continua a única que usa texto-primario por cima (ver
      badge.contract.json) — reavaliado: #d99a1f com texto-primario escuro
      (agora #111827) seguem passando AA */
-  --fundo-erro-forte: #e14b4b;
-  --fundo-sucesso-forte: #2f9c5c;
+  --fundo-erro-forte: #db2828;
+  --fundo-sucesso-forte: #27814c;
   --fundo-aviso-forte: #d99a1f;
-  --fundo-info-forte: #3d7ee8;
+  --fundo-info-forte: #226ce5;
   --fundo-apoio-1-forte: #7c53d1;
-  --fundo-apoio-2-forte: #e0651f;
+  --fundo-apoio-2-forte: #b9531a;
 
   /* Bordas — AJUSTADO a pedido do usuário: neutralizadas junto dos fundos
      (eram azul-ardósia) */
   --borda-base: #46453f;
+  --borda-campo: #85847c;
   --borda-foco: #22c55e;
   --borda-erro: #f27272;
   --borda-inativo: #5c5b54;

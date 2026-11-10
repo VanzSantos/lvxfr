@@ -11,39 +11,140 @@
     "Conteúdo — imagem, OU iniciais (texto), OU Icon genérico de pessoa, nessa ordem de fallback",
     "Indicador de presença (opcional, pontinho no canto inferior direito com anel de contraste)"
   ],
-  "dependencies": ["Icon"],
-  "props": [
-    { "name": "src", "type": "string", "required": false, "description": "URL da imagem. Se falhar ao carregar (onError) ou não for fornecida, cai pra iniciais (se name existir) ou ícone genérico." },
-    { "name": "name", "type": "string", "required": false, "description": "Nome da pessoa. Fonte das iniciais (2 letras: primeira letra do primeiro nome + primeira letra do último, ou 1 letra se for uma palavra só — ver decisions) e do nome acessível padrão (alt/aria-label), quando accessibleLabel não é fornecido." },
-    { "name": "accessibleLabel", "type": "string", "required": false, "requiredWhen": "nem src com contexto de nome, nem name são suficientes pra identificar a imagem/o avatar (ver forbidden) — funciona como override do nome acessível, tem prioridade sobre name quando os dois existem.", "description": "Nome acessível explícito (alt da imagem / aria-label do fallback). Usa name como padrão quando omitido." },
-    { "name": "size", "type": "enum", "enum": ["small", "medium", "large", "xlarge"], "default": "medium", "required": false, "description": "small=24px (icone-grande), medium=32px (icone-extra-grande), large=48px (espaco-xg), xlarge=64px (espaco-xgg) — os 4 valores já existem como tokens estruturais, nenhum tamanho novo foi inventado." },
-    { "name": "shape", "type": "enum", "enum": ["circle", "square"], "default": "circle", "required": false, "description": "circle=raio-circular (padrão, pessoa). square=raio-p, cantos arredondados mas não uma pill — pensado pra diferenciar visualmente pessoa de organização/equipe no futuro, sem criar um componente novo agora." },
-    { "name": "status", "type": "enum", "enum": ["online", "away", "offline"], "required": false, "description": "Indicador de presença opcional, pontinho no canto inferior direito. Ausente (padrão) = sem indicador. Puramente decorativo pra leitor de tela (aria-hidden) — se o status precisa ser lido, é responsabilidade de quem consome expor isso em texto em outro lugar (ver decisions)." }
+  "dependencies": [
+    "Icon"
   ],
-  "variants": ["circle", "square"],
-  "states": ["static"],
+  "props": [
+    {
+      "name": "src",
+      "type": "string",
+      "required": false,
+      "description": "URL da imagem. Se falhar ao carregar (onError) ou não for fornecida, cai pra iniciais (se name existir) ou ícone genérico."
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "required": false,
+      "description": "Nome da pessoa. Fonte das iniciais (2 letras: primeira letra do primeiro nome + primeira letra do último, ou 1 letra se for uma palavra só — ver decisions) e do nome acessível padrão (alt/aria-label), quando accessibleLabel não é fornecido."
+    },
+    {
+      "name": "accessibleLabel",
+      "type": "string",
+      "required": false,
+      "requiredWhen": "nem src com contexto de nome, nem name são suficientes pra identificar a imagem/o avatar (ver forbidden) — funciona como override do nome acessível, tem prioridade sobre name quando os dois existem.",
+      "description": "Nome acessível explícito (alt da imagem / aria-label do fallback). Usa name como padrão quando omitido."
+    },
+    {
+      "name": "size",
+      "type": "enum",
+      "enum": [
+        "small",
+        "medium",
+        "large",
+        "xlarge"
+      ],
+      "default": "medium",
+      "required": false,
+      "description": "small=24px (icone-grande), medium=32px (icone-extra-grande), large=48px (espaco-xg), xlarge=64px (espaco-xgg) — os 4 valores já existem como tokens estruturais, nenhum tamanho novo foi inventado."
+    },
+    {
+      "name": "shape",
+      "type": "enum",
+      "enum": [
+        "circle",
+        "square"
+      ],
+      "default": "circle",
+      "required": false,
+      "description": "circle=raio-circular (padrão, pessoa). square=raio-p, cantos arredondados mas não uma pill — pensado pra diferenciar visualmente pessoa de organização/equipe no futuro, sem criar um componente novo agora."
+    },
+    {
+      "name": "status",
+      "type": "enum",
+      "enum": [
+        "online",
+        "away",
+        "offline"
+      ],
+      "required": false,
+      "description": "Indicador de presença opcional, pontinho no canto inferior direito. Ausente (padrão) = sem indicador. Puramente decorativo pra leitor de tela (aria-hidden) — se o status precisa ser lido, é responsabilidade de quem consome expor isso em texto em outro lugar (ver decisions)."
+    }
+  ],
+  "variants": [
+    "circle",
+    "square"
+  ],
+  "states": [
+    "static"
+  ],
   "tokensAllowed": {
-    "background": ["semantic.fundo-secundario", "semantic.borda-inativo"],
-    "text": ["semantic.texto-secundario"],
-    "border": ["semantic.fundo-superficie"],
-    "status": ["semantic.borda-sucesso", "semantic.borda-aviso", "semantic.borda-inativo"],
-    "radius": ["structural.raio-circular", "structural.raio-p"],
-    "size": ["structural.icone-grande", "structural.icone-extra-grande", "structural.espaco-xg", "structural.espaco-xgg"],
-    "iconSize": ["structural.icone-pequeno", "structural.icone-medio", "structural.icone-grande"],
-    "typography": ["type-style.texto-p", "type-style.texto-m", "type-style.texto-m-forte", "type-style.texto-g-forte"]
+    "background": [
+      "semantic.fundo-secundario",
+      "semantic.borda-inativo"
+    ],
+    "text": [
+      "semantic.texto-secundario",
+      "semantic.texto-primario"
+    ],
+    "border": [
+      "semantic.fundo-superficie"
+    ],
+    "status": [
+      "semantic.borda-sucesso",
+      "semantic.borda-aviso",
+      "semantic.borda-inativo"
+    ],
+    "radius": [
+      "structural.raio-circular",
+      "structural.raio-p"
+    ],
+    "size": [
+      "structural.icone-grande",
+      "structural.icone-extra-grande",
+      "structural.espaco-xg",
+      "structural.espaco-xgg"
+    ],
+    "iconSize": [
+      "structural.icone-pequeno",
+      "structural.icone-medio",
+      "structural.icone-grande"
+    ],
+    "typography": [
+      "type-style.texto-p",
+      "type-style.texto-m",
+      "type-style.texto-m-forte",
+      "type-style.texto-g-forte"
+    ]
   },
   "a11y": {
     "role": "img — <img> nativo quando src carrega com sucesso (alt = nome acessível); role=\"img\" com aria-label no container quando o fallback (iniciais ou ícone) está ativo, já que nem <span> de iniciais nem Icon sozinhos comunicam 'isto representa uma pessoa'.",
-    "requiredAria": ["alt no <img> sempre que src é usado (nome acessível = accessibleLabel ?? name — erro em tempo de execução se nenhum dos dois existir)", "aria-label no container do fallback (mesma regra: accessibleLabel ?? name, erro se nenhum existir)", "conteúdo de iniciais/Icon dentro do fallback marcado aria-hidden — o nome acessível já vem do container, duplicar seria redundante"],
-    "keyboard": ["nenhuma — Avatar não é focável, não é um controle interativo (mesmo padrão do Card/Badge)"],
+    "requiredAria": [
+      "alt no <img> sempre que src é usado (nome acessível = accessibleLabel ?? name — erro em tempo de execução se nenhum dos dois existir)",
+      "aria-label no container do fallback (mesma regra: accessibleLabel ?? name, erro se nenhum existir)",
+      "conteúdo de iniciais/Icon dentro do fallback marcado aria-hidden — o nome acessível já vem do container, duplicar seria redundante"
+    ],
+    "keyboard": [
+      "nenhuma — Avatar não é focável, não é um controle interativo (mesmo padrão do Card/Badge)"
+    ],
     "contrastMin": "AA (mínimo já validado) pro texto das iniciais (texto-secundario sobre fundo-secundario, 6.87:1) — mesmo par já usado no Badge neutral/HelperText.",
     "notes": "Indicador de presença (status) é decorativo pro leitor de tela — a cor sozinha não é suficiente pra comunicar o estado pra quem não vê, então se presença for informação crítica em algum fluxo futuro, quem consome precisa expor isso em texto (ex.: um HelperText ou label ao lado), não confiar só no pontinho."
   },
-  "events": { "status": "não definido no contrato original" },
+  "events": {
+    "status": "não definido no contrato original"
+  },
   "composition": {
-    "canContain": ["Icon"],
-    "canBeContainedBy": ["listas", "cards", "cabeçalhos", "comentários"],
-    "doNotCombine": ["Avatar dentro de Avatar"]
+    "canContain": [
+      "Icon"
+    ],
+    "canBeContainedBy": [
+      "listas",
+      "cards",
+      "cabeçalhos",
+      "comentários"
+    ],
+    "doNotCombine": [
+      "Avatar dentro de Avatar"
+    ]
   },
   "forbidden": [
     "src fornecido sem accessibleLabel nem name — imagem sem nome acessível, erro em tempo de execução",
@@ -67,7 +168,10 @@
     "Tipografia das iniciais escala com size: small=texto-p (14px), medium=texto-m (16px), large=texto-m-forte (16px negrito), xlarge=texto-g-forte (18px negrito, novo em tokens.css — só texto-micro/micro-forte tinham sido trazidos até o Badge). Não é uma escala linear perfeita (large e medium têm o mesmo tamanho, só o peso muda) — suficiente pra diferenciar visualmente os 4 tamanhos sem inventar um valor de fonte fora da tabela de type-style existente.",
     "Indicador de presença é aria-hidden (puramente visual) — cor sozinha não comunica estado pra quem não vê; se um fluxo real precisar que presença seja lida, é responsabilidade de quem consome adicionar texto em outro elemento, não deste contrato inventar uma frase tipo 'online' embutida (evita também problema de tradução/i18n dentro do componente).",
     "AJUSTADO a pedido do usuário (modo escuro) — 'a cor de fundo do avatar com texto e com ícone está muito próxima da cor de fundo, deixe ela um pouquinho mais clara'. fundo-secundario ficou quase idêntico à página depois da rodada de escurecimento geral dos fundos (fundo-secundario é o mais claro dos 3 níveis, mas ainda próximo de fundo-superficie).",
-    "REVISADO a pedido do usuário — o primeiro fix trocou fundo-secundario por borda-inativo GLOBALMENTE (os dois temas), mas borda-inativo tem valores bem diferentes por tema: no escuro (#5c5b54) ficou correto, no claro (#9ca3af, bem mais saturado que o fundo-secundario original #f3f4f6) ficou escuro demais — 'apenas no modo claro, o fundo do círculo do avatar com letras e ícone está muito escuro'. Corrigido restringindo a troca só ao modo escuro, via seletor [data-theme=\"dark\"] .fallback no CSS — modo claro voltou pra fundo-secundario (correto desde sempre), modo escuro continua com borda-inativo (correto)."
+    "REVISADO a pedido do usuário — o primeiro fix trocou fundo-secundario por borda-inativo GLOBALMENTE (os dois temas), mas borda-inativo tem valores bem diferentes por tema: no escuro (#5c5b54) ficou correto, no claro (#9ca3af, bem mais saturado que o fundo-secundario original #f3f4f6) ficou escuro demais — 'apenas no modo claro, o fundo do círculo do avatar com letras e ícone está muito escuro'. Corrigido restringindo a troca só ao modo escuro, via seletor [data-theme=\"dark\"] .fallback no CSS — modo claro voltou pra fundo-secundario (correto desde sempre), modo escuro continua com borda-inativo (correto).",
+    "CORRIGIDO — auditoria de acessibilidade (2026-11-10): o texto declarava cor só por herança (3,68:1 no escuro no valor do Rating; iniciais do Avatar com 3,28:1 sobre o fundo do modo escuro); agora usa texto-primario explicitamente."
   ],
-  "references": { "tokensFile": "tokens/tokens.json — Cores Semânticas (Fundos e Superfícies, Textos, Bordas/Sinalização), Estrutural (raio-circular, raio-p, icone-grande, icone-extra-grande, espaco-xg, espaco-xgg), Tipografia Estilo (texto-p, texto-m, texto-m-forte)" }
+  "references": {
+    "tokensFile": "tokens/tokens.json — Cores Semânticas (Fundos e Superfícies, Textos, Bordas/Sinalização), Estrutural (raio-circular, raio-p, icone-grande, icone-extra-grande, espaco-xg, espaco-xgg), Tipografia Estilo (texto-p, texto-m, texto-m-forte)"
+  }
 }

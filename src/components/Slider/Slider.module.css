@@ -25,7 +25,7 @@
   right: 0;
   height: 4px;
   border-radius: var(--raio-circular);
-  background: var(--borda-base);
+  background: var(--borda-campo);
 }
 
 .trackFill {

@@ -64,7 +64,7 @@
 }
 
 .itemButton.active {
-  color: var(--acao-primaria);
+  color: var(--acao-link-texto);
 }
 
 .itemButton:focus-visible {
@@ -88,11 +88,11 @@
 }
 
 .nav a:hover {
-  color: var(--acao-primaria);
+  color: var(--acao-link-texto);
 }
 
 .nav a[aria-current="page"] {
-  color: var(--acao-primaria);
+  color: var(--acao-link-texto);
 }
 
 .dropdown {
@@ -112,11 +112,11 @@
 }
 
 .dropdown a:hover {
-  color: var(--acao-primaria);
+  color: var(--acao-link-texto);
 }
 
 .dropdown a[aria-current="page"] {
-  color: var(--acao-primaria);
+  color: var(--acao-link-texto);
 }
 
 .dropdownList {

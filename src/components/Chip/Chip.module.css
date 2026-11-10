@@ -60,7 +60,7 @@ button.label:disabled {
 
 .neutral {
   background: var(--fundo-secundario);
-  border-color: var(--borda-base);
+  border-color: var(--borda-campo);
   color: var(--texto-secundario);
 }
 

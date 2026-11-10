@@ -9,7 +9,7 @@
   display: flex;
   padding: var(--espaco-pp);
   background: var(--fundo-campo);
-  border: 1px solid var(--borda-base);
+  border: 1px solid var(--borda-campo);
   border-radius: var(--raio-pp);
   box-sizing: border-box;
 }

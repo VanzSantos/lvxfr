@@ -11,39 +11,127 @@
     "Por etapa: indicador (número da posição, ou ícone customizado via items[].icon, ou marca de concluído automática — ver decisions), texto principal (label) e texto secundário opcional (description)",
     "Conector entre etapas (só na variant='stacked') — linha horizontal, cor muda conforme a etapa anterior está concluída ou não"
   ],
-  "dependencies": ["Icon"],
-  "props": [
-    { "name": "items", "type": "array", "required": true, "description": "Array de { label: string, description?: string, icon?: string }. label é o texto principal, description o texto secundário (opcional). icon (IconName) substitui o número dessa etapa especificamente — dev decide por etapa se quer número ou ícone (ver decisions); etapas sem icon mostram o número da posição (1-indexado) enquanto pending/current, e uma marca de concluído automática quando completed (a menos que icon tenha sido dado, que aí prevalece sempre)." },
-    { "name": "currentStep", "type": "number", "required": true, "description": "Índice (0-based) da etapa atual. Controlado — Stepper não navega sozinho. Etapas com índice menor viram 'completed', a de índice igual vira 'current', as de índice maior ficam 'pending'." },
-    { "name": "accessibleLabel", "type": "string", "required": true, "description": "Nome acessível da lista de etapas (ex.: 'Etapas do cadastro')." },
-    { "name": "onStepClick", "type": "function", "required": false, "description": "Assinatura (index: number) => void. Quando fornecida, etapas completed e current viram <button> clicáveis (voltar ou permanecer numa etapa já alcançada); etapas pending NUNCA ficam clicáveis, mesmo com onStepClick definido — não dá pra pular pra uma etapa ainda não alcançada (ver forbidden). Sem esta prop, o Stepper inteiro é só informativo, sem nenhum elemento interativo." },
-    { "name": "variant", "type": "enum", "enum": ["inline", "stacked"], "default": "stacked", "required": false, "description": "'stacked' (padrão) = conector ligando os marcadores, texto ABAIXO de cada marcador, itens dividem a largura disponível igualmente. 'inline' = texto AO LADO do marcador, SEM conector entre etapas, itens do tamanho do próprio conteúdo. Ver decisions." }
+  "dependencies": [
+    "Icon"
   ],
-  "variants": ["inline", "stacked"],
-  "states": ["pending", "current", "completed"],
+  "props": [
+    {
+      "name": "items",
+      "type": "array",
+      "required": true,
+      "description": "Array de { label: string, description?: string, icon?: string }. label é o texto principal, description o texto secundário (opcional). icon (IconName) substitui o número dessa etapa especificamente — dev decide por etapa se quer número ou ícone (ver decisions); etapas sem icon mostram o número da posição (1-indexado) enquanto pending/current, e uma marca de concluído automática quando completed (a menos que icon tenha sido dado, que aí prevalece sempre)."
+    },
+    {
+      "name": "currentStep",
+      "type": "number",
+      "required": true,
+      "description": "Índice (0-based) da etapa atual. Controlado — Stepper não navega sozinho. Etapas com índice menor viram 'completed', a de índice igual vira 'current', as de índice maior ficam 'pending'."
+    },
+    {
+      "name": "accessibleLabel",
+      "type": "string",
+      "required": true,
+      "description": "Nome acessível da lista de etapas (ex.: 'Etapas do cadastro')."
+    },
+    {
+      "name": "onStepClick",
+      "type": "function",
+      "required": false,
+      "description": "Assinatura (index: number) => void. Quando fornecida, etapas completed e current viram <button> clicáveis (voltar ou permanecer numa etapa já alcançada); etapas pending NUNCA ficam clicáveis, mesmo com onStepClick definido — não dá pra pular pra uma etapa ainda não alcançada (ver forbidden). Sem esta prop, o Stepper inteiro é só informativo, sem nenhum elemento interativo."
+    },
+    {
+      "name": "variant",
+      "type": "enum",
+      "enum": [
+        "inline",
+        "stacked"
+      ],
+      "default": "stacked",
+      "required": false,
+      "description": "'stacked' (padrão) = conector ligando os marcadores, texto ABAIXO de cada marcador, itens dividem a largura disponível igualmente. 'inline' = texto AO LADO do marcador, SEM conector entre etapas, itens do tamanho do próprio conteúdo. Ver decisions."
+    }
+  ],
+  "variants": [
+    "inline",
+    "stacked"
+  ],
+  "states": [
+    "pending",
+    "current",
+    "completed"
+  ],
   "tokensAllowed": {
-    "background": ["semantic.fundo-superficie", "semantic.fundo-secundario", "semantic.acao-primaria"],
-    "border": ["semantic.borda-base", "semantic.acao-primaria", "semantic.borda-foco"],
-    "text": ["semantic.texto-primario", "semantic.texto-secundario", "semantic.texto-inativo", "semantic.acao-primaria-texto"],
-    "iconColor": ["semantic.acao-primaria-texto", "semantic.icone-secundario"],
-    "iconSize": ["structural.icone-pequeno"],
-    "radius": ["structural.raio-circular"],
-    "focusRing": ["structural.foco-espessura"],
-    "spacing": ["structural.espaco-xp", "structural.espaco-pp", "structural.espaco-p", "structural.espaco-g"],
-    "typography": ["type-style.texto-p", "type-style.texto-micro", "type-style.texto-rotulo-botao"]
+    "background": [
+      "semantic.fundo-superficie",
+      "semantic.fundo-secundario",
+      "semantic.acao-primaria"
+    ],
+    "border": [
+      "semantic.borda-base",
+      "semantic.acao-primaria",
+      "semantic.borda-foco"
+    ],
+    "text": [
+      "semantic.texto-primario",
+      "semantic.texto-secundario",
+      "semantic.texto-inativo",
+      "semantic.acao-primaria-texto",
+      "semantic.acao-link-texto"
+    ],
+    "iconColor": [
+      "semantic.acao-primaria-texto",
+      "semantic.icone-secundario"
+    ],
+    "iconSize": [
+      "structural.icone-pequeno"
+    ],
+    "radius": [
+      "structural.raio-circular"
+    ],
+    "focusRing": [
+      "structural.foco-espessura"
+    ],
+    "spacing": [
+      "structural.espaco-xp",
+      "structural.espaco-pp",
+      "structural.espaco-p",
+      "structural.espaco-g"
+    ],
+    "typography": [
+      "type-style.texto-p",
+      "type-style.texto-micro",
+      "type-style.texto-rotulo-botao"
+    ]
   },
   "a11y": {
     "role": "nav (aria-label=accessibleLabel) envolvendo um <ol> — a ordem importa (é sequencial), mesma semântica já usada em breadcrumb.contract.json. Etapa current tem aria-current=\"step\" (token de aria-current específico pra indicadores de progresso por etapa, diferente do aria-current=\"page\" usado em Breadcrumb/NavBar).",
-    "requiredAria": ["aria-label no nav", "aria-current=\"step\" na etapa current", "aria-label descrevendo o estado da etapa quando onStepClick torna o item um <button> (ex.: 'Dados pessoais, concluída' / 'Endereço, etapa atual')"],
-    "keyboard": ["sem onStepClick: nenhum elemento focável, é conteúdo só informativo", "com onStepClick: Tab navega entre os <button> de etapas completed/current (pending nunca são focáveis, mesmo padrão de item disabled não entrar na ordem de tabulação usado no resto do harness); Enter/Espaço ativa (comportamento nativo de <button>)"],
+    "requiredAria": [
+      "aria-label no nav",
+      "aria-current=\"step\" na etapa current",
+      "aria-label descrevendo o estado da etapa quando onStepClick torna o item um <button> (ex.: 'Dados pessoais, concluída' / 'Endereço, etapa atual')"
+    ],
+    "keyboard": [
+      "sem onStepClick: nenhum elemento focável, é conteúdo só informativo",
+      "com onStepClick: Tab navega entre os <button> de etapas completed/current (pending nunca são focáveis, mesmo padrão de item disabled não entrar na ordem de tabulação usado no resto do harness); Enter/Espaço ativa (comportamento nativo de <button>)"
+    ],
     "contrastMin": "AAA (7:1) pro texto principal/secundário, mesma régua do resto do harness.",
     "notes": "Indicador de etapa completed (marca de concluído automática) é redundante de propósito com o texto — nunca é a ÚNICA forma de saber que a etapa foi concluída: a cor muda, mas o estado também é comunicado via aria-current/ausência dele e pela ordem sequencial do <ol>."
   },
-  "events": { "status": "não definido no contrato original" },
+  "events": {
+    "status": "não definido no contrato original"
+  },
   "composition": {
-    "canContain": ["Icon"],
-    "canBeContainedBy": ["topo de formulários multi-etapa", "organismo Wizard (fora deste contrato, orquestra a navegação real entre as telas)"],
-    "doNotCombine": ["Stepper dentro de Stepper", "usar Stepper pra progresso percentual contínuo sem etapas nomeadas — isso é Progress Bar"]
+    "canContain": [
+      "Icon"
+    ],
+    "canBeContainedBy": [
+      "topo de formulários multi-etapa",
+      "organismo Wizard (fora deste contrato, orquestra a navegação real entre as telas)"
+    ],
+    "doNotCombine": [
+      "Stepper dentro de Stepper",
+      "usar Stepper pra progresso percentual contínuo sem etapas nomeadas — isso é Progress Bar"
+    ]
   },
   "forbidden": [
     "menos de 2 items — sem sequência real pra mostrar",
@@ -63,7 +151,11 @@
     "structural.espaco-g entrou em tokensAllowed.spacing — largura mínima do conector entre etapas (evita conectores colapsados demais em telas estreitas com labels curtos).",
     "Wizard (organismo separado, fila do roadmap) reaproveita Stepper como o indicador visual, mas não faz parte deste contrato — Stepper nunca sabe о que está sendo validado ou quando avançar; ele só reflete um currentStep que já vem pronto de fora.",
     "BUG CORRIGIDO (teste em navegador) — item.icon numa etapa 'current' ficava invisível: a cor do ícone usava sempre semantic.acao-primaria-texto (pensada pro marcador 'completed', que tem fundo preenchido com acao-primaria), mas o marcador 'current' não tem fundo preenchido (só borda) — resultado era ícone claro sobre fundo claro. Corrigido pra cor do ícone acompanhar o estado do marcador: completed usa acao-primaria-texto (fundo preenchido), current usa semantic.acao-primaria (mesma cor do texto/borda do marcador current), pending usa semantic.icone-secundario.",
-    "AJUSTADO a pedido do usuário — duas variantes visuais explícitas em vez de uma única aparência fixa: 'inline' (texto ao lado do marcador, sem conector — itens ficam do tamanho do próprio conteúdo, mais compacto pra poucos passos curtos) e 'stacked' (conector ligando os marcadores, texto abaixo — itens dividem a largura igualmente, mais legível quando há vários passos lado a lado, ex.: dentro do Wizard). default='stacked' porque preserva o racional visual original do componente (conector sempre existiu); 'inline' é o opt-in pra quando o espaço horizontal for mais escasso ou os labels forem curtos o bastante pra caberem ao lado do marcador sem quebrar a leitura. A lógica de estado (pending/current/completed), navegação (onStepClick) e aria-current continuam idênticas nas duas variantes — só a disposição visual muda."
+    "AJUSTADO a pedido do usuário — duas variantes visuais explícitas em vez de uma única aparência fixa: 'inline' (texto ao lado do marcador, sem conector — itens ficam do tamanho do próprio conteúdo, mais compacto pra poucos passos curtos) e 'stacked' (conector ligando os marcadores, texto abaixo — itens dividem a largura igualmente, mais legível quando há vários passos lado a lado, ex.: dentro do Wizard). default='stacked' porque preserva o racional visual original do componente (conector sempre existiu); 'inline' é o opt-in pra quando o espaço horizontal for mais escasso ou os labels forem curtos o bastante pra caberem ao lado do marcador sem quebrar a leitura. A lógica de estado (pending/current/completed), navegação (onStepClick) e aria-current continuam idênticas nas duas variantes — só a disposição visual muda.",
+    "CORRIGIDO — auditoria de acessibilidade (2026-11-10, perfil padrão): texto que usava acao-primaria como COR (estado ativo/hover/atual) ficava com 3,68:1 no modo escuro (#16814a sobre #161616; mínimo 4,5:1). Passou a usar acao-link-texto (#006631 no claro, #3ecf82 no escuro — 7,13:1 e 9,01:1). Bordas e fundos continuam em acao-primaria; só a cor do TEXTO mudou.",
+    "CORRIGIDO — auditoria de acessibilidade (2026-11-10, perfil padrão): texto INFORMATIVO (não desabilitado) usava texto-inativo, com 2,31–2,54:1 no claro e 3,73–4,14:1 no escuro (mínimo 4,5:1). Passou a texto-secundario (6,87:1 / 8,70:1). texto-inativo fica reservado a elementos de fato desabilitados, que a WCAG isenta de contraste mínimo."
   ],
-  "references": { "tokensFile": "tokens/tokens.json — Cores Semânticas (Fundos, Bordas, Textos, Ações/Primária), Estrutural (raio-circular, foco-espessura, espaco-xp/pp/p, icone-pequeno), Tipografia Estilo (texto-p, texto-micro, texto-rotulo-botao)" }
+  "references": {
+    "tokensFile": "tokens/tokens.json — Cores Semânticas (Fundos, Bordas, Textos, Ações/Primária), Estrutural (raio-circular, foco-espessura, espaco-xp/pp/p, icone-pequeno), Tipografia Estilo (texto-p, texto-micro, texto-rotulo-botao)"
+  }
 }

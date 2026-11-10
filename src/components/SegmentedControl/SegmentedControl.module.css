@@ -2,7 +2,7 @@
   display: inline-flex;
   padding: var(--espaco-xp);
   background: var(--fundo-secundario);
-  border: 1px solid var(--borda-base);
+  border: 1px solid var(--borda-campo);
   border-radius: var(--raio-pp);
   gap: var(--espaco-xp);
 }

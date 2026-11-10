@@ -164,7 +164,8 @@
       "semantic.borda-erro",
       "semantic.borda-inativo",
       "semantic.acao-primaria",
-      "semantic.borda-foco"
+      "semantic.borda-foco",
+      "semantic.borda-campo"
     ],
     "text": [
       "semantic.texto-primario",
@@ -246,7 +247,8 @@
     "accept é revalidado manualmente no drop (o atributo HTML accept só filtra o picker nativo de clique, navegadores não aplicam automaticamente em arquivos arrastados) — sem essa revalidação, arrastar um arquivo de tipo errado passaria despercebido.",
     "Sem preview de imagem nesta v1 (mesmo pra accept='image/*') — não foi pedido; se surgir caso real, decisão nova (provavelmente reaproveitando ImageThumbnail pro preview em vez de reinventar).",
     "Drag-and-drop reforça mas não substitui o clique — a dropzone inteira é um <button> clicável por baixo (mesmo alvo do teclado/Enter), o listener de drop é um extra por cima, não o único caminho (ver a11y notes).",
-    "EXTENSÃO — novas props buttonVariant/buttonOutlined (só variant='button'), sob demanda real: SettingsTemplate precisava do gatilho de upload no estilo 'botão link' (ícone + texto, sem fundo/borda), diretamente abaixo do Avatar — o Button interno da variant='button' vinha com variant/outlined FIXOS em 'neutral'/true, sem forma de configurar. Reaproveita o enum ButtonVariant já existente (nenhum enum novo) — default 'neutral'/true preserva 100% o comportamento de todos os outros consumidores já existentes do componente."
+    "EXTENSÃO — novas props buttonVariant/buttonOutlined (só variant='button'), sob demanda real: SettingsTemplate precisava do gatilho de upload no estilo 'botão link' (ícone + texto, sem fundo/borda), diretamente abaixo do Avatar — o Button interno da variant='button' vinha com variant/outlined FIXOS em 'neutral'/true, sem forma de configurar. Reaproveita o enum ButtonVariant já existente (nenhum enum novo) — default 'neutral'/true preserva 100% o comportamento de todos os outros consumidores já existentes do componente.",
+    "CORRIGIDO — auditoria de acessibilidade (2026-11-10, perfil padrão, WCAG 1.4.11): a borda do controle usava borda-base, com 1,47:1 no claro e 1,88:1 no escuro contra a superfície (mínimo 3:1 pra identificar um componente de interface). Passou a borda-campo, token novo (#6b7280 no claro = 4,83:1; #85847c no escuro = 4,82:1). borda-base continua valendo pra divisórias e superfícies decorativas, que a WCAG não exige em 3:1."
   ],
   "references": {
     "tokensFile": "tokens/tokens.json — Cores Semânticas (Fundos, Bordas, Textos, Ícones, Ação Primária), Estrutural (raio-pp, foco-espessura, espaco-xp/pp/p/m), Tipografia Estilo (texto-p, texto-m)"

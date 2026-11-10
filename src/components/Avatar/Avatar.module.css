@@ -65,6 +65,7 @@
    fundo-secundario (correto) no modo claro. */
 :root[data-theme="dark"] .fallback {
   background: var(--borda-inativo);
+  color: var(--texto-primario);
 }
 
 .small .fallback {

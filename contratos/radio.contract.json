@@ -73,7 +73,8 @@
       "semantic.borda-base",
       "semantic.borda-foco",
       "semantic.borda-erro",
-      "semantic.borda-inativo"
+      "semantic.borda-inativo",
+      "semantic.borda-campo"
     ],
     "dotColor": [
       "semantic.acao-primaria",
@@ -139,7 +140,8 @@
     "Alvo de toque 44×44px com o círculo visual em structural.icone-medio (20px) centralizado — mesma decisão do Checkbox, mesmo motivo (público 60+).",
     "Borda fixa em 2px — não é token, mesma constante não-tokenizada usada no Checkbox/Spinner.",
     "Erro + foco: erro vence visualmente — mesma regra já fixada em text-field.contract.json/checkbox.contract.json, aplicada aqui por consistência.",
-    "AJUSTADO a pedido do usuário — fundo do campo trocado de semantic.fundo-superficie pra semantic.fundo-campo (token novo): 'o fundo dos inputs de forma geral, devem ser levemente mais escuros que a cor de fundo da página onde estão, para destacar melhor'. No modo claro fundo-campo é idêntico a fundo-superficie (sem mudança visual, branco com borda já bastava) — só no modo escuro os dois valores divergem (fundo-campo um degrau mais escuro que a página), porque era só ali que o campo ficava indistinguível da própria página por trás."
+    "AJUSTADO a pedido do usuário — fundo do campo trocado de semantic.fundo-superficie pra semantic.fundo-campo (token novo): 'o fundo dos inputs de forma geral, devem ser levemente mais escuros que a cor de fundo da página onde estão, para destacar melhor'. No modo claro fundo-campo é idêntico a fundo-superficie (sem mudança visual, branco com borda já bastava) — só no modo escuro os dois valores divergem (fundo-campo um degrau mais escuro que a página), porque era só ali que o campo ficava indistinguível da própria página por trás.",
+    "CORRIGIDO — auditoria de acessibilidade (2026-11-10, perfil padrão, WCAG 1.4.11): a borda do controle usava borda-base, com 1,47:1 no claro e 1,88:1 no escuro contra a superfície (mínimo 3:1 pra identificar um componente de interface). Passou a borda-campo, token novo (#6b7280 no claro = 4,83:1; #85847c no escuro = 4,82:1). borda-base continua valendo pra divisórias e superfícies decorativas, que a WCAG não exige em 3:1."
   ],
   "references": {
     "tokensFile": "tokens/tokens.json — Cores Semânticas (Ações/Primárias, Bordas, Fundos, Textos), Estrutural (raio-circular, foco-espessura, espaco-pp, icone-medio), Tipografia Estilo (texto-m)"

@@ -168,7 +168,8 @@
       "semantic.borda-base",
       "semantic.borda-erro",
       "semantic.borda-inativo",
-      "semantic.borda-foco"
+      "semantic.borda-foco",
+      "semantic.borda-campo"
     ],
     "text": [
       "semantic.texto-primario",
@@ -259,7 +260,8 @@
     "AJUSTADO a pedido do usuário — popover do Calendar ganhou box-shadow (structural.sombra-p, mesmo token já usado no Popover genérico) além da borda que já existia, pra ter elevação visual consistente com o resto dos popovers do harness em vez de parecer 'colado' no fundo da página.",
     "AJUSTADO a pedido do usuário (uso no DashboardTemplate, item 5.3) — dois reforços: (1) Icon 'calendar' fixo à esquerda do trigger, sempre presente (não configurável, diferente do leftIcon opcional do TextField) — todo DatePicker se beneficia dessa pista visual universal de 'isso é um campo de data', não é um caso específico de um consumidor só; (2) nova prop hideLabel pra permitir omitir o FieldLabel visível (ex.: 'Início'/'Fim' de um range dentro de uma FilterBar, onde os rótulos já eram redundantes) SEM perder o nome acessível — o texto do label continua sendo aplicado como aria-label no input quando hideLabel=true, escape explícito documentado em forbidden pra nunca deixar o campo sem nome acessível.",
     "REVISADO a pedido do usuário — a decisão acima ('Icon calendar sempre presente, não configurável') foi revertida: nova prop showIcon (default true, preserva o comportamento visual de antes pra quem já usa o componente) permite esconder o ícone. Motivo: mesmo pedido feito de uma vez pros três pickers de data/hora do harness (DatePicker/TimePicker/DateTimePicker) — não é mais tratado como 'pista visual universal inegociável', vira uma preferência de densidade visual do consumidor.",
-    "AJUSTADO a pedido do usuário — fundo do campo trocado de semantic.fundo-superficie pra semantic.fundo-campo (token novo): 'o fundo dos inputs de forma geral, devem ser levemente mais escuros que a cor de fundo da página onde estão, para destacar melhor'. No modo claro fundo-campo é idêntico a fundo-superficie (sem mudança visual, branco com borda já bastava) — só no modo escuro os dois valores divergem (fundo-campo um degrau mais escuro que a página), porque era só ali que o campo ficava indistinguível da própria página por trás."
+    "AJUSTADO a pedido do usuário — fundo do campo trocado de semantic.fundo-superficie pra semantic.fundo-campo (token novo): 'o fundo dos inputs de forma geral, devem ser levemente mais escuros que a cor de fundo da página onde estão, para destacar melhor'. No modo claro fundo-campo é idêntico a fundo-superficie (sem mudança visual, branco com borda já bastava) — só no modo escuro os dois valores divergem (fundo-campo um degrau mais escuro que a página), porque era só ali que o campo ficava indistinguível da própria página por trás.",
+    "CORRIGIDO — auditoria de acessibilidade (2026-11-10, perfil padrão, WCAG 1.4.11): a borda do controle usava borda-base, com 1,47:1 no claro e 1,88:1 no escuro contra a superfície (mínimo 3:1 pra identificar um componente de interface). Passou a borda-campo, token novo (#6b7280 no claro = 4,83:1; #85847c no escuro = 4,82:1). borda-base continua valendo pra divisórias e superfícies decorativas, que a WCAG não exige em 3:1."
   ],
   "references": {
     "tokensFile": "tokens/tokens.json — Cores Semânticas (Fundos, Bordas, Textos, Ícones), Estrutural (raio-pp, foco-espessura, espaco-xp/pp/m, sombra-p), Tipografia Estilo (texto-m)"

@@ -231,7 +231,7 @@
 }
 
 input.headerControl {
-  border-color: var(--borda-base);
+  border-color: var(--borda-campo);
   background: var(--fundo-superficie);
   color: var(--texto-primario);
   text-transform: none;
@@ -273,7 +273,7 @@ input.headerControl:disabled {
   width: 100%;
   box-sizing: border-box;
   padding: var(--espaco-xp) var(--espaco-pp);
-  border: 1px solid var(--borda-base);
+  border: 1px solid var(--borda-campo);
   border-radius: var(--raio-pp);
   background: var(--fundo-superficie);
   color: var(--texto-primario);
@@ -402,7 +402,7 @@ input.headerControl:disabled {
 
 .pageSizeSelect {
   padding: var(--espaco-xp) var(--espaco-pp);
-  border: 1px solid var(--borda-base);
+  border: 1px solid var(--borda-campo);
   border-radius: var(--raio-pp);
   background: var(--fundo-superficie);
   color: var(--texto-primario);

@@ -50,7 +50,7 @@
   height: var(--track-height);
   box-sizing: border-box;
   padding: 2px;
-  border: 2px solid var(--borda-base);
+  border: 2px solid var(--borda-campo);
   border-radius: var(--raio-circular);
   background: var(--fundo-secundario);
   transition: background-color 0.15s ease, border-color 0.15s ease;

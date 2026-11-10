@@ -29,7 +29,7 @@
 
 .pageSizeSelect {
   padding: var(--espaco-xp) var(--espaco-pp);
-  border: 1px solid var(--borda-base);
+  border: 1px solid var(--borda-campo);
   border-radius: var(--raio-pp);
   background: var(--fundo-superficie);
   color: var(--texto-primario);

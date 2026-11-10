@@ -1,25 +1,9 @@
+/* O wrapper não gera caixa: cada seção é um Card irmão no layout da página (o gap vem de lá). */
 .specs {
-  display: flex;
-  flex-direction: column;
-  gap: calc(var(--espaco-m) * 2);
+  display: contents;
   font-family: var(--texto-p-family);
   font-size: var(--texto-p-size);
   color: var(--texto-primario);
-}
-
-.section {
-  display: flex;
-  flex-direction: column;
-  gap: var(--espaco-pp);
-}
-
-.sectionTitle {
-  margin: 0;
-  padding-bottom: var(--espaco-xp);
-  border-bottom: 1px solid var(--borda-base);
-  font-family: var(--texto-m-forte-family);
-  font-size: var(--texto-m-forte-size);
-  font-weight: var(--texto-m-forte-weight);
 }
 
 .subTitle {
@@ -265,6 +249,13 @@
   height: 0;
   border-top-style: solid;
   border-top-color: var(--borda-foco);
+}
+
+.shadowStage {
+  display: inline-flex;
+  padding: var(--espaco-m);
+  background: var(--fundo-secundario);
+  border-radius: var(--raio-pp);
 }
 
 .shadowBox {

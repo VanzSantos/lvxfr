@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Sidebar, ICON_LIBRARY_ID } from "./nav/Sidebar";
 import { STORIES } from "./stories/registry";
 import { StoryDetail } from "./stories/StoryDetail";
+import { TokensPage } from "./stories/tokens/TokensPage";
 import { IconLibrary } from "./stories/IconLibrary";
 import { ProtoTablePage } from "./prototable/ProtoTablePage";
 import { SCREENS } from "./prototable/registry";
@@ -30,27 +31,30 @@ function readInitialMode(): AppMode {
   return params.has("pt_project") || params.has("pt_module") || params.has("pt_flow") ? "prototable" : "playground";
 }
 
-/** Tela selecionada vem da hash da URL ("#/<id>") — é o que o SideNav (que só
-    navega por href) altera ao clicar; sem hash, abre o primeiro story. */
-function readSelectedId(): string {
-  if (typeof window === "undefined") return STORIES[0].id;
+/** Rota vem da hash da URL: "#/<id>" ou "#/<id>/<secao>" — é o que o SideNav (que só
+    navega por href) e o menu "Nesta página" alteram ao clicar; sem hash, abre o
+    primeiro story. A seção opcional é âncora dentro da tela do componente. */
+function readRoute(): { id: string; section?: string } {
+  if (typeof window === "undefined") return { id: STORIES[0].id };
   const hash = window.location.hash.replace(/^#\/?/, "");
-  if (!hash) return STORIES[0].id;
+  if (!hash) return { id: STORIES[0].id };
+  const [rawId, rawSection] = hash.split("/");
   try {
-    return decodeURIComponent(hash);
+    return { id: decodeURIComponent(rawId), section: rawSection ? decodeURIComponent(rawSection) : undefined };
   } catch {
-    return STORIES[0].id;
+    return { id: STORIES[0].id };
   }
 }
 
 export function App() {
-  const [selectedId, setSelectedId] = useState<string>(readSelectedId);
+  const [route, setRoute] = useState(readRoute);
+  const selectedId = route.id;
   const [mode, setMode] = useState<AppMode>(readInitialMode);
   const { theme, preference, setPreference } = useTheme();
   const [standaloneId] = useState<string | null>(readStandaloneId);
 
   useEffect(() => {
-    const onHashChange = () => setSelectedId(readSelectedId());
+    const onHashChange = () => setRoute(readRoute());
     window.addEventListener("hashchange", onHashChange);
     return () => window.removeEventListener("hashchange", onHashChange);
   }, []);
@@ -141,8 +145,10 @@ export function App() {
           <main className={styles.main}>
             {selectedId === ICON_LIBRARY_ID ? (
               <IconLibrary />
+            ) : story?.tokenPage ? (
+              <TokensPage key={story.id} story={story} initialSection={route.section} />
             ) : story ? (
-              <StoryDetail key={story.id} story={story} theme={theme} />
+              <StoryDetail key={story.id} story={story} theme={theme} initialSection={route.section} />
             ) : null}
           </main>
         </>

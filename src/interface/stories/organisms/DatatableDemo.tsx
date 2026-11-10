@@ -202,7 +202,7 @@ function CompleteExample() {
   }
 
   return (
-    <div className={styles.column} style={{ maxWidth: "none" }}>
+    <div className={`${styles.column} ${styles.stack}`} style={{ maxWidth: "none" }}>
       <Datatable
         title="Pedidos"
         toolbarActions={
@@ -280,7 +280,7 @@ function CompleteExample() {
         }
         size="small"
       >
-        <div className={styles.column} style={{ gap: 16 }}>
+        <div className={`${styles.column} ${styles.stack}`} style={{ gap: 16 }}>
           <p>
             {bulkConfirm === "delete"
               ? `${selectedRowKeys.length} pedido(s) serão excluídos.`
@@ -439,7 +439,7 @@ function WideExample() {
   ];
 
   return (
-    <div className={styles.column} style={{ maxWidth: "none" }}>
+    <div className={`${styles.column} ${styles.stack}`} style={{ maxWidth: "none" }}>
       <Datatable
         title="Produtos"
         columnVisibilityEnabled
@@ -455,7 +455,7 @@ function WideExample() {
 
 export function DatatableDemo() {
   return (
-    <div className={styles.column} style={{ maxWidth: "none" }}>
+    <div className={`${styles.column} ${styles.stack}`} style={{ maxWidth: "none" }}>
       <div className={styles.section}>
         <span className={styles.sectionLabel}>
           Simples — sem sort/filtro/seleção/paginação, célula de 2 linhas (StackedText)

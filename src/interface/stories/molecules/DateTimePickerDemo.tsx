@@ -12,7 +12,7 @@ export function DateTimePickerDemo() {
   const [semIcone, setSemIcone] = useState<string | null>(null);
 
   return (
-    <div className={styles.column} style={{ maxWidth: 560 }}>
+    <div className={`${styles.column} ${styles.stack}`} style={{ maxWidth: 560 }}>
       <div className={styles.section}>
         <span className={styles.sectionLabel}>Campo único — Calendar + Hora/Minuto no mesmo popover</span>
         <DateTimePicker label="Início do evento" value={inicioEvento} onChange={setInicioEvento} />

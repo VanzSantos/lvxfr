@@ -1,5 +1,6 @@
 import { useState, type CSSProperties, type ReactNode } from "react";
 import { Accordion } from "../../../components/Accordion/Accordion";
+import { SectionCard } from "../SectionCard";
 import { resolveToken, type ResolvedToken } from "./tokenResolver";
 import styles from "./ContractSpecs.module.css";
 
@@ -50,12 +51,33 @@ const TOKEN_GROUP_LABEL: Record<string, string> = {
   color: "Cores",
 };
 
-function Section({ title, children }: { title: string; children: ReactNode }) {
+/** Seções da aba Especificações, na ordem em que aparecem — alimenta o menu
+    "Nesta página" (ids = âncoras). "Decisões" só existe se o contrato tiver. */
+export interface SpecSection {
+  id: string;
+  label: string;
+}
+
+export function specSections(contract: Contract): SpecSection[] {
+  const sections: SpecSection[] = [
+    { id: "visao-geral", label: "Visão geral" },
+    { id: "anatomia", label: "Anatomia" },
+    { id: "props", label: "Props" },
+    { id: "variantes", label: "Variantes e estados" },
+    { id: "tokens", label: "Tokens" },
+    { id: "acessibilidade", label: "Acessibilidade" },
+    { id: "composicao", label: "Composição" },
+    { id: "proibido", label: "Proibido" },
+  ];
+  if (contract.decisions && contract.decisions.length > 0) sections.push({ id: "decisoes", label: "Decisões" });
+  return sections;
+}
+
+function Section({ id, title, children }: { id: string; title: string; children: ReactNode }) {
   return (
-    <section className={styles.section}>
-      <h3 className={styles.sectionTitle}>{title}</h3>
+    <SectionCard id={id} title={title}>
       {children}
-    </section>
+    </SectionCard>
   );
 }
 
@@ -94,7 +116,7 @@ function pxOf(value: string | null): number {
   return value ? parseFloat(value) : 0;
 }
 
-function TokenVisual({ token }: { token: ResolvedToken }) {
+export function TokenVisual({ token }: { token: ResolvedToken }) {
   if (token.kind === "color") {
     return (
       <span className={styles.swatches}>
@@ -150,7 +172,10 @@ function TokenVisual({ token }: { token: ResolvedToken }) {
   if (token.kind === "shadow") {
     return (
       <span className={styles.visualRow}>
-        <span className={styles.shadowBox} style={{ boxShadow: token.light ?? undefined }} />
+        {/* base cinza: a sombra é sutil e some sobre um card branco */}
+        <span className={styles.shadowStage}>
+          <span className={styles.shadowBox} style={{ boxShadow: token.light ?? undefined }} />
+        </span>
         <code className={styles.wrap}>{token.light}</code>
       </span>
     );
@@ -167,7 +192,7 @@ function TokenVisual({ token }: { token: ResolvedToken }) {
       <span className={styles.typeRow}>
         <span style={sample}>Aa Texto de exemplo</span>
         <code className={styles.wrap}>
-          {token.type.size} / {token.type.lineHeight} · peso {token.type.weight}
+          {token.type.family.split(",")[0].trim()} · {token.type.size} / {token.type.lineHeight} · peso {token.type.weight}
         </code>
       </span>
     );
@@ -181,7 +206,7 @@ function TokenVisual({ token }: { token: ResolvedToken }) {
 function TokenGroup({ groupKey, paths }: { groupKey: string; paths: string[] }) {
   return (
     <div className={styles.tokenGroup}>
-      <h4 className={styles.tokenGroupTitle}>{TOKEN_GROUP_LABEL[groupKey] ?? groupKey}</h4>
+      <h3 className={styles.tokenGroupTitle}>{TOKEN_GROUP_LABEL[groupKey] ?? groupKey}</h3>
       <div className={styles.tokenRows}>
         {paths.map((path) => {
           const token = resolveToken(path);
@@ -212,7 +237,7 @@ export function ContractSpecs({ contract }: { contract: Contract }) {
 
   return (
     <div className={styles.specs}>
-      <Section title="Visão geral">
+      <Section id="visao-geral" title="Visão geral">
         {contract.oneLiner && <p className={styles.lead}>{contract.oneLiner}</p>}
         <dl className={styles.facts}>
           <dt>Categoria</dt>
@@ -238,7 +263,7 @@ export function ContractSpecs({ contract }: { contract: Contract }) {
         </div>
       </Section>
 
-      <Section title="Anatomia">
+      <Section id="anatomia" title="Anatomia">
         {contract.anatomy && contract.anatomy.length > 0 ? (
           <ol className={styles.anatomy}>
             {contract.anatomy.map((part, index) => (
@@ -253,7 +278,7 @@ export function ContractSpecs({ contract }: { contract: Contract }) {
         )}
       </Section>
 
-      <Section title="Props">
+      <Section id="props" title="Props">
         {contract.props && contract.props.length > 0 ? (
           <div className={styles.tableWrap}>
             <table className={styles.table}>
@@ -288,7 +313,7 @@ export function ContractSpecs({ contract }: { contract: Contract }) {
         )}
       </Section>
 
-      <Section title="Variantes e estados">
+      <Section id="variantes" title="Variantes e estados">
         <dl className={styles.facts}>
           <dt>Variantes</dt>
           <dd>
@@ -325,7 +350,7 @@ export function ContractSpecs({ contract }: { contract: Contract }) {
         )}
       </Section>
 
-      <Section title="Tokens">
+      <Section id="tokens" title="Tokens">
         {tokenGroups.length === 0 ? (
           <p className={styles.muted}>Nenhum token declarado.</p>
         ) : (
@@ -336,16 +361,16 @@ export function ContractSpecs({ contract }: { contract: Contract }) {
         </p>
       </Section>
 
-      <Section title="Acessibilidade">
+      <Section id="acessibilidade" title="Acessibilidade">
         <dl className={styles.facts}>
           <dt>Role</dt>
           <dd>{contract.a11y?.role ?? "—"}</dd>
           <dt>Contraste mínimo</dt>
           <dd>{contract.a11y?.contrastMin ?? "—"}</dd>
         </dl>
-        <h4 className={styles.subTitle}>ARIA obrigatório</h4>
+        <h3 className={styles.subTitle}>ARIA obrigatório</h3>
         <List items={contract.a11y?.requiredAria} />
-        <h4 className={styles.subTitle}>Teclado</h4>
+        <h3 className={styles.subTitle}>Teclado</h3>
         <List items={contract.a11y?.keyboard} />
         {contract.a11y?.notes && (
           <div className={styles.callout}>
@@ -355,21 +380,21 @@ export function ContractSpecs({ contract }: { contract: Contract }) {
         )}
       </Section>
 
-      <Section title="Composição">
-        <h4 className={styles.subTitle}>Pode conter</h4>
+      <Section id="composicao" title="Composição">
+        <h3 className={styles.subTitle}>Pode conter</h3>
         <List items={contract.composition?.canContain} />
-        <h4 className={styles.subTitle}>Pode estar dentro de</h4>
+        <h3 className={styles.subTitle}>Pode estar dentro de</h3>
         <List items={contract.composition?.canBeContainedBy} />
-        <h4 className={styles.subTitle}>Não combinar com</h4>
+        <h3 className={styles.subTitle}>Não combinar com</h3>
         <List items={contract.composition?.doNotCombine} />
       </Section>
 
-      <Section title="Proibido">
+      <Section id="proibido" title="Proibido">
         <List items={contract.forbidden} />
       </Section>
 
       {contract.decisions && contract.decisions.length > 0 && (
-        <Section title={`Decisões (${contract.decisions.length})`}>
+        <Section id="decisoes" title={`Decisões (${contract.decisions.length})`}>
           <Accordion
             mode="multiple"
             openKeys={openDecisions}

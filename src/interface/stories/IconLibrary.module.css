@@ -1,7 +1,5 @@
 .wrapper {
-  max-width: 880px;
-  margin: 0 auto;
-  padding: calc(var(--espaco-m) * 2) calc(var(--espaco-m) * 1.5);
+  padding: calc(var(--espaco-m) * 2) calc(var(--espaco-m) * 2.5);
 }
 
 .header {
@@ -29,7 +27,6 @@
   font-family: var(--texto-p-family);
   font-size: var(--texto-m-size);
   color: var(--texto-secundario);
-  max-width: 640px;
   margin: 0 0 calc(var(--espaco-m) * 1.5);
 }
 

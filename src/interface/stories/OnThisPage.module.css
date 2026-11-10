@@ -1,0 +1,43 @@
+.toc {
+  font-family: var(--texto-p-family);
+  font-size: 15px;
+}
+
+.title {
+  margin: 0 0 var(--espaco-pp);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--texto-secundario);
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 var(--espaco-pp);
+  border-left: 1px solid var(--borda-base);
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-xp);
+}
+
+.sub {
+  padding-left: var(--espaco-pp);
+}
+
+/* Links discretos: o Link do SDK é verde por padrão; num índice de página todos verdes
+   competem com o conteúdo. Só a seção atual ganha cor e peso. */
+.toc a {
+  color: var(--texto-secundario);
+  font-weight: 400;
+}
+
+.toc a:hover {
+  color: var(--texto-primario);
+}
+
+.toc a[aria-current="page"] {
+  color: var(--acao-link-texto);
+  font-weight: 600;
+}

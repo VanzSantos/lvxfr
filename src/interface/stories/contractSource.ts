@@ -24,3 +24,8 @@ export function getContractSource(contractFile: string | undefined): string | un
   if (!filename) return undefined;
   return BY_FILENAME.get(filename);
 }
+
+/** Todos os contratos (nome do arquivo + JSON bruto) — usado pela página de Tokens pra montar "usado por". */
+export function getAllContractSources(): Array<{ filename: string; source: string }> {
+  return [...BY_FILENAME.entries()].map(([filename, source]) => ({ filename, source }));
+}

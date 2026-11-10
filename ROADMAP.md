@@ -3618,3 +3618,14 @@ Reauditado depois: 0 botões/campos sem nome, 0 ids duplicados, 0 tablists sem n
 de contraste de texto nas telas alteradas, nos dois temas. Não coberto: teste com leitor de
 tela (P28), espaçamento de texto (P05) e rótulo VISÍVEL em FilterBar/CommentComposer (hoje só
 nome acessível — decisão de design pendente).
+
+### Categoria "Tokens" no Playground (2026-11-10)
+
+Nova categoria antes de "Átomos", com 4 páginas geradas (nada digitado à mão): **Cores**,
+**Tipografia**, **Espaçamento e raios** e **Sombras e foco**. Os tokens vêm de
+`tokens/tokens.css`, agrupados pelos cabeçalhos de comentário do próprio arquivo; "usado por"
+vem dos `tokensAllowed` dos contratos. Cada token mostra valor nos dois temas, amostra e os
+componentes que o declaram; tokens de texto mostram o contraste (texto de sinalização é medido
+contra o próprio fundo, `texto-inativo` aparece como "só desabilitado"). A página avisa que o
+`tokens.json` (export do Figma) não é atualizado por ela e pode estar defasado.
+Código: `src/interface/stories/tokens/` (`TokensPage`, `tokenData`).

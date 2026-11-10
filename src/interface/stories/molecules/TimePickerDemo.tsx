@@ -13,7 +13,7 @@ export function TimePickerDemo() {
   const [horarioSemIcone, setHorarioSemIcone] = useState<string | null>(null);
 
   return (
-    <div className={styles.column} style={{ maxWidth: 480 }}>
+    <div className={`${styles.column} ${styles.stack}`} style={{ maxWidth: 480 }}>
       <div className={styles.section}>
         <span className={styles.sectionLabel}>Campo único (step=5)</span>
         <TimePicker label="Horário do compromisso" value={horario} onChange={setHorario} />

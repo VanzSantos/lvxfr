@@ -81,6 +81,9 @@ import { SideNavDemo } from "./organisms/SideNavDemo";
 import { DatatableDemo } from "./organisms/DatatableDemo";
 import { KanbanBoardDemo } from "./organisms/KanbanBoardDemo";
 
+/** Telas do grupo Tokens não têm Demo — a página é gerada de tokens/tokens.css (ver tokens/TokensPage). */
+const NoDemo = () => null;
+
 export const STORIES: StoryMeta[] = [
   {
     id: "icon",
@@ -1366,6 +1369,47 @@ toast({ intent: "error", message: "Falha ao salvar.", actionLabel: "Tentar de no
 <FullPageLoading message="Carregando seus dados..." />`,
     Demo: FullPageLoadingDemo,
   },
+  // ---- Tokens: páginas geradas de tokens/tokens.css (sem contrato nem Demo) ----
+  {
+    id: "tokens-cores",
+    title: "Cores",
+    group: "Tokens",
+    status: "draft",
+    tokenPage: "cores",
+    description: "Cores semânticas, nomeadas por função e não por tom. Cada token tem valor no tema claro e no escuro, e a lista dos componentes que o declaram.",
+    code: "",
+    Demo: NoDemo,
+  },
+  {
+    id: "tokens-tipografia",
+    title: "Tipografia",
+    group: "Tokens",
+    status: "draft",
+    tokenPage: "tipografia",
+    description: "Estilos de texto: família, tamanho, peso e entrelinha, e os componentes que usam cada um.",
+    code: "",
+    Demo: NoDemo,
+  },
+  {
+    id: "tokens-espacamento",
+    title: "Espaçamento e raios",
+    group: "Tokens",
+    status: "draft",
+    tokenPage: "espacamento",
+    description: "Escala de espaçamento, raios de borda e tamanhos de ícone.",
+    code: "",
+    Demo: NoDemo,
+  },
+  {
+    id: "tokens-sombras",
+    title: "Sombras e foco",
+    group: "Tokens",
+    status: "draft",
+    tokenPage: "sombras",
+    description: "Sombras de elevação e o anel de foco do teclado.",
+    code: "",
+    Demo: NoDemo,
+  },
 ];
 
-export const GROUP_ORDER = ["Átomos", "Moléculas", "Organismos", "Templates", "Páginas"] as const;
+export const GROUP_ORDER = ["Tokens", "Átomos", "Moléculas", "Organismos", "Templates", "Páginas"] as const;

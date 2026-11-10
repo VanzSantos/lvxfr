@@ -1,7 +1,62 @@
+/* Largura total da área principal (antes: coluna de 880px centralizada). Quem usa
+   .wrapper sozinho (ProtoTable) só ganha o respiro; a tela de componente usa .layout. */
 .wrapper {
-  max-width: 880px;
-  margin: 0 auto;
-  padding: calc(var(--espaco-m) * 2) calc(var(--espaco-m) * 1.5);
+  padding: calc(var(--espaco-m) * 2) calc(var(--espaco-m) * 2.5);
+}
+
+/* Tela de componente: conteúdo + menu "Nesta página" fixo à direita. */
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 192px;
+  gap: calc(var(--espaco-m) * 2);
+  align-items: start;
+  padding: calc(var(--espaco-m) * 2) calc(var(--espaco-m) * 2.5);
+}
+
+/* Cada seção é um Card; o espaço entre eles vem só do gap (nada de margin por seção). */
+.content {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--espaco-m) * 2.5);
+}
+
+.pageHeader {
+  min-width: 0;
+}
+
+/* Ao rolar até uma âncora, deixa um respiro acima do título; foco só por programação. */
+.content [id] {
+  scroll-margin-top: var(--espaco-m);
+}
+
+.content [id]:focus {
+  outline: none;
+}
+
+/* sticky relativo à área rolável (<main>); o menu acompanha a rolagem. Sem rolagem
+   própria: telas baixas demais pra caber o menu inteiro deixam ele rolar junto com a página. */
+.toc {
+  position: sticky;
+  top: calc(var(--espaco-m) * 2);
+  align-self: start;
+}
+
+@media (max-height: 640px) {
+  .toc {
+    position: static;
+  }
+}
+
+/* Telas estreitas: o menu sai e o conteúdo usa a largura toda. */
+@media (max-width: 1100px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .toc {
+    display: none;
+  }
 }
 
 .header {
@@ -19,16 +74,11 @@
   color: var(--texto-primario);
 }
 
-
-
-
-
 .description {
   font-family: var(--texto-p-family);
   font-size: var(--texto-m-size);
   color: var(--texto-secundario);
-  margin: 0 0 calc(var(--espaco-m) * 1.5);
-  max-width: 640px;
+  margin: 0;
 }
 
 .canvasToolbar {
@@ -38,9 +88,6 @@
   gap: var(--espaco-m);
   margin-bottom: var(--espaco-pp);
 }
-
-
-
 
 /* "Device frame" simulando um smartphone — largura fixa dentro de um iframe
    (viewport própria, então @media reage de verdade), altura de referência de
@@ -60,6 +107,8 @@
 .canvasFlush {
   padding: 0;
   overflow: hidden;
+  border: 1px solid var(--borda-base);
+  border-radius: var(--raio-pp);
 }
 
 .canvas {
@@ -67,11 +116,8 @@
   align-items: center;
   justify-content: center;
   min-height: 200px;
-  padding: calc(var(--espaco-m) * 1.5);
-  background: var(--fundo-superficie);
-  border: 1px solid var(--borda-base);
-  border-radius: var(--raio-pp);
-  margin-bottom: calc(var(--espaco-m) * 1.5);
+  padding: var(--espaco-m) 0;
+  min-width: 0;
   /* fonte base do design system por padrão em toda demo — componentes sem
      tipografia própria (ex.: Link, que herda do contexto de propósito) só
      mostram a fonte certa se o contexto ao redor já a definir. Sem isso,
@@ -80,29 +126,14 @@
   color: var(--texto-primario);
 }
 
-.section {
-  margin-bottom: calc(var(--espaco-m) * 1.5);
-}
-
-.sectionTitle {
-  font-family: var(--texto-p-family);
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--texto-secundario);
-  margin: 0 0 var(--espaco-pp);
-}
-
 .code {
   margin: 0;
   padding: var(--espaco-m);
-  /* a página ao redor é fundo-secundario no claro (ver App.module.css), então o
-     bloco sobe pra superfície; no escuro a página é a superfície e o bloco desce. */
-  background: var(--fundo-superficie);
-  border: 1px solid var(--borda-base);
+  /* dentro de um Card (superfície): o bloco desce um degrau pra se destacar */
+  background: var(--fundo-secundario);
   border-radius: var(--raio-pp);
-  overflow-x: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
   font-family: "SF Mono", Menlo, Consolas, monospace;
   font-size: 13px;
   line-height: 1.6;
@@ -127,11 +158,3 @@
   color: var(--texto-primario);
 }
 
-
-
-
-
-
-:root[data-theme="dark"] .code {
-  background: var(--fundo-secundario);
-}

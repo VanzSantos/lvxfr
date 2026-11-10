@@ -1,36 +1,20 @@
-.panel {
-  margin-top: calc(var(--espaco-m) * 1.5);
-}
-
-.body {
-  padding-top: var(--espaco-m);
-}
-
-.fileRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--espaco-m);
-  margin-bottom: var(--espaco-pp);
+.fileName {
   font-family: "SF Mono", Menlo, Consolas, monospace;
   font-size: 13px;
-  color: var(--texto-primario);
+  color: var(--texto-secundario);
 }
 
 .code {
   margin: 0;
-  max-height: 640px;
   padding: var(--espaco-m);
-  overflow: auto;
-  background: var(--fundo-superficie);
-  border: 1px solid var(--borda-base);
+  /* quebra de linha em vez de rolagem horizontal: descrições longas do contrato ficam legíveis
+     sem arrastar a barra. overflow-wrap:anywhere cobre tokens/caminhos sem espaço. */
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  background: var(--fundo-secundario);
   border-radius: var(--raio-pp);
   font-family: "SF Mono", Menlo, Consolas, monospace;
   font-size: 13px;
   line-height: 1.6;
   color: var(--texto-primario);
-}
-
-:root[data-theme="dark"] .code {
-  background: var(--fundo-secundario);
 }

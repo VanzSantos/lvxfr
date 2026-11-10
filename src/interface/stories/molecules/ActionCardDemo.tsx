@@ -3,7 +3,7 @@ import styles from "../Demo.module.css";
 
 export function ActionCardDemo() {
   return (
-    <div className={styles.column} style={{ maxWidth: 720 }}>
+    <div className={`${styles.column} ${styles.stack}`} style={{ maxWidth: 720 }}>
       <div className={styles.section}>
         <span className={styles.sectionLabel}>Grade de ações administrativas</span>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 12 }}>

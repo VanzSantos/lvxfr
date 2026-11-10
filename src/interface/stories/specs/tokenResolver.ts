@@ -30,6 +30,9 @@ function extractBlock(css: string, selector: string): string {
   return "";
 }
 
+/** Bloco :root do tokens.css COM os comentários — a página de Tokens agrupa pelos cabeçalhos dele. */
+export const ROOT_BLOCK_WITH_COMMENTS = extractBlock(tokensCss, ":root {");
+
 const css = tokensCss.replace(/\/\*[\s\S]*?\*\//g, "");
 const LIGHT = parseBlock(extractBlock(css, ":root {"));
 const DARK_ONLY = parseBlock(extractBlock(css, ':root[data-theme="dark"]'));
@@ -83,4 +86,9 @@ export function resolveToken(path: string): ResolvedToken {
   const light = resolveVar(`--${name}`, LIGHT);
   const dark = resolveVar(`--${name}`, DARK);
   return { path, name, kind: kindOf(light), light, dark };
+}
+
+/** Valor resolvido (claro/escuro) de uma variável CSS pelo nome sem "--" (ex.: "espaco-p"). */
+export function resolveCssVar(name: string): { light: string | null; dark: string | null } {
+  return { light: resolveVar(`--${name}`, LIGHT), dark: resolveVar(`--${name}`, DARK) };
 }

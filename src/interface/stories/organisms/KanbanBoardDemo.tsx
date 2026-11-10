@@ -104,7 +104,7 @@ export function KanbanBoardDemo() {
   }
 
   return (
-    <div className={styles.column} style={{ maxWidth: "none" }}>
+    <div className={`${styles.column} ${styles.stack}`} style={{ maxWidth: "none" }}>
       <div className={styles.section}>
         <span className={styles.sectionLabel}>Board com 4 colunas (uma vazia), drag-and-drop + ações reais de duplicar/habilitar/editar/ver/apagar</span>
         <div style={{ height: 520, width: "100%" }}>

@@ -14,7 +14,7 @@ export function StepperDemo() {
   ];
 
   return (
-    <div className={styles.column} style={{ maxWidth: "none" }}>
+    <div className={`${styles.column} ${styles.stack}`} style={{ maxWidth: "none" }}>
       <div className={styles.section}>
         <span className={styles.sectionLabel}>variant="stacked" (padrão) — conector ligando os marcadores, texto abaixo</span>
         <Stepper items={etapas} currentStep={1} accessibleLabel="Etapas do cadastro" variant="stacked" />

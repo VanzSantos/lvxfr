@@ -13,7 +13,7 @@ export function DatePickerDemo() {
   const [dataSemIcone, setDataSemIcone] = useState<string | null>(null);
 
   return (
-    <div className={styles.column} style={{ maxWidth: 480 }}>
+    <div className={`${styles.column} ${styles.stack}`} style={{ maxWidth: 480 }}>
       <div className={styles.section}>
         <span className={styles.sectionLabel}>Campo único</span>
         <DatePicker

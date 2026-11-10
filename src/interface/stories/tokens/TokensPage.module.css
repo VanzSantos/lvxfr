@@ -1,0 +1,100 @@
+.source {
+  margin: var(--espaco-pp) 0 0;
+  color: var(--texto-secundario);
+  font-family: var(--texto-p-family);
+  font-size: 13px;
+}
+
+.source code {
+  font-family: "SF Mono", Menlo, Consolas, monospace;
+  font-size: 12.5px;
+}
+
+.table {
+  border: 1px solid var(--borda-base);
+  border-radius: var(--raio-pp);
+  overflow: hidden;
+  font-family: var(--texto-p-family);
+  font-size: var(--texto-p-size);
+  color: var(--texto-primario);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: minmax(200px, 280px) minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: var(--espaco-m);
+  align-items: center;
+  padding: var(--espaco-pp) var(--espaco-p);
+  border-bottom: 1px solid var(--borda-base);
+}
+
+.row:last-child {
+  border-bottom: none;
+}
+
+.head {
+  background: var(--fundo-secundario);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--texto-secundario);
+}
+
+.cellName {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  word-break: break-all;
+}
+
+.cellName code,
+.row code {
+  font-family: "SF Mono", Menlo, Consolas, monospace;
+  font-size: 12.5px;
+}
+
+.cellValue {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--espaco-xp);
+  min-width: 0;
+}
+
+.cellUsers {
+  min-width: 0;
+}
+
+.users {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--espaco-xp) var(--espaco-pp);
+}
+
+.contrast {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--espaco-pp);
+  font-size: 12.5px;
+}
+
+.muted {
+  color: var(--texto-secundario);
+}
+
+/* telas estreitas: Token / Valor / Usado por empilham */
+@media (max-width: 900px) {
+  .row {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    gap: var(--espaco-xp);
+  }
+
+  .head {
+    display: none;
+  }
+}

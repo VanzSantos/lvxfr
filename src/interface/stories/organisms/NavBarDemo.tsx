@@ -16,7 +16,7 @@ export function NavBarDemo() {
   ].map((item) => ({ ...item, active: item.href === rota }));
 
   return (
-    <div className={styles.column} style={{ maxWidth: "none" }}>
+    <div className={`${styles.column} ${styles.stack}`} style={{ maxWidth: "none" }}>
       <div className={styles.section}>
         <span className={styles.sectionLabel}>
           Completa — brand, navegação primária (item ativo controlado de fora) e ações

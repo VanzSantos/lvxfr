@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-09-02T18:07:05.608Z",
+  "generatedAt": "2026-11-10T14:01:54.726Z",
   "projects": [
     {
-      "key": "lvxfr-referencia",
-      "title": "LVXFR — telas de referência",
+      "key": "selenesdk-referencia",
+      "title": "SeleneSDK — telas de referência",
       "description": "Telas de exemplo que já vêm com o harness, semente inicial do ProtoTable.",
       "uncommitted": false,
       "createdBy": "Vanz Santos",
@@ -30,7 +30,7 @@
       "modules": [
         {
           "key": "referencia",
-          "projectKey": "lvxfr-referencia",
+          "projectKey": "selenesdk-referencia",
           "title": "Referência",
           "uncommitted": false,
           "createdBy": "Vanz Santos",

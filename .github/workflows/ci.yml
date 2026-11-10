@@ -37,7 +37,7 @@ jobs:
           script: |
             const summary = `${{ steps.decisions.outputs.summary }}`.trim();
             if (!summary) return;
-            const marker = "<!-- lvxfr-contract-summary -->";
+            const marker = "<!-- selenesdk-contract-summary -->";
             const body = `${marker}\n${summary}`;
             const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,

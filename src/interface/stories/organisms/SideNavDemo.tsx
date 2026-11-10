@@ -38,7 +38,7 @@ function WorkspaceHeader() {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: "var(--espaco-pp)" }}>
       <WorkspaceLogoIcon />
-      <StackedText primaryText="LVXFR" secondaryText="lvxfr.com" />
+      <StackedText primaryText="SeleneSDK" secondaryText="selenesdk.com" />
     </div>
   );
 }
@@ -142,7 +142,7 @@ export function SideNavDemo() {
         <div style={{ height: 280, border: "1px solid var(--borda-base)", borderRadius: "var(--raio-pp)", overflow: "hidden", display: "flex" }}>
           <SideNav
             items={flatItems}
-            header={<strong style={{ fontSize: 16 }}>LVXFR</strong>}
+            header={<strong style={{ fontSize: 16 }}>SeleneSDK</strong>}
             footer={<Avatar name="Ana Souza" size="small" />}
           />
           <div className={styles.pageArea} style={{ flex: 1, padding: 16 }}>
@@ -208,7 +208,7 @@ export function SideNavDemo() {
           <SideNav
             items={flatItems}
             width="small"
-            header={<strong style={{ fontSize: 16 }}>LVXFR</strong>}
+            header={<strong style={{ fontSize: 16 }}>SeleneSDK</strong>}
             footer={<Avatar name="Ana Souza" size="small" />}
           />
           <div className={styles.pageArea} style={{ flex: 1, padding: 16 }}>
@@ -226,7 +226,7 @@ export function SideNavDemo() {
           <button type="button" className={styles.trigger} onClick={() => setMobileOpen(true)}>
             Abrir navegação (gatilho próprio do consumidor)
           </button>
-          <SideNav items={flatItems} mobileOpen={mobileOpen} onMobileOpenChange={setMobileOpen} header={<strong style={{ fontSize: 16 }}>LVXFR</strong>} />
+          <SideNav items={flatItems} mobileOpen={mobileOpen} onMobileOpenChange={setMobileOpen} header={<strong style={{ fontSize: 16 }}>SeleneSDK</strong>} />
         </div>
       </div>
     </div>

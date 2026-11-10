@@ -3515,3 +3515,21 @@ escopo do script antigo) com o novo `npm run dev` rodando — autosync detectou,
 debounce, e gerou um commit `auto: sync (contratos) — <timestamp>` enviado sozinho pro
 `origin/main`, confirmado comparando `git log` local com `git fetch origin main`. Entrada
 de teste revertida antes de finalizar, não ficou no contrato. Build limpo.
+
+### Rebrand LVXFR → SeleneSDK (2026-11-10)
+
+O projeto deixou de se chamar LVXFR e passou a se chamar **SeleneSDK** (nome mais
+corporativo, e referência a Selene, deusa irmã de Aurora). Trocadas todas as ocorrências
+vivas: `README.md`, `ARCHITECTURE.md`, `CONTRIBUTING.md`, `package.json` (`name`) e
+`package-lock.json`, marcador do comentário de CI (`<!-- selenesdk-contract-summary -->`
+em `.github/workflows/ci.yml`), chave/título do projeto no ProtoTable
+(`selenesdk-referencia`), textos de exemplo do Playground/AppShell (marca, e-mails
+`@selenesdk.com`, nomes de produto de demo) e um exemplo em
+`quantity-selector.contract.json`.
+
+Mantido de propósito: as entradas históricas acima neste ROADMAP que citam "LVXFR"
+(descrevem o que aconteceu na época) e as mensagens de commit antigas ("Initial commit —
+LVXFR design system harness") que aparecem no `manifest.json` do ProtoTable, porque vêm
+do histórico do git. Pendente fora do código: renomear o repositório no GitHub
+(`VanzSantos/lvxfr` → `selenesdk`, o remote `origin` ainda aponta pro nome antigo) e a
+pasta local do projeto.

@@ -332,8 +332,8 @@ const PRIORIDADE_VARIANT: Record<Produto["prioridade"], "error" | "warning" | "n
 };
 
 const PRODUTOS_INICIAIS: Produto[] = [
-  { id: "P01", nome: "Fone LVXFR", sku: "FON-001", imagem: PLACEHOLDER, categorias: ["Eletrônicos", "Novo"], cliente: "Loja Centro", clienteEmail: "centro@loja.com", preco: 89.9, estoque: 12, prioridade: "alta" },
-  { id: "P02", nome: "Mouse LVXFR", sku: "MOU-014", imagem: PLACEHOLDER, categorias: ["Periféricos"], cliente: "Loja Praia", clienteEmail: "praia@loja.com", preco: 59.9, estoque: 4, prioridade: "media" },
+  { id: "P01", nome: "Fone SeleneSDK", sku: "FON-001", imagem: PLACEHOLDER, categorias: ["Eletrônicos", "Novo"], cliente: "Loja Centro", clienteEmail: "centro@loja.com", preco: 89.9, estoque: 12, prioridade: "alta" },
+  { id: "P02", nome: "Mouse SeleneSDK", sku: "MOU-014", imagem: PLACEHOLDER, categorias: ["Periféricos"], cliente: "Loja Praia", clienteEmail: "praia@loja.com", preco: 59.9, estoque: 4, prioridade: "media" },
   { id: "P03", nome: "Teclado Kardüm", sku: "TEC-022", imagem: PLACEHOLDER, categorias: ["Periféricos", "Gamer"], cliente: "Loja Centro", clienteEmail: "centro@loja.com", preco: 179.9, estoque: 0, prioridade: "alta" },
   { id: "P04", nome: "Adesivo Olhosvaldo", sku: "ADE-003", imagem: PLACEHOLDER, categorias: ["Periféricos", "Novo"], cliente: "Loja Online", clienteEmail: "online@loja.com", preco: 9.9, estoque: 230, prioridade: "baixa" },
 ];

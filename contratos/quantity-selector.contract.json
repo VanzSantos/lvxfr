@@ -43,7 +43,7 @@
       "name": "accessibleLabel",
       "type": "string",
       "required": true,
-      "description": "Nome acessível do controle inteiro (ex.: 'Quantidade de Fone LVXFR'). Cada botão deriva seu próprio aria-label a partir deste (ex.: 'Diminuir Quantidade de Fone LVXFR')."
+      "description": "Nome acessível do controle inteiro (ex.: 'Quantidade de Fone SeleneSDK'). Cada botão deriva seu próprio aria-label a partir deste (ex.: 'Diminuir Quantidade de Fone SeleneSDK')."
     },
     {
       "name": "state",

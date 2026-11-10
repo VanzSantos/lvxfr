@@ -112,7 +112,8 @@
       "semantic.borda-base",
       "semantic.borda-foco",
       "semantic.borda-erro",
-      "semantic.borda-inativo"
+      "semantic.borda-inativo",
+      "semantic.borda-campo"
     ],
     "text": [
       "semantic.texto-primario",
@@ -214,7 +215,8 @@
     "RESOLVIDO — cada option recebe um id real (`${fieldId}-option-${index}`), pra aria-activedescendant no botão apontar pra algo de verdade. Bug real encontrado testando com JS no navegador: o destaque visual da opção ativa funcionava (state do React), mas aria-activedescendant ficava vazio, porque nenhum elemento tinha id — leitor de tela não teria como saber qual opção está em foco virtual.",
     "RESOLVIDO — Enter/Espaço para confirmar a seleção são tratados no onKeyDown do botão-gatilho, não da opção. Bug real encontrado testando: como o foco real nunca sai do botão (navegação virtual), um onKeyDown na <div> da opção nunca dispara — keydown só chega no elemento que de fato está focado no DOM.",
     "RESOLVIDO — foco real de teclado nunca sai do botão-gatilho, mesmo durante navegação (padrão 'virtual' do useListNavigation: aria-activedescendant simula o foco, o DOM focus fica parado). Bug real encontrado ao testar no navegador (não só inspeção de código): clique do mouse numa opção movia o foco do DOM pro <div> dela (mesmo com tabIndex=-1) — quando o popup fechava e a opção sumia do DOM, o foco se perdia e voltava pro topo da página. onMouseDown={e => e.preventDefault()} sozinho não foi suficiente (confirmado testando — algum handler interno ainda focava a opção). Fix definitivo: guardar um ref pro próprio botão-gatilho e chamar .focus() nele explicitamente ao fim de toda seleção (única ou múltipla), independente da causa exata do desvio de foco.",
-    "AJUSTADO a pedido do usuário — fundo do campo trocado de semantic.fundo-superficie pra semantic.fundo-campo (token novo): 'o fundo dos inputs de forma geral, devem ser levemente mais escuros que a cor de fundo da página onde estão, para destacar melhor'. No modo claro fundo-campo é idêntico a fundo-superficie (sem mudança visual, branco com borda já bastava) — só no modo escuro os dois valores divergem (fundo-campo um degrau mais escuro que a página), porque era só ali que o campo ficava indistinguível da própria página por trás."
+    "AJUSTADO a pedido do usuário — fundo do campo trocado de semantic.fundo-superficie pra semantic.fundo-campo (token novo): 'o fundo dos inputs de forma geral, devem ser levemente mais escuros que a cor de fundo da página onde estão, para destacar melhor'. No modo claro fundo-campo é idêntico a fundo-superficie (sem mudança visual, branco com borda já bastava) — só no modo escuro os dois valores divergem (fundo-campo um degrau mais escuro que a página), porque era só ali que o campo ficava indistinguível da própria página por trás.",
+    "CORRIGIDO — auditoria de acessibilidade (2026-11-10, perfil padrão, WCAG 1.4.11): a borda do controle usava borda-base, com 1,47:1 no claro e 1,88:1 no escuro contra a superfície (mínimo 3:1 pra identificar um componente de interface). Passou a borda-campo, token novo (#6b7280 no claro = 4,83:1; #85847c no escuro = 4,82:1). borda-base continua valendo pra divisórias e superfícies decorativas, que a WCAG não exige em 3:1."
   ],
   "references": {
     "tokensFile": "tokens/tokens.json — Cores Semânticas (Fundos, Bordas, Textos, Ações/Primárias), Estrutural (raio-pp, foco-espessura, espaco-xp/pp, icone-pequeno/medio), Tipografia Estilo (texto-m)"

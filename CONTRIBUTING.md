@@ -1,4 +1,4 @@
-# Contribuindo com o LVXFR
+# Contribuindo com o SeleneSDK
 
 Este repositório é compartilhado com um grupo de Product Designers testando o
 harness. O fluxo abaixo existe pra que qualquer ajuste feito no seu fork — contrato de

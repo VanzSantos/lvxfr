@@ -14,7 +14,7 @@
 
 .trackWrapper {
   position: relative;
-  height: 20px;
+  height: 24px;
   display: flex;
   align-items: center;
 }
@@ -25,7 +25,7 @@
   right: 0;
   height: 4px;
   border-radius: var(--raio-circular);
-  background: var(--borda-base);
+  background: var(--borda-campo);
 }
 
 .trackFill {
@@ -62,20 +62,21 @@
   appearance: none;
   -webkit-appearance: none;
   pointer-events: auto;
-  width: 18px;
-  height: 18px;
+  width: 24px;
+  height: 24px;
   border-radius: var(--raio-circular);
   background: var(--acao-primaria);
   border: 2px solid var(--fundo-superficie);
   box-shadow: 0 0 0 1px var(--acao-primaria);
   cursor: pointer;
-  margin-top: 0;
+  /* centraliza o polegar de 24px no trilho de 4px: (4 − 24) / 2 */
+  margin-top: -10px;
 }
 
 .rangeInput::-moz-range-thumb {
   pointer-events: auto;
-  width: 18px;
-  height: 18px;
+  width: 24px;
+  height: 24px;
   border-radius: var(--raio-circular);
   background: var(--acao-primaria);
   border: 2px solid var(--fundo-superficie);

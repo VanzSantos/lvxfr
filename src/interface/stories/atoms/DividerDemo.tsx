@@ -1,4 +1,5 @@
 import { Divider } from "../../../components/Divider/Divider";
+import { Button } from "../../../components/Button/Button";
 import styles from "../Demo.module.css";
 
 export function DividerDemo() {
@@ -16,9 +17,9 @@ export function DividerDemo() {
       <div className={styles.section}>
         <span className={styles.sectionLabel}>Horizontal, com label</span>
         <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: 8, padding: "8px 0" }}>
-          <button type="button">Entrar com Google</button>
+          <Button variant="neutral" outlined fullWidth label="Entrar com Google" />
           <Divider label="ou" />
-          <button type="button">Entrar com e-mail</button>
+          <Button variant="neutral" outlined fullWidth label="Entrar com e-mail" />
         </div>
       </div>
 

@@ -2,16 +2,25 @@ import { useEffect, useRef, useState } from "react";
 import {
   DndContext,
   DragOverlay,
+  KeyboardSensor,
   PointerSensor,
   closestCorners,
   useDroppable,
   useSensor,
   useSensors,
+  type Announcements,
   type DragEndEvent,
   type DragOverEvent,
   type DragStartEvent,
+  type ScreenReaderInstructions,
 } from "@dnd-kit/core";
-import { SortableContext, arrayMove, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import {
+  SortableContext,
+  arrayMove,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { TicketCard, type TicketPriority, type TicketMetadataRow } from "../TicketCard/TicketCard";
 import { Badge } from "../Badge/Badge";
@@ -125,7 +134,35 @@ export function KanbanBoard({
     setLocalColumns(columns);
   }, [columns]);
 
-  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }));
+  // KeyboardSensor: Espaço/Enter pega o card, setas movem (dentro da coluna e entre colunas),
+  // Espaço/Enter solta e Esc cancela — mesma operação do mouse, sem alternativa à parte.
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
+
+  const ticketTitle = (id: string | number) =>
+    localColumns.flatMap((c) => c.tickets).find((t) => t.id === id)?.title ?? String(id);
+  // "coluna X, posição N de M" pra um id de coluna ou de ticket
+  const placeOf = (id: string | number) => {
+    const column = localColumns.find((c) => c.id === id);
+    if (column) return `coluna ${column.title}`;
+    const owner = localColumns.find((c) => c.tickets.some((t) => t.id === id));
+    if (!owner) return "fora das colunas";
+    const index = owner.tickets.findIndex((t) => t.id === id);
+    return `coluna ${owner.title}, posição ${index + 1} de ${owner.tickets.length}`;
+  };
+  const announcements: Announcements = {
+    onDragStart: ({ active }) => `Ticket ${ticketTitle(active.id)} selecionado, em ${placeOf(active.id)}.`,
+    onDragOver: ({ active, over }) => (over ? `Ticket ${ticketTitle(active.id)} sobre ${placeOf(over.id)}.` : undefined),
+    onDragEnd: ({ active, over }) =>
+      over ? `Ticket ${ticketTitle(active.id)} solto em ${placeOf(over.id)}.` : `Ticket ${ticketTitle(active.id)} solto fora das colunas, nada mudou.`,
+    onDragCancel: ({ active }) => `Movimento cancelado. Ticket ${ticketTitle(active.id)} voltou ao lugar de origem.`,
+  };
+  const screenReaderInstructions: ScreenReaderInstructions = {
+    draggable:
+      "Para mover o ticket, pressione Espaço ou Enter. Use as setas para escolher a posição ou a coluna, Espaço ou Enter para soltar e Esc para cancelar.",
+  };
 
   const actions: TicketCardActionProps = { onDuplicate, onToggleEnabled, onEdit, onViewDetails, onDelete };
 
@@ -229,6 +266,7 @@ export function KanbanBoard({
   return (
     <DndContext
       sensors={sensors}
+      accessibility={{ announcements, screenReaderInstructions }}
       collisionDetection={closestCorners}
       onDragStart={handleDragStart}
       onDragOver={handleDragOver}

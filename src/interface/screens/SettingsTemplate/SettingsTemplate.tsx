@@ -125,7 +125,7 @@ export function SettingsTemplate({ embedded = false }: SettingsTemplateProps) {
       <div className={styles.body}>
         <div className={styles.content}>
           <Card padding="large">
-            <Tabs items={SECTIONS} value={section} onChange={(value) => setSection(value as SettingsSection)} />
+            <Tabs accessibleLabel="Seções de configurações" items={SECTIONS} value={section} onChange={(value) => setSection(value as SettingsSection)} />
 
             <TabPanel value="perfil" hidden={section !== "perfil"}>
               <div className={styles.panelContent}>

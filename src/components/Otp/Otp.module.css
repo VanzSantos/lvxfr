@@ -14,7 +14,7 @@
   height: 52px;
   text-align: center;
   background: var(--fundo-campo);
-  border: 1px solid var(--borda-base);
+  border: 1px solid var(--borda-campo);
   border-radius: var(--raio-pp);
   box-sizing: border-box;
   color: var(--texto-primario);

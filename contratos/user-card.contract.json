@@ -39,7 +39,7 @@
       "name": "accessibleLabel",
       "type": "string",
       "required": false,
-      "description": "aria-label do botão. Sem valor default fixo — UserCard não assume que o botão sempre abre 'o menu da conta' (quem decide o que abre é o Popover por fora, ver decisions); omitir deixa o botão sem aria-label explícito, dependendo do texto visível (Avatar+StackedText) como nome acessível via conteúdo, mesmo racional de outros gatilhos de Popover no harness que não fixam um aria-label obrigatório."
+      "description": "Finalidade do cartão (ex.: 'Menu da conta'), ANEXADA ao texto visível — o nome acessível do botão é 'nome, secondaryText, accessibleLabel', então sempre contém o que se vê na tela (WCAG 2.5.3 Label in Name)."
     },
     {
       "name": "caretDirection",
@@ -119,7 +119,8 @@
     "UserCard é só o CARTÃO/gatilho, não envolve Popover internamente — mesmo racional já estabelecido em action-card.contract.json (onInfo/onSettings 'só expõe o gatilho, o que abre é responsabilidade de quem consome'): o menu de conta (itens, quantidade, texto) varia por consumidor (SideNavDemo tem 4 itens incl. 'Device management', BackofficeTemplate tem 3), então o content do Popover continua 100% livre e por fora, só o botão-gatilho virou componente.",
     "Fundo do cartão é o par de tokens da PÁGINA (fundo-secundario no claro/fundo-superficie no escuro), não do painel/SideNav que o contém (que usa o par OPOSTO) — decisão herdada de rodadas anteriores do SideNav ('a cor de fundo do User Card deve ser igual à cor de fundo da página'), agora fixada dentro do próprio componente em vez de precisar ser reimplementada em CSS module por consumidor (era a mesma regra duplicada em Demo.module.css/.pageArea e BackofficeTemplate.module.css/.userCard).",
     "REVISADO a pedido do usuário — Ícone deixou de ser fixo 'caret-up' e virou configurável via caretDirection ('up' padrão, 'down' novo). Motivo: surgiu um segundo consumidor real com a direção OPOSTA — BackofficeTemplate, no rodapé mobile, precisa do User Card no TOPO do Drawer, com o menu expandindo PRA BAIXO como um collapse inline (não um Popover) — um caret fixo 'pra cima' ficaria semanticamente errado ali. Mesma régua já usada no resto do harness ('cresce sob demanda de um consumidor real, nunca especulativamente') aplicada aqui: a prop só foi criada quando um segundo caso real precisando do oposto apareceu, não antes.",
-    "forwardRef — primeiro componente customizado do harness usado como children direto de Popover (até aqui só elementos nativos como <button> eram usados). Popover faz cloneElement injetando ref+onClick no children (ver popover.contract.json) — sem forwardRef, o ref cairia no vazio (componentes de função não aceitam ref por padrão) e o floating-ui não conseguiria medir a posição real do gatilho no DOM."
+    "forwardRef — primeiro componente customizado do harness usado como children direto de Popover (até aqui só elementos nativos como <button> eram usados). Popover faz cloneElement injetando ref+onClick no children (ver popover.contract.json) — sem forwardRef, o ref cairia no vazio (componentes de função não aceitam ref por padrão) e o floating-ui não conseguiria medir a posição real do gatilho no DOM.",
+    "CORRIGIDO — auditoria de acessibilidade (2026-11-10, perfil padrão): o nome acessível era só o accessibleLabel ('Menu da conta de Ana Souza') e não continha o e-mail visível (WCAG 2.5.3). Agora aria-label = nome, secondaryText e accessibleLabel; accessibleLabel passou a descrever só a FINALIDADE ('Menu da conta'), sem repetir o nome."
   ],
   "references": {
     "tokensFile": "tokens/tokens.json — Cores Semânticas (Fundos), Estrutural (raio-p, foco-espessura, espaco-pp)"

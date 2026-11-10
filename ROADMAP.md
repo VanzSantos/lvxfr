@@ -3573,3 +3573,48 @@ git reais de autor/data do outro clone), tela renderizando via `?standalone=` co
 correta (confirma de novo o fix de `base.css`/font-family, agora num consumidor real
 diferente de tudo que existia antes). Build limpo. `git push` normal (sem force) depois
 do merge.
+
+### Rebrand LVXFR → SeleneSDK (2026-11-10)
+
+O projeto deixou de se chamar LVXFR e passou a se chamar **SeleneSDK** (nome mais
+corporativo, e referência a Selene, deusa irmã de Aurora). Trocadas todas as ocorrências
+vivas: `README.md`, `ARCHITECTURE.md`, `CONTRIBUTING.md`, `package.json` (`name`) e
+`package-lock.json`, marcador do comentário de CI (`<!-- selenesdk-contract-summary -->`
+em `.github/workflows/ci.yml`), chave/título do projeto no ProtoTable
+(`selenesdk-referencia`), textos de exemplo do Playground/AppShell (marca, e-mails
+`@selenesdk.com`, nomes de produto de demo) e um exemplo em
+`quantity-selector.contract.json`.
+
+Mantido de propósito: as entradas históricas acima neste ROADMAP que citam "LVXFR"
+(descrevem o que aconteceu na época) e as mensagens de commit antigas ("Initial commit —
+LVXFR design system harness") que aparecem no `manifest.json` do ProtoTable, porque vêm
+do histórico do git. Pendente fora do código: renomear o repositório no GitHub
+(`VanzSantos/lvxfr` → `selenesdk`, o remote `origin` ainda aponta pro nome antigo) e a
+pasta local do projeto.
+
+### Correções da auditoria de acessibilidade, perfil padrão (2026-11-10)
+
+Auditoria (skill `acessibilidade-medsenior`, perfil padrão, desktop) nas 82 telas do
+Playground, nos 66 componentes e nos tokens. Resultado antes: 8 itens P-* com falha.
+Corrigido (cada mudança tem entrada `CORRIGIDO`/`EXTENSÃO` em `decisions` do contrato):
+
+- **P01 (contraste de texto):** `texto-inativo` só em desabilitado (informativo passou a
+  `texto-secundario`); `acao-primaria` como TEXTO passou a `acao-link-texto`; fundos "forte"
+  escuros de erro/sucesso/info/apoio-2 escurecidos (≥ 4,62:1); tokens da variante secondary do
+  Button (texto mais escuro, hover/pressed menos escuros); contornados primary/destructive no
+  escuro; Avatar, Badge invertido crítico, SelectableCard.
+- **P02 (borda de campo ≥ 3:1):** token novo `borda-campo` (`#6b7280` claro, `#85847c` escuro),
+  aplicado em campos, checkbox/radio/switch/slider e afins. `borda-base` segue pra divisórias.
+- **P10:** `KanbanBoard` ganhou `KeyboardSensor` (Espaço/Enter pega, setas movem entre colunas,
+  Esc cancela) com anúncios em pt-BR.
+- **P14:** link "Pular para o conteúdo" e `<title>` por tela no Playground.
+- **P17 (alvo ≥ 24px):** Button link, botão de senha, info do FieldLabel, ordenar do Datatable,
+  Chip, Rating, NavBar, Breadcrumb, Link, polegar do Slider.
+- **P20:** nome acessível contém o texto visível (UserCard, Stepper/Wizard).
+- **P23/P27:** `accessibleLabel` em TextField/Textarea/CommentComposer/Tabs; Slider exige
+  nome (e nomeia os dois cabos); Button em `loading` mantém o nome; SideNav sem ids duplicados.
+
+Reauditado depois: 0 botões/campos sem nome, 0 ids duplicados, 0 tablists sem nome e 0 falhas
+de contraste de texto nas telas alteradas, nos dois temas. Não coberto: teste com leitor de
+tela (P28), espaçamento de texto (P05) e rótulo VISÍVEL em FilterBar/CommentComposer (hoje só
+nome acessível — decisão de design pendente).

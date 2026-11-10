@@ -34,7 +34,7 @@ export function NavBarDemo() {
           ))}
         </div>
         <NavBar
-          brand={<strong style={{ fontSize: 18 }}>LVXFR</strong>}
+          brand={<strong style={{ fontSize: 18 }}>SeleneSDK</strong>}
           items={items}
           actions={
             <>
@@ -57,7 +57,7 @@ export function NavBarDemo() {
           janela abaixo de 768px pra ver o colapso no Drawer (mesma árvore, formato expansível)
         </span>
         <NavBar
-          brand={<strong style={{ fontSize: 18 }}>LVXFR</strong>}
+          brand={<strong style={{ fontSize: 18 }}>SeleneSDK</strong>}
           items={[
             { label: "Início", href: "/", active: true },
             {

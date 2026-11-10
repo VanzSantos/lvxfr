@@ -5,9 +5,12 @@ import { Badge } from "../../components/Badge/Badge";
 import { Drawer } from "../../components/Drawer/Drawer";
 import { EmptyState } from "../../components/EmptyState/EmptyState";
 import { Breadcrumb, type BreadcrumbItem } from "../../components/Breadcrumb/Breadcrumb";
+import { Link } from "../../components/Link/Link";
+import { SideNav } from "../../components/SideNav/SideNav";
+import { Brand, SidebarFooter } from "../nav/Sidebar";
+import type { ThemePreference } from "../theme/useTheme";
 import { useProtoTablePath } from "./useProtoTablePath";
 import staticManifest from "./manifest.json";
-import sidebarStyles from "../nav/Sidebar.module.css";
 import storyStyles from "../stories/StoryDetail.module.css";
 import styles from "./ProtoTablePage.module.css";
 
@@ -149,6 +152,8 @@ interface ProtoTablePageProps {
   /** Navega de volta pro módulo DS Playground — módulo irmão deste, mesma
       estrutura visual, dados totalmente separados (ver App.tsx). */
   onNavigateToPlayground: () => void;
+  themePreference: ThemePreference;
+  onThemePreferenceChange: (preference: ThemePreference) => void;
 }
 
 /** Índice de PROTÓTIPOS organizados em hierarquia Projeto > Módulo > Fluxo >
@@ -156,13 +161,13 @@ interface ProtoTablePageProps {
     direto pro filho (sem renderizar uma tabela de "1 item só") — o caminho
     atual mora na URL (useProtoTablePath), não em estado solto, pra permitir
     reaproveitar o átomo Breadcrumb de verdade (só aceita href, sem onClick).
-    Reaproveita DELIBERADAMENTE as classes de Sidebar.module.css (painel
-    lateral) e StoryDetail.module.css (título/descrição) — mesmos tokens de
+    Reaproveita DELIBERADAMENTE o SideNav (painel lateral) e StoryDetail.module.css (título/descrição) — mesmos tokens de
     cor/fonte do Playground, mesma estrutura visual, pra ler como dois
     módulos do mesmo sistema, mesmo com dados 100% separados. Metadados de
     autoria/data/histórico vêm 100% do git real de cada Tela, agregados pra
     cima (ver scripts/prototable-manifest.mjs) — nunca digitados à mão. */
-export function ProtoTablePage({ onNavigateToPlayground }: ProtoTablePageProps) {
+export function ProtoTablePage({ onNavigateToPlayground, themePreference, onThemePreferenceChange }: ProtoTablePageProps) {
+  const [openKeys, setOpenKeys] = useState<string[]>(["projetos"]);
   const [manifest, setManifest] = useState<Manifest>(staticManifest as unknown as Manifest);
   const [historyTarget, setHistoryTarget] = useState<HistoryTarget>(null);
   const { path, navigate, hrefFor } = useProtoTablePath();
@@ -214,7 +219,7 @@ export function ProtoTablePage({ onNavigateToPlayground }: ProtoTablePageProps) 
      clique aqui e navega via pushState (mesmo destino, sem reload), preciso
      não interceptar Cmd/Ctrl/clique-do-meio (abrir em nova aba deve
      continuar funcionando de verdade, mesmo padrão que SPA routers usam). */
-  function handleBreadcrumbClick(event: React.MouseEvent<HTMLDivElement>) {
+  function handleLinkClick(event: React.MouseEvent<HTMLDivElement>) {
     if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
     const anchor = (event.target as HTMLElement).closest("a");
     if (!anchor) return;
@@ -288,9 +293,7 @@ export function ProtoTablePage({ onNavigateToPlayground }: ProtoTablePageProps) 
           </div>
           <div className={styles.rowActions}>
             <Button variant="link" label="Ver histórico" onPress={() => setHistoryTarget({ title: screen.title, history: screen.history })} state={screen.commitCount === 0 ? "disabled" : "default"} />
-            <a className={styles.openButton} href={`/?standalone=${screen.standaloneStoryId}`} target="_blank" rel="noopener noreferrer">
-              Abrir
-            </a>
+            <Link href={`/?standalone=${screen.standaloneStoryId}`} label="Abrir" external />
           </div>
         </div>
       );
@@ -303,9 +306,7 @@ export function ProtoTablePage({ onNavigateToPlayground }: ProtoTablePageProps) 
           (row) => row.description,
           (row) => setHistoryTarget({ title: row.title, history: row.history }),
           (row) => (
-            <a className={styles.openButton} href={`/?standalone=${row.standaloneStoryId}`} target="_blank" rel="noopener noreferrer">
-              Abrir
-            </a>
+            <Link href={`/?standalone=${row.standaloneStoryId}`} label="Abrir" external />
           )
         )}
         data={currentFlow.screens}
@@ -317,38 +318,44 @@ export function ProtoTablePage({ onNavigateToPlayground }: ProtoTablePageProps) 
 
   return (
     <>
-      <nav className={sidebarStyles.sidebar} aria-label="Navegação de protótipos">
-        <div className={sidebarStyles.brand}>ProtoTable</div>
-        <button type="button" className={sidebarStyles.moduleSwitch} onClick={onNavigateToPlayground}>
-          ← Voltar pro DS Playground
-        </button>
-        <div className={sidebarStyles.group}>
-          <span className={sidebarStyles.groupTitle}>Projetos</span>
-          {manifest.projects.length === 0 ? (
-            <span className={sidebarStyles.empty}>Nenhum projeto ainda</span>
-          ) : (
-            <ul className={sidebarStyles.list}>
-              {manifest.projects.map((project) => (
-                <li key={project.key}>
-                  <button
-                    type="button"
-                    className={`${sidebarStyles.item} ${currentProject?.key === project.key ? sidebarStyles.itemActive : ""}`}
-                    onClick={() => navigate({ project: project.key, module: null, flow: null })}
-                    aria-current={currentProject?.key === project.key ? "page" : undefined}
-                  >
-                    {project.title}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      </nav>
+      {/* display: contents — o wrapper só existe pra interceptar o clique nos
+          <a href> reais do SideNav (mesmo racional do Breadcrumb), sem virar
+          uma caixa de layout entre o SideNav e o resto do shell. */}
+      <div style={{ display: "contents" }} onClick={handleLinkClick}>
+        <SideNav
+          accessibleLabel="Navegação de protótipos"
+          items={[
+            {
+              key: "projetos",
+              label: "Projetos",
+              children: manifest.projects.map((project) => ({
+                key: project.key,
+                label: project.title,
+                href: hrefFor({ project: project.key, module: null, flow: null }),
+                active: currentProject?.key === project.key,
+              })),
+            },
+          ]}
+          openKeys={openKeys}
+          onOpenKeysChange={setOpenKeys}
+          header={<Brand icon="pencil-ruler" name="ProtoTable" />}
+          footer={
+            <SidebarFooter
+              themePreference={themePreference}
+              onThemePreferenceChange={onThemePreferenceChange}
+              moduleLabel="SeleneSDK"
+              moduleIcon="moon"
+              moduleDirection="back"
+              onNavigate={onNavigateToPlayground}
+            />
+          }
+        />
+      </div>
 
       <main className={styles.main}>
         <div className={storyStyles.wrapper}>
           {breadcrumbItems.length >= 2 && (
-            <div className={styles.breadcrumbRow} onClick={handleBreadcrumbClick}>
+            <div className={styles.breadcrumbRow} onClick={handleLinkClick}>
               <Breadcrumb items={breadcrumbItems} />
             </div>
           )}

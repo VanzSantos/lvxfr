@@ -2,6 +2,14 @@
   display: flex;
   height: 100vh;
   overflow: hidden;
+  /* O SideNav precisa ser sempre a superfície mais CLARA das duas (ele vs. a
+     página, ver SideNav.module.css): no claro o menu é fundo-superficie, então
+     a página fica em fundo-secundario; no escuro o menu é fundo-secundario, a
+     página volta pra fundo-superficie. */
+  background: var(--fundo-secundario);
+}
+
+:root[data-theme="dark"] .shell {
   background: var(--fundo-superficie);
 }
 
@@ -18,4 +26,32 @@
   height: 100vh;
   overflow: auto;
   background: var(--fundo-superficie);
+}
+
+/* Link "Pular para o conteúdo": fora da tela até receber foco por teclado. */
+.skipLink {
+  position: absolute;
+  top: var(--espaco-pp);
+  left: var(--espaco-pp);
+  z-index: 1000;
+  padding: var(--espaco-pp) var(--espaco-m);
+  border-radius: var(--raio-pp);
+  background: var(--fundo-superficie);
+  color: var(--acao-link-texto);
+  font-family: var(--texto-p-family);
+  font-size: var(--texto-p-size);
+  font-weight: 600;
+  text-decoration: none;
+  transform: translateY(-200%);
+}
+
+.skipLink:focus-visible {
+  transform: none;
+  outline: var(--foco-espessura) solid var(--borda-foco);
+  outline-offset: 2px;
+}
+
+/* <main> recebe foco só por programação (skip link) — sem anel de foco. */
+.main:focus {
+  outline: none;
 }

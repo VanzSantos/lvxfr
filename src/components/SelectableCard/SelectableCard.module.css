@@ -7,7 +7,7 @@
   box-sizing: border-box;
   padding: var(--espaco-p);
   background: var(--fundo-superficie);
-  border: 1px solid var(--borda-base);
+  border: 1px solid var(--borda-campo);
   border-radius: var(--raio-pp);
   cursor: pointer;
 }
@@ -51,7 +51,7 @@
   width: var(--icone-medio);
   height: var(--icone-medio);
   box-sizing: border-box;
-  border: 2px solid var(--borda-base);
+  border: 2px solid var(--borda-campo);
   border-radius: var(--raio-circular);
   background: var(--fundo-superficie);
 }
@@ -131,7 +131,7 @@
 
 .toneAccent1 {
   background: var(--borda-apoio-3);
-  color: var(--texto-primario);
+  color: var(--texto-escuro-fixo);
 }
 
 .toneAccent2 {
@@ -145,6 +145,6 @@
 }
 
 .toneInfo {
-  background: var(--texto-info);
+  background: var(--fundo-info-forte);
   color: var(--texto-invertido);
 }

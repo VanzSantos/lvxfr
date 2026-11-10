@@ -38,7 +38,7 @@ export function FilterBar({
       <div className={styles.mainRow}>
         {showSearch && (
           <div className={styles.searchField}>
-            <TextField placeholder={searchPlaceholder} value={searchValue} onChange={onSearchChange} leftIcon="magnifying-glass" />
+            <TextField accessibleLabel={searchPlaceholder} placeholder={searchPlaceholder} value={searchValue} onChange={onSearchChange} leftIcon="magnifying-glass" />
           </div>
         )}
         {filters && <div className={styles.filters}>{filters}</div>}

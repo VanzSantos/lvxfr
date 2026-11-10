@@ -169,7 +169,8 @@
       "semantic.borda-base",
       "semantic.borda-erro",
       "semantic.borda-inativo",
-      "semantic.borda-foco"
+      "semantic.borda-foco",
+      "semantic.borda-campo"
     ],
     "text": [
       "semantic.texto-primario",
@@ -263,7 +264,8 @@
     "AJUSTADO a pedido do usuário — nova prop 'showPicker' (default true), mesma implementação e racional do DatePicker/TimePicker: hooks useClick/useFocus/useDismiss desabilitados via { enabled: showPicker } quando false.",
     "AJUSTADO a pedido do usuário — colunas de Hora/Minuto dentro do popover combinado receberam o mesmo retrabalho visual do TimePicker (cabeçalho fixo por coluna, opções circulares de 40px, box-shadow no popover) — reaproveita a decisão já tomada lá em vez de inventar uma segunda linguagem visual pro mesmo tipo de coluna.",
     "AJUSTADO a pedido do usuário — fundo do campo trocado de semantic.fundo-superficie pra semantic.fundo-campo (token novo): 'o fundo dos inputs de forma geral, devem ser levemente mais escuros que a cor de fundo da página onde estão, para destacar melhor'. No modo claro fundo-campo é idêntico a fundo-superficie (sem mudança visual, branco com borda já bastava) — só no modo escuro os dois valores divergem (fundo-campo um degrau mais escuro que a página), porque era só ali que o campo ficava indistinguível da própria página por trás.",
-    "AJUSTADO a pedido do usuário — novo Icon 'calendar' fixo à esquerda do trigger (antes o DateTimePicker não tinha ícone nenhum à esquerda, só o caret-down à direita), com nova prop showIcon (default true) pra permitir escondê-lo. Reaproveita o mesmo ícone 'calendar' do DatePicker em vez de um ícone combinado data+hora (não existe um no registro fechado do Icon, e criar um agora seria antecipar sem um pedido explícito por ele) — mesmo pedido de uma vez pros três pickers de data/hora do harness (ver decisions do DatePicker/TimePicker)."
+    "AJUSTADO a pedido do usuário — novo Icon 'calendar' fixo à esquerda do trigger (antes o DateTimePicker não tinha ícone nenhum à esquerda, só o caret-down à direita), com nova prop showIcon (default true) pra permitir escondê-lo. Reaproveita o mesmo ícone 'calendar' do DatePicker em vez de um ícone combinado data+hora (não existe um no registro fechado do Icon, e criar um agora seria antecipar sem um pedido explícito por ele) — mesmo pedido de uma vez pros três pickers de data/hora do harness (ver decisions do DatePicker/TimePicker).",
+    "CORRIGIDO — auditoria de acessibilidade (2026-11-10, perfil padrão, WCAG 1.4.11): a borda do controle usava borda-base, com 1,47:1 no claro e 1,88:1 no escuro contra a superfície (mínimo 3:1 pra identificar um componente de interface). Passou a borda-campo, token novo (#6b7280 no claro = 4,83:1; #85847c no escuro = 4,82:1). borda-base continua valendo pra divisórias e superfícies decorativas, que a WCAG não exige em 3:1."
   ],
   "references": {
     "tokensFile": "tokens/tokens.json — Cores Semânticas (Fundos, Bordas, Textos, Ações/Primária, Ícones), Estrutural (raio-pp/p/circular, foco-espessura, espaco-xp/pp/p/m, sombra-p), Tipografia Estilo (texto-m, texto-p, texto-micro, texto-micro-forte)"

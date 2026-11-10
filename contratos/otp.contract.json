@@ -95,7 +95,8 @@
       "semantic.borda-base",
       "semantic.borda-erro",
       "semantic.borda-inativo",
-      "semantic.borda-foco"
+      "semantic.borda-foco",
+      "semantic.borda-campo"
     ],
     "text": [
       "semantic.texto-primario",
@@ -159,7 +160,8 @@
     "Sem estado 'focus' nem 'readOnly' no enum de state (diferente de TextField) — foco é uma propriedade de cada caixa individual, não do grupo inteiro, e readOnly não tem um caso de uso real pra um código de verificação (ou o campo está editável, ou está disabled).",
     "Tipografia texto-g-forte (maior, negrito) pro dígito dentro da caixa — mesmo racional visual já usado em outros contextos de 'poucos caracteres importantes' do harness, prioriza legibilidade de um código curto sobre a densidade de texto normal.",
     "BUG REAL corrigido em uso real (TwoFactorScreen) — onComplete originalmente disparava sem argumento (assinatura () => void), então quem consome precisava ler seu PRÓPRIO state (ex.: um value espelhado via useState) dentro do handler. Como onComplete é chamado SINCRONAMENTE logo depois de onChange (mesmo tick, antes do componente pai re-renderizar), esse state ainda estava com o valor ANTERIOR (closure obsoleta) — colar um código válido de 6 dígitos disparava onComplete, mas o handler via o value antigo (vazio) e reportava 'código inválido' incorretamente. Corrigido passando o value completo como argumento de onComplete (agora (value: string) => void) — quem consome usa o argumento recebido, nunca precisa depender do próprio state estar sincronizado a tempo.",
-    "AJUSTADO a pedido do usuário — fundo do campo trocado de semantic.fundo-superficie pra semantic.fundo-campo (token novo): 'o fundo dos inputs de forma geral, devem ser levemente mais escuros que a cor de fundo da página onde estão, para destacar melhor'. No modo claro fundo-campo é idêntico a fundo-superficie (sem mudança visual, branco com borda já bastava) — só no modo escuro os dois valores divergem (fundo-campo um degrau mais escuro que a página), porque era só ali que o campo ficava indistinguível da própria página por trás."
+    "AJUSTADO a pedido do usuário — fundo do campo trocado de semantic.fundo-superficie pra semantic.fundo-campo (token novo): 'o fundo dos inputs de forma geral, devem ser levemente mais escuros que a cor de fundo da página onde estão, para destacar melhor'. No modo claro fundo-campo é idêntico a fundo-superficie (sem mudança visual, branco com borda já bastava) — só no modo escuro os dois valores divergem (fundo-campo um degrau mais escuro que a página), porque era só ali que o campo ficava indistinguível da própria página por trás.",
+    "CORRIGIDO — auditoria de acessibilidade (2026-11-10, perfil padrão, WCAG 1.4.11): a borda do controle usava borda-base, com 1,47:1 no claro e 1,88:1 no escuro contra a superfície (mínimo 3:1 pra identificar um componente de interface). Passou a borda-campo, token novo (#6b7280 no claro = 4,83:1; #85847c no escuro = 4,82:1). borda-base continua valendo pra divisórias e superfícies decorativas, que a WCAG não exige em 3:1."
   ],
   "references": {
     "tokensFile": "tokens/tokens.json — Cores Semânticas (Fundos, Bordas, Textos), Estrutural (raio-pp, foco-espessura, espaco-xp/pp), Tipografia Estilo (texto-g-forte)"

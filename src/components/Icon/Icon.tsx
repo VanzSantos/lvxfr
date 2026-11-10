@@ -53,6 +53,7 @@ import {
   DeviceMobile,
   Clock,
   Bell,
+  PencilRuler,
 } from "@phosphor-icons/react";
 import type { Icon as PhosphorIcon } from "@phosphor-icons/react";
 
@@ -115,6 +116,7 @@ const REGISTRY: Record<string, PhosphorIcon> = {
   "device-mobile": DeviceMobile,
   clock: Clock,
   bell: Bell,
+  "pencil-ruler": PencilRuler,
 };
 
 export type IconName = keyof typeof REGISTRY;

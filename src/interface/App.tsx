@@ -30,13 +30,41 @@ function readInitialMode(): AppMode {
   return params.has("pt_project") || params.has("pt_module") || params.has("pt_flow") ? "prototable" : "playground";
 }
 
+/** Tela selecionada vem da hash da URL ("#/<id>") — é o que o SideNav (que só
+    navega por href) altera ao clicar; sem hash, abre o primeiro story. */
+function readSelectedId(): string {
+  if (typeof window === "undefined") return STORIES[0].id;
+  const hash = window.location.hash.replace(/^#\/?/, "");
+  if (!hash) return STORIES[0].id;
+  try {
+    return decodeURIComponent(hash);
+  } catch {
+    return STORIES[0].id;
+  }
+}
+
 export function App() {
-  const [selectedId, setSelectedId] = useState<string>(STORIES[0].id);
+  const [selectedId, setSelectedId] = useState<string>(readSelectedId);
   const [mode, setMode] = useState<AppMode>(readInitialMode);
-  const { theme, toggleTheme } = useTheme();
+  const { theme, preference, setPreference } = useTheme();
   const [standaloneId] = useState<string | null>(readStandaloneId);
 
+  useEffect(() => {
+    const onHashChange = () => setSelectedId(readSelectedId());
+    window.addEventListener("hashchange", onHashChange);
+    return () => window.removeEventListener("hashchange", onHashChange);
+  }, []);
+
   const standaloneStory = standaloneId ? STORIES.find((item) => item.id === standaloneId) : undefined;
+  const story = STORIES.find((item) => item.id === selectedId);
+
+  // Título da aba por tela (WCAG 2.4.2) — antes era "SeleneSDK" fixo em todas.
+  useEffect(() => {
+    if (standaloneId) return;
+    const screen =
+      mode === "prototable" ? "ProtoTable" : selectedId === ICON_LIBRARY_ID ? "Ícones (Phosphor)" : story?.title;
+    document.title = screen ? `${screen} · SeleneSDK` : "SeleneSDK";
+  }, [standaloneId, mode, selectedId, story?.title]);
   /* Protótipos ProtoTable-only (sem entrada em stories/registry.ts — pedido
      explícito do usuário: US de produto real não deve aparecer no Playground
      nem ganhar contrato) resolvem o standalone pelo próprio ScreenEntry.Demo
@@ -62,10 +90,22 @@ export function App() {
     );
   }
 
-  const story = STORIES.find((item) => item.id === selectedId);
+  /* "Pular para o conteúdo" (WCAG 2.4.1) — o menu tem ~90 itens focáveis antes do
+     <main>. Não dá pra usar href="#conteudo": a hash da URL é a rota do Playground
+     ("#/radio"), então o clique move o foco por JS e deixa a URL como está. */
+  function skipToContent(event: React.MouseEvent<HTMLAnchorElement>) {
+    event.preventDefault();
+    const main = document.querySelector("main");
+    if (!main) return;
+    main.setAttribute("tabindex", "-1");
+    main.focus();
+  }
 
   return (
     <div className={styles.shell}>
+      <a href={window.location.hash || "#"} className={styles.skipLink} onClick={skipToContent}>
+        Pular para o conteúdo
+      </a>
       {/* Alterna entre o DS Playground (vitrine de componentes) e o ProtoTable
           (índice de protótipos/produtos reais) — telas deliberadamente
           distintas, sem Sidebar/dados compartilhados entre si (pedido
@@ -75,6 +115,8 @@ export function App() {
           em vez de um seletor externo por cima das duas. */}
       {mode === "prototable" ? (
         <ProtoTablePage
+          themePreference={preference}
+          onThemePreferenceChange={setPreference}
           onNavigateToPlayground={() => {
             // Limpa o caminho do ProtoTable da URL — sem isso, um reload
             // futuro (readInitialMode) voltaria pro ProtoTable mesmo depois
@@ -92,9 +134,8 @@ export function App() {
         <>
           <Sidebar
             selectedId={selectedId}
-            onSelect={setSelectedId}
-            theme={theme}
-            onToggleTheme={toggleTheme}
+            themePreference={preference}
+            onThemePreferenceChange={setPreference}
             onNavigateToPrototable={() => setMode("prototable")}
           />
           <main className={styles.main}>

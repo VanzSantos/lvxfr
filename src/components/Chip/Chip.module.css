@@ -23,6 +23,11 @@
 
 button.label {
   cursor: pointer;
+  /* o botão ocupa a altura toda do chip (alvo ≥ 24px), não só a linha de texto */
+  align-self: stretch;
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
 }
 
 .label:focus-visible {
@@ -36,8 +41,8 @@ button.label {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   background: none;
   border: none;
   border-radius: var(--raio-circular);
@@ -60,7 +65,7 @@ button.label:disabled {
 
 .neutral {
   background: var(--fundo-secundario);
-  border-color: var(--borda-base);
+  border-color: var(--borda-campo);
   color: var(--texto-secundario);
 }
 

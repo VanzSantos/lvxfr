@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useId, useState, type ReactNode } from "react";
 import { Link } from "../Link/Link";
 import { Icon, type IconName } from "../Icon/Icon";
 import { Drawer } from "../Drawer/Drawer";
@@ -90,6 +90,8 @@ function validateItems(items: SideNavItem[], depth: number) {
 interface TreeProps {
   items: SideNavItem[];
   depth: number;
+  /** Prefixo único por INSTÂNCIA da árvore — o SideNav monta a árvore até 3x (painel, overlay do trilho e Drawer mobile) e os ids de aria-controls/labelledby não podem repetir. */
+  idPrefix: string;
   openKeys: string[];
   onOpenKeysChange: (openKeys: string[]) => void;
 }
@@ -97,7 +99,7 @@ interface TreeProps {
 /** Árvore recursiva — item-folha é Link, item com children vira um botão
     expansível (mesmo padrão exato do Accordion) com os filhos indentados um
     passo a mais por nível (contratos/side-nav.contract.json, anatomy). */
-function SideNavTree({ items, depth, openKeys, onOpenKeysChange }: TreeProps) {
+function SideNavTree({ items, depth, idPrefix, openKeys, onOpenKeysChange }: TreeProps) {
   function toggle(key: string, isOpen: boolean) {
     onOpenKeysChange(isOpen ? openKeys.filter((k) => k !== key) : [...openKeys, key]);
   }
@@ -107,8 +109,8 @@ function SideNavTree({ items, depth, openKeys, onOpenKeysChange }: TreeProps) {
       {items.map((item) => {
         if (item.children) {
           const isOpen = openKeys.includes(item.key);
-          const headerId = `sidenav-${item.key}-header`;
-          const panelId = `sidenav-${item.key}-panel`;
+          const headerId = `${idPrefix}-${item.key}-header`;
+          const panelId = `${idPrefix}-${item.key}-panel`;
 
           return (
             <li key={item.key} className={styles.item}>
@@ -133,6 +135,7 @@ function SideNavTree({ items, depth, openKeys, onOpenKeysChange }: TreeProps) {
                   <SideNavTree
                     items={item.children}
                     depth={depth + 1}
+                    idPrefix={idPrefix}
                     openKeys={openKeys}
                     onOpenKeysChange={onOpenKeysChange}
                   />
@@ -169,6 +172,7 @@ export function SideNav({
   footerMobile,
 }: SideNavProps) {
   validateItems(items, 1);
+  const uid = useId();
   const [internalMobileOpen, setInternalMobileOpen] = useState(false);
   const mobileControlled = onMobileOpenChange !== undefined;
   const mobileOpen = mobileControlled ? mobileOpenProp! : internalMobileOpen;
@@ -187,10 +191,10 @@ export function SideNav({
     </button>
   );
 
-  const bodyAndFooter = (
+  const bodyAndFooterFor = (scope: string) => (
     <>
       <div className={styles.body}>
-        <SideNavTree items={items} depth={1} openKeys={openKeys} onOpenKeysChange={onOpenKeysChange} />
+        <SideNavTree items={items} depth={1} idPrefix={`${uid}-${scope}`} openKeys={openKeys} onOpenKeysChange={onOpenKeysChange} />
       </div>
       {footer && <div className={styles.footer}>{footer}</div>}
     </>
@@ -239,13 +243,13 @@ export function SideNav({
           <>
             <div className={styles.footerMobile}>{footerMobile}</div>
             <div className={styles.body}>
-              <SideNavTree items={items} depth={1} openKeys={openKeys} onOpenKeysChange={onOpenKeysChange} />
+              <SideNavTree items={items} depth={1} idPrefix={`${uid}-drawer`} openKeys={openKeys} onOpenKeysChange={onOpenKeysChange} />
             </div>
           </>
         ) : (
           <>
             {header && <div className={styles.header}>{header}</div>}
-            {bodyAndFooter}
+            {bodyAndFooterFor("drawer")}
           </>
         )}
       </Drawer>
@@ -319,7 +323,7 @@ export function SideNav({
           {hovering && (
             <nav aria-label={accessibleLabel} className={`${styles.nav} ${styles[width]} ${styles.overlay}`}>
               {headerRow}
-              {bodyAndFooter}
+              {bodyAndFooterFor("overlay")}
             </nav>
           )}
         </div>
@@ -333,7 +337,7 @@ export function SideNav({
     <>
       <nav aria-label={accessibleLabel} className={`${styles.nav} ${styles[width]}`}>
         {headerRow}
-        {bodyAndFooter}
+        {bodyAndFooterFor("nav")}
       </nav>
 
       {mobileTrigger}

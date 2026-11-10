@@ -54,7 +54,7 @@ export function BreadcrumbDemo() {
             { label: "Loja", href: "/loja" },
             { label: "Eletrônicos", href: "/loja/eletronicos" },
             { label: "Fones", href: "/loja/eletronicos/fones" },
-            { label: "LVXFR", href: "/loja/eletronicos/fones/lvxfr" },
+            { label: "SeleneSDK", href: "/loja/eletronicos/fones/selenesdk" },
             { label: "Fone Olhosvaldo" },
           ]}
         />

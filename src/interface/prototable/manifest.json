@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-09-02T19:42:16.700Z",
+  "generatedAt": "2026-11-10T18:52:01.009Z",
   "projects": [
     {
-      "key": "lvxfr-referencia",
-      "title": "LVXFR — telas de referência",
+      "key": "selenesdk-referencia",
+      "title": "SeleneSDK — telas de referência",
       "description": "Telas de exemplo que já vêm com o harness, semente inicial do ProtoTable.",
       "uncommitted": false,
       "createdBy": "Vanz Santos",
@@ -30,7 +30,7 @@
       "modules": [
         {
           "key": "referencia",
-          "projectKey": "lvxfr-referencia",
+          "projectKey": "selenesdk-referencia",
           "title": "Referência",
           "uncommitted": false,
           "createdBy": "Vanz Santos",
@@ -259,9 +259,16 @@
       "createdBy": "Vanz Santos",
       "createdAt": "2026-09-02T15:05:30-03:00",
       "lastUpdatedBy": "Vanz Santos",
-      "lastUpdatedAt": "2026-09-02T15:27:12-03:00",
-      "commitCount": 3,
+      "lastUpdatedAt": "2026-11-10T15:41:38-03:00",
+      "commitCount": 4,
       "history": [
+        {
+          "hash": "14b96b6fa44050071617ea12861433dc9c55dff2",
+          "shortHash": "14b96b6",
+          "author": "Vanz Santos",
+          "date": "2026-11-10T15:41:38-03:00",
+          "message": "auto: sync (contratos/avatar.contract.json, contratos/badge.contract.json, contratos/button.contract.json, contratos/calendar.contract.json, contratos/checkbox.contract.json, contratos/chip.contract.json, contratos/combobox.contract.json, contratos/datatable.contract.json, contratos/date-picker.contract.json, contratos/date-time-picker.contract.json, contratos/file-upload.contract.json, contratos/kanban-board.contract.json, contratos/navbar.contract.json, contratos/otp.contract.json, contratos/pagination.contract.json, contratos/quantity-selector.contract.json, contratos/radio.contract.json, contratos/rating.contract.json, contratos/segmented-control.contract.json, contratos/select.contract.json, contratos/selectable-card.contract.json, contratos/slider.contract.json, contratos/stepper.contract.json, contratos/switch.contract.json, contratos/tabs.contract.json, contratos/text-field.contract.json, contratos/textarea.contract.json, contratos/time-picker.contract.json, contratos/timeline.contract.json, contratos/toast.contract.json, src/components, src/interface, tokens/tokens.css) — 2026-11-10T18:41:38.450Z"
+        },
         {
           "hash": "417355b1f964812dd8db942fff681f565604984f",
           "shortHash": "417355b",
@@ -293,9 +300,16 @@
           "createdBy": "Vanz Santos",
           "createdAt": "2026-09-02T15:05:30-03:00",
           "lastUpdatedBy": "Vanz Santos",
-          "lastUpdatedAt": "2026-09-02T15:27:12-03:00",
-          "commitCount": 3,
+          "lastUpdatedAt": "2026-11-10T15:41:38-03:00",
+          "commitCount": 4,
           "history": [
+            {
+              "hash": "14b96b6fa44050071617ea12861433dc9c55dff2",
+              "shortHash": "14b96b6",
+              "author": "Vanz Santos",
+              "date": "2026-11-10T15:41:38-03:00",
+              "message": "auto: sync (contratos/avatar.contract.json, contratos/badge.contract.json, contratos/button.contract.json, contratos/calendar.contract.json, contratos/checkbox.contract.json, contratos/chip.contract.json, contratos/combobox.contract.json, contratos/datatable.contract.json, contratos/date-picker.contract.json, contratos/date-time-picker.contract.json, contratos/file-upload.contract.json, contratos/kanban-board.contract.json, contratos/navbar.contract.json, contratos/otp.contract.json, contratos/pagination.contract.json, contratos/quantity-selector.contract.json, contratos/radio.contract.json, contratos/rating.contract.json, contratos/segmented-control.contract.json, contratos/select.contract.json, contratos/selectable-card.contract.json, contratos/slider.contract.json, contratos/stepper.contract.json, contratos/switch.contract.json, contratos/tabs.contract.json, contratos/text-field.contract.json, contratos/textarea.contract.json, contratos/time-picker.contract.json, contratos/timeline.contract.json, contratos/toast.contract.json, src/components, src/interface, tokens/tokens.css) — 2026-11-10T18:41:38.450Z"
+            },
             {
               "hash": "417355b1f964812dd8db942fff681f565604984f",
               "shortHash": "417355b",
@@ -327,9 +341,16 @@
               "createdBy": "Vanz Santos",
               "createdAt": "2026-09-02T15:05:30-03:00",
               "lastUpdatedBy": "Vanz Santos",
-              "lastUpdatedAt": "2026-09-02T15:27:12-03:00",
-              "commitCount": 3,
+              "lastUpdatedAt": "2026-11-10T15:41:38-03:00",
+              "commitCount": 4,
               "history": [
+                {
+                  "hash": "14b96b6fa44050071617ea12861433dc9c55dff2",
+                  "shortHash": "14b96b6",
+                  "author": "Vanz Santos",
+                  "date": "2026-11-10T15:41:38-03:00",
+                  "message": "auto: sync (contratos/avatar.contract.json, contratos/badge.contract.json, contratos/button.contract.json, contratos/calendar.contract.json, contratos/checkbox.contract.json, contratos/chip.contract.json, contratos/combobox.contract.json, contratos/datatable.contract.json, contratos/date-picker.contract.json, contratos/date-time-picker.contract.json, contratos/file-upload.contract.json, contratos/kanban-board.contract.json, contratos/navbar.contract.json, contratos/otp.contract.json, contratos/pagination.contract.json, contratos/quantity-selector.contract.json, contratos/radio.contract.json, contratos/rating.contract.json, contratos/segmented-control.contract.json, contratos/select.contract.json, contratos/selectable-card.contract.json, contratos/slider.contract.json, contratos/stepper.contract.json, contratos/switch.contract.json, contratos/tabs.contract.json, contratos/text-field.contract.json, contratos/textarea.contract.json, contratos/time-picker.contract.json, contratos/timeline.contract.json, contratos/toast.contract.json, src/components, src/interface, tokens/tokens.css) — 2026-11-10T18:41:38.450Z"
+                },
                 {
                   "hash": "417355b1f964812dd8db942fff681f565604984f",
                   "shortHash": "417355b",
@@ -364,9 +385,16 @@
                   "createdBy": "Vanz Santos",
                   "createdAt": "2026-09-02T15:05:30-03:00",
                   "lastUpdatedBy": "Vanz Santos",
-                  "lastUpdatedAt": "2026-09-02T15:27:12-03:00",
-                  "commitCount": 3,
+                  "lastUpdatedAt": "2026-11-10T15:41:38-03:00",
+                  "commitCount": 4,
                   "history": [
+                    {
+                      "hash": "14b96b6fa44050071617ea12861433dc9c55dff2",
+                      "shortHash": "14b96b6",
+                      "author": "Vanz Santos",
+                      "date": "2026-11-10T15:41:38-03:00",
+                      "message": "auto: sync (contratos/avatar.contract.json, contratos/badge.contract.json, contratos/button.contract.json, contratos/calendar.contract.json, contratos/checkbox.contract.json, contratos/chip.contract.json, contratos/combobox.contract.json, contratos/datatable.contract.json, contratos/date-picker.contract.json, contratos/date-time-picker.contract.json, contratos/file-upload.contract.json, contratos/kanban-board.contract.json, contratos/navbar.contract.json, contratos/otp.contract.json, contratos/pagination.contract.json, contratos/quantity-selector.contract.json, contratos/radio.contract.json, contratos/rating.contract.json, contratos/segmented-control.contract.json, contratos/select.contract.json, contratos/selectable-card.contract.json, contratos/slider.contract.json, contratos/stepper.contract.json, contratos/switch.contract.json, contratos/tabs.contract.json, contratos/text-field.contract.json, contratos/textarea.contract.json, contratos/time-picker.contract.json, contratos/timeline.contract.json, contratos/toast.contract.json, src/components, src/interface, tokens/tokens.css) — 2026-11-10T18:41:38.450Z"
+                    },
                     {
                       "hash": "417355b1f964812dd8db942fff681f565604984f",
                       "shortHash": "417355b",

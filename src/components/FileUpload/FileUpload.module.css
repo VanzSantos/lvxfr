@@ -16,7 +16,7 @@
   min-height: 44px;
   padding: var(--espaco-pp);
   background: var(--fundo-superficie);
-  border: 1px solid var(--borda-base);
+  border: 1px solid var(--borda-campo);
   border-radius: var(--raio-pp);
   box-sizing: border-box;
 }
@@ -57,7 +57,7 @@
   width: 100%;
   padding: var(--espaco-m);
   background: var(--fundo-superficie);
-  border: 2px dashed var(--borda-base);
+  border: 2px dashed var(--borda-campo);
   border-radius: var(--raio-pp);
   cursor: pointer;
   box-sizing: border-box;

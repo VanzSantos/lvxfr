@@ -167,7 +167,7 @@
   font-family: var(--texto-g-forte-family);
   font-size: var(--texto-g-forte-size);
   font-weight: var(--texto-g-forte-weight);
-  color: var(--acao-primaria);
+  color: var(--acao-link-texto);
 }
 
 @media (max-width: 640px) {

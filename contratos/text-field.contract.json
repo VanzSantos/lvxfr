@@ -124,6 +124,12 @@
       "required": false,
       "default": false,
       "description": "Só se aplica com type='tel'. true = mostra o prefixo fixo '+55' (DDI) à esquerda do número mascarado, separado por uma borda vertical. false (padrão) = só o número mascarado, sem DDI. Cobre os dois casos reais: formulário nacional (sem DDI) e formulário que precisa deixar explícito o código do país."
+    },
+    {
+      "name": "accessibleLabel",
+      "type": "string",
+      "required": false,
+      "description": "Nome acessível do campo quando não há `label` visível (vira aria-label do input). Placeholder NÃO é rótulo — some ao digitar. Ignorado quando `label` existe."
     }
   ],
   "variants": [
@@ -152,7 +158,8 @@
       "semantic.borda-base",
       "semantic.borda-foco",
       "semantic.borda-erro",
-      "semantic.borda-inativo"
+      "semantic.borda-inativo",
+      "semantic.borda-campo"
     ],
     "text": [
       "semantic.texto-primario",
@@ -233,7 +240,10 @@
     "AJUSTADO a pedido do usuário — nova prop 'showCountryCode' (só com type='tel') mostra um prefixo fixo '+55', não-editável, à esquerda do número. NÃO é um seletor de país completo com lista/bandeira/código dinâmico — o harness inteiro já assume locale fixo pt-BR/Brasil em todo lugar que lida com formato (DatePicker sempre DD/MM/AAAA, Calendar sempre locale pt-BR), então um DDI fixo '+55' é consistente com essa decisão já tomada, não uma escolha nova. Se aparecer um caso real de formulário multi-país, é decisão nova (provavelmente um componente PhoneField dedicado, não uma prop a mais aqui).",
     "Telefone mascarado permanece o próprio 'value' do campo (a string já formatada com parênteses/traço), não um valor 'limpo' por trás de bastidores — mesma escolha de superfície simples já usada no restante do TextField (o campo é 100% controlado e devolve exatamente o que está mostrando, sem um segundo formato paralelo pro consumidor gerenciar). Quem precisar só dos dígitos aplica o próprio replace(/\\D/g, '') no value recebido.",
     "AJUSTADO a pedido do usuário — fundo do campo trocado de semantic.fundo-superficie pra semantic.fundo-campo (token novo): 'o fundo dos inputs de forma geral, devem ser levemente mais escuros que a cor de fundo da página onde estão, para destacar melhor'. No modo claro fundo-campo é idêntico a fundo-superficie (sem mudança visual, branco com borda já bastava) — só no modo escuro os dois valores divergem (fundo-campo um degrau mais escuro que a página), porque era só ali que o campo ficava indistinguível da própria página por trás.",
-    "EXTENSÃO — nova opção type='cpf', motivada pelo redesenho do LoginScreen (padrão real dos produtos do usuário: campo de identificação por CPF, mascarado 000.000.000-00). Mesmo racional e mesma técnica já estabelecidos por type='tel': lógica extraída pra src/components/shared/cpfMask.ts (mesmo padrão de phoneMask.ts/dateTimeMask.ts — nunca duplicar a função onlyDigits), aplica só dígitos e insere pontuação progressivamente conforme o usuário digita (sem exigir um separador manual). CPF não é um type nativo de <input> (diferente de 'tel', que É nativo) — renderiza como type='text' por baixo, com inputMode='numeric' pra teclado numérico em telas touch, mesmo comportamento visual de 'tel' nesse quesito. Sem validação de dígito verificador (algoritmo de CPF válido) nesta v1 — TextField mascara o FORMATO, não valida se o número é um CPF real; validação de conteúdo é responsabilidade de quem consome (ex.: no submit do formulário), mesma fronteira já estabelecida pro resto do harness (Checkbox 'required' não valida se marcado É a resposta certa, só que foi marcado)."
+    "EXTENSÃO — nova opção type='cpf', motivada pelo redesenho do LoginScreen (padrão real dos produtos do usuário: campo de identificação por CPF, mascarado 000.000.000-00). Mesmo racional e mesma técnica já estabelecidos por type='tel': lógica extraída pra src/components/shared/cpfMask.ts (mesmo padrão de phoneMask.ts/dateTimeMask.ts — nunca duplicar a função onlyDigits), aplica só dígitos e insere pontuação progressivamente conforme o usuário digita (sem exigir um separador manual). CPF não é um type nativo de <input> (diferente de 'tel', que É nativo) — renderiza como type='text' por baixo, com inputMode='numeric' pra teclado numérico em telas touch, mesmo comportamento visual de 'tel' nesse quesito. Sem validação de dígito verificador (algoritmo de CPF válido) nesta v1 — TextField mascara o FORMATO, não valida se o número é um CPF real; validação de conteúdo é responsabilidade de quem consome (ex.: no submit do formulário), mesma fronteira já estabelecida pro resto do harness (Checkbox 'required' não valida se marcado É a resposta certa, só que foi marcado).",
+    "CORRIGIDO — auditoria de acessibilidade (2026-11-10, perfil padrão, WCAG 1.4.11): a borda do controle usava borda-base, com 1,47:1 no claro e 1,88:1 no escuro contra a superfície (mínimo 3:1 pra identificar um componente de interface). Passou a borda-campo, token novo (#6b7280 no claro = 4,83:1; #85847c no escuro = 4,82:1). borda-base continua valendo pra divisórias e superfícies decorativas, que a WCAG não exige em 3:1.",
+    "EXTENSÃO — accessibleLabel: auditoria de acessibilidade (2026-11-10, perfil padrão) (WCAG 3.3.2/4.1.2) — FilterBar e CommentComposer usavam o campo só com placeholder. Quem não mostra `label` visível agora declara o nome por aqui. Não substitui o rótulo visível: pra formulários, `label` continua sendo o recomendado.",
+    "CORRIGIDO — auditoria de acessibilidade (2026-11-10, perfil padrão, WCAG 2.5.8 — alvo mínimo de 24×24 px): o botão de mostrar/ocultar senha tinha 20×20; ganhou min 24×24."
   ],
   "references": {
     "tokensFile": "tokens/tokens.json — Cores Semânticas (Fundos, Bordas, Textos), Estrutural (raio-pp, foco-espessura, espaco-xp, icone-medio), Tipografia Estilo (texto-m)"

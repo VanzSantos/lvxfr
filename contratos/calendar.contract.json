@@ -12,40 +12,131 @@
     "Grade de dias do mês — sempre 6 linhas × 7 colunas (42 células) fixas, mesmo quando o mês cabe em 5 linhas; dias de meses adjacentes aparecem esmaecidos e não são clicáveis",
     "Seletor rápido de mês/ano (alterna com a grade de dias ao clicar no rótulo do cabeçalho) — navegação de ano (setas) + grade de 12 meses do ano exibido"
   ],
-  "dependencies": ["Icon"],
+  "dependencies": [
+    "Icon"
+  ],
   "props": [
-    { "name": "value", "type": "string", "required": true, "description": "Data selecionada no formato ISO 'AAAA-MM-DD', ou null se nenhuma. 100% controlado, mesmo padrão de TextField/Select — Calendar nunca decide sozinho qual data está 'selecionada'." },
-    { "name": "onChange", "type": "function", "required": true, "description": "Assinatura (value: string) => void, chamado com a data ISO clicada. Só dispara pra dias do mês corrente e habilitados (ver minDate/maxDate/disabledDate)." },
-    { "name": "minDate", "type": "string", "required": false, "description": "Data ISO mínima selecionável (inclusive). Dias antes dela ficam desabilitados." },
-    { "name": "maxDate", "type": "string", "required": false, "description": "Data ISO máxima selecionável (inclusive). Dias depois dela ficam desabilitados." },
-    { "name": "disabledDate", "type": "function", "required": false, "description": "Assinatura (value: string) => boolean. Quando retorna true pra uma data ISO específica, esse dia fica desabilitado além do intervalo min/max (ex.: feriados, dias sem vaga)." },
-    { "name": "accessibleLabel", "type": "string", "required": false, "default": "Calendário", "description": "Nome acessível do componente inteiro (role=group)." }
+    {
+      "name": "value",
+      "type": "string",
+      "required": true,
+      "description": "Data selecionada no formato ISO 'AAAA-MM-DD', ou null se nenhuma. 100% controlado, mesmo padrão de TextField/Select — Calendar nunca decide sozinho qual data está 'selecionada'."
+    },
+    {
+      "name": "onChange",
+      "type": "function",
+      "required": true,
+      "description": "Assinatura (value: string) => void, chamado com a data ISO clicada. Só dispara pra dias do mês corrente e habilitados (ver minDate/maxDate/disabledDate)."
+    },
+    {
+      "name": "minDate",
+      "type": "string",
+      "required": false,
+      "description": "Data ISO mínima selecionável (inclusive). Dias antes dela ficam desabilitados."
+    },
+    {
+      "name": "maxDate",
+      "type": "string",
+      "required": false,
+      "description": "Data ISO máxima selecionável (inclusive). Dias depois dela ficam desabilitados."
+    },
+    {
+      "name": "disabledDate",
+      "type": "function",
+      "required": false,
+      "description": "Assinatura (value: string) => boolean. Quando retorna true pra uma data ISO específica, esse dia fica desabilitado além do intervalo min/max (ex.: feriados, dias sem vaga)."
+    },
+    {
+      "name": "accessibleLabel",
+      "type": "string",
+      "required": false,
+      "default": "Calendário",
+      "description": "Nome acessível do componente inteiro (role=group)."
+    }
   ],
   "variants": [],
-  "states": ["default", "selected", "today", "disabled", "adjacent-month"],
+  "states": [
+    "default",
+    "selected",
+    "today",
+    "disabled",
+    "adjacent-month"
+  ],
   "tokensAllowed": {
-    "background": ["semantic.fundo-superficie", "semantic.fundo-secundario", "semantic.acao-primaria"],
-    "border": ["semantic.borda-base", "semantic.borda-foco"],
-    "text": ["semantic.texto-primario", "semantic.texto-secundario", "semantic.texto-inativo", "semantic.acao-primaria", "semantic.acao-primaria-texto"],
-    "iconColor": ["semantic.icone-secundario"],
-    "iconSize": ["structural.icone-pequeno"],
-    "radius": ["structural.raio-circular", "structural.raio-pp"],
-    "focusRing": ["structural.foco-espessura"],
-    "spacing": ["structural.espaco-xp", "structural.espaco-pp", "structural.espaco-p", "structural.espaco-m"],
-    "typography": ["type-style.texto-p", "type-style.texto-micro", "type-style.texto-rotulo-botao"]
+    "background": [
+      "semantic.fundo-superficie",
+      "semantic.fundo-secundario",
+      "semantic.acao-primaria"
+    ],
+    "border": [
+      "semantic.borda-base",
+      "semantic.borda-foco"
+    ],
+    "text": [
+      "semantic.texto-primario",
+      "semantic.texto-secundario",
+      "semantic.texto-inativo",
+      "semantic.acao-primaria",
+      "semantic.acao-primaria-texto",
+      "semantic.acao-link-texto"
+    ],
+    "iconColor": [
+      "semantic.icone-secundario"
+    ],
+    "iconSize": [
+      "structural.icone-pequeno"
+    ],
+    "radius": [
+      "structural.raio-circular",
+      "structural.raio-pp"
+    ],
+    "focusRing": [
+      "structural.foco-espessura"
+    ],
+    "spacing": [
+      "structural.espaco-xp",
+      "structural.espaco-pp",
+      "structural.espaco-p",
+      "structural.espaco-m"
+    ],
+    "typography": [
+      "type-style.texto-p",
+      "type-style.texto-micro",
+      "type-style.texto-rotulo-botao"
+    ]
   },
   "a11y": {
     "role": "group (aria-label=accessibleLabel) no container. Dias são <button> normais na ordem natural de Tab, não uma grade ARIA completa (role=grid/row/gridcell) — ver decisions.",
-    "requiredAria": ["aria-label por dia com a data completa por extenso (ex.: '15 de agosto de 2026'), não só o número visível", "aria-current=\"date\" no dia de hoje (token específico da spec ARIA pra 'hoje' num calendário, diferente de aria-current=\"page\"/\"step\" já usados em NavBar/Link/Breadcrumb e Stepper)", "aria-pressed no dia selecionado (true só nele)", "aria-expanded no rótulo do cabeçalho, refletindo se o seletor rápido de mês/ano está aberto", "dias de mês adjacente e desabilitados (minDate/maxDate/disabledDate) saem da ordem de tabulação (tabIndex=-1), mesmo padrão de opção disabled usado em Select/ComboBox/Stepper/Accordion"],
-    "keyboard": ["Tab navega entre os controles do cabeçalho e os dias habilitados do mês corrente, na ordem natural do DOM — sem navegação por seta dentro da grade nesta v1 (ver decisions)", "Enter/Espaço seleciona o dia focado ou aciona os botões de navegação (comportamento nativo de <button>)"],
+    "requiredAria": [
+      "aria-label por dia com a data completa por extenso (ex.: '15 de agosto de 2026'), não só o número visível",
+      "aria-current=\"date\" no dia de hoje (token específico da spec ARIA pra 'hoje' num calendário, diferente de aria-current=\"page\"/\"step\" já usados em NavBar/Link/Breadcrumb e Stepper)",
+      "aria-pressed no dia selecionado (true só nele)",
+      "aria-expanded no rótulo do cabeçalho, refletindo se o seletor rápido de mês/ano está aberto",
+      "dias de mês adjacente e desabilitados (minDate/maxDate/disabledDate) saem da ordem de tabulação (tabIndex=-1), mesmo padrão de opção disabled usado em Select/ComboBox/Stepper/Accordion"
+    ],
+    "keyboard": [
+      "Tab navega entre os controles do cabeçalho e os dias habilitados do mês corrente, na ordem natural do DOM — sem navegação por seta dentro da grade nesta v1 (ver decisions)",
+      "Enter/Espaço seleciona o dia focado ou aciona os botões de navegação (comportamento nativo de <button>)"
+    ],
     "contrastMin": "AAA (7:1) pro texto dos dias do mês corrente/cabeçalho; dias de mês adjacente e desabilitados usam semantic.texto-inativo, deliberadamente fora dessa régua (mesma exceção documentada em outros contratos pra estados 'disabled' ou 'não é o foco principal').",
     "notes": "Grade sempre 6 linhas fixas — evita a altura do Calendar pular ao trocar de mês (mesmo racional de altura previsível já aplicado em Skeleton/Datatable)."
   },
-  "events": { "status": "não definido no contrato original" },
+  "events": {
+    "status": "não definido no contrato original"
+  },
   "composition": {
-    "canContain": ["Icon"],
-    "canBeContainedBy": ["páginas", "cards", "popover ancorado a um campo (DatePicker/DateTimePicker, fora deste contrato)"],
-    "doNotCombine": ["Calendar dentro de Calendar", "usar Calendar sozinho pra selecionar um intervalo — isso é responsabilidade do DatePicker (fila do roadmap), que orquestra dois valores (início/fim) por fora, reaproveitando este componente pra cada extremidade ou pra uma única grade com lógica de range acrescentada no futuro"]
+    "canContain": [
+      "Icon"
+    ],
+    "canBeContainedBy": [
+      "páginas",
+      "cards",
+      "popover ancorado a um campo (DatePicker/DateTimePicker, fora deste contrato)"
+    ],
+    "doNotCombine": [
+      "Calendar dentro de Calendar",
+      "usar Calendar sozinho pra selecionar um intervalo — isso é responsabilidade do DatePicker (fila do roadmap), que orquestra dois valores (início/fim) por fora, reaproveitando este componente pra cada extremidade ou pra uma única grade com lógica de range acrescentada no futuro"
+    ]
   },
   "forbidden": [
     "dias de mês adjacente clicáveis/selecionáveis — só decorativos, nunca disparam onChange",
@@ -64,7 +155,11 @@
     "aria-current=\"date\" pro dia de hoje — token correto da spec ARIA especificamente pra 'data atual' num calendário, seguindo a mesma disciplina já usada em aria-current=\"page\" (Breadcrumb/NavBar/Link) e aria-current=\"step\" (Stepper): cada contexto usa o valor de aria-current mais específico da spec, nunca um genérico 'true'.",
     "minDate/maxDate/disabledDate compõem juntos num único estado visual 'disabled' — o dia fica cinza e não-clicável independente de qual das três regras o desabilitou; a distinção do motivo (fora do intervalo vs. bloqueado especificamente) não tem um caso de uso real ainda que justifique estados visuais separados.",
     "Locale fixo em pt-BR (nomes de mês e dia da semana hardcoded), sem prop de internacionalização — o harness inteiro já é pt-BR (mesmo racional de Alert/Toast/Datatable não terem prop de idioma).",
-    "Dias de mês adjacente usam opacity: 0.5 (valor cru, não é um token de cor) sobre a mesma cor semantic.texto-inativo, em vez de um token de opacidade dedicado — mesma classe de exceção documentada em border-width de Checkbox/Radio/Switch e no padding 0 do Datatable condensed: resolve uma necessidade visual real (esmaecer sem inventar uma nova cor) sem token formal ainda existente pra 'opacidade' no harness."
+    "Dias de mês adjacente usam opacity: 0.5 (valor cru, não é um token de cor) sobre a mesma cor semantic.texto-inativo, em vez de um token de opacidade dedicado — mesma classe de exceção documentada em border-width de Checkbox/Radio/Switch e no padding 0 do Datatable condensed: resolve uma necessidade visual real (esmaecer sem inventar uma nova cor) sem token formal ainda existente pra 'opacidade' no harness.",
+    "CORRIGIDO — auditoria de acessibilidade (2026-11-10, perfil padrão): texto que usava acao-primaria como COR (estado ativo/hover/atual) ficava com 3,68:1 no modo escuro (#16814a sobre #161616; mínimo 4,5:1). Passou a usar acao-link-texto (#006631 no claro, #3ecf82 no escuro — 7,13:1 e 9,01:1). Bordas e fundos continuam em acao-primaria; só a cor do TEXTO mudou.",
+    "CORRIGIDO — auditoria de acessibilidade (2026-11-10, perfil padrão): texto INFORMATIVO (não desabilitado) usava texto-inativo, com 2,31–2,54:1 no claro e 3,73–4,14:1 no escuro (mínimo 4,5:1). Passou a texto-secundario (6,87:1 / 8,70:1). texto-inativo fica reservado a elementos de fato desabilitados, que a WCAG isenta de contraste mínimo."
   ],
-  "references": { "tokensFile": "tokens/tokens.json — Cores Semânticas (Fundos, Bordas, Textos, Ações/Primária, Ícones), Estrutural (raio-circular/pp, foco-espessura, espaco-xp/pp/p/m, icone-pequeno), Tipografia Estilo (texto-p, texto-micro, texto-rotulo-botao)" }
+  "references": {
+    "tokensFile": "tokens/tokens.json — Cores Semânticas (Fundos, Bordas, Textos, Ações/Primária, Ícones), Estrutural (raio-circular/pp, foco-espessura, espaco-xp/pp/p/m, icone-pequeno), Tipografia Estilo (texto-p, texto-micro, texto-rotulo-botao)"
+  }
 }

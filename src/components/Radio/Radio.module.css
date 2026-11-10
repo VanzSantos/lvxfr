@@ -33,7 +33,7 @@
   width: var(--icone-medio);
   height: var(--icone-medio);
   box-sizing: border-box;
-  border: 2px solid var(--borda-base);
+  border: 2px solid var(--borda-campo);
   border-radius: var(--raio-circular);
   background: var(--fundo-campo);
 }

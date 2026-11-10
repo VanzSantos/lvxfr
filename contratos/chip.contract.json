@@ -11,43 +11,147 @@
     "Texto do label — <button> quando selected é usado (toggle), <span> quando só exibição/removível",
     "Botão de remover (X, opcional, sempre um <button> IRMÃO do label, nunca aninhado — ver decisions)"
   ],
-  "dependencies": ["Icon"],
-  "props": [
-    { "name": "label", "type": "string", "required": true },
-    { "name": "variant", "type": "enum", "enum": ["neutral", "info", "success", "warning", "error"], "default": "neutral", "required": true, "description": "Cor de base do chip (mesmos tokens sólidos do Badge). Independente do estado selected — ver decisions sobre por que seleção não muda por variant." },
-    { "name": "selected", "type": "boolean", "required": false, "description": "Ausente = chip não é selecionável (label vira <span> estático). Presente = modo toggle: label vira <button aria-pressed>, e o chip inteiro assume o visual 'selecionado' (acao-primaria), independente da variant." },
-    { "name": "onToggle", "type": "function", "required": false, "requiredWhen": "selected é fornecido", "description": "Assinatura (nextSelected: boolean) => void." },
-    { "name": "removable", "type": "boolean", "default": false, "required": false },
-    { "name": "onRemove", "type": "function", "required": false, "requiredWhen": "removable = true", "description": "Assinatura () => void." },
-    { "name": "disabled", "type": "boolean", "default": false, "required": false }
+  "dependencies": [
+    "Icon"
   ],
-  "variants": ["neutral", "info", "success", "warning", "error"],
-  "states": ["default", "selected", "disabled"],
+  "props": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "variant",
+      "type": "enum",
+      "enum": [
+        "neutral",
+        "info",
+        "success",
+        "warning",
+        "error"
+      ],
+      "default": "neutral",
+      "required": true,
+      "description": "Cor de base do chip (mesmos tokens sólidos do Badge). Independente do estado selected — ver decisions sobre por que seleção não muda por variant."
+    },
+    {
+      "name": "selected",
+      "type": "boolean",
+      "required": false,
+      "description": "Ausente = chip não é selecionável (label vira <span> estático). Presente = modo toggle: label vira <button aria-pressed>, e o chip inteiro assume o visual 'selecionado' (acao-primaria), independente da variant."
+    },
+    {
+      "name": "onToggle",
+      "type": "function",
+      "required": false,
+      "requiredWhen": "selected é fornecido",
+      "description": "Assinatura (nextSelected: boolean) => void."
+    },
+    {
+      "name": "removable",
+      "type": "boolean",
+      "default": false,
+      "required": false
+    },
+    {
+      "name": "onRemove",
+      "type": "function",
+      "required": false,
+      "requiredWhen": "removable = true",
+      "description": "Assinatura () => void."
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "default": false,
+      "required": false
+    }
+  ],
+  "variants": [
+    "neutral",
+    "info",
+    "success",
+    "warning",
+    "error"
+  ],
+  "states": [
+    "default",
+    "selected",
+    "disabled"
+  ],
   "tokensAllowed": {
-    "background": ["semantic.fundo-secundario", "semantic.fundo-erro-forte", "semantic.fundo-sucesso-forte", "semantic.fundo-info-forte", "semantic.borda-aviso", "semantic.acao-primaria", "semantic.acao-inativa"],
-    "border": ["semantic.borda-base"],
-    "text": ["semantic.texto-secundario", "semantic.texto-invertido", "semantic.texto-escuro-fixo", "semantic.texto-primario", "semantic.acao-primaria-texto", "semantic.acao-inativa-texto"],
-    "radius": ["structural.raio-circular"],
-    "spacing": ["structural.espaco-xp", "structural.espaco-pp"],
-    "iconSize": ["structural.icone-pequeno"],
-    "typography": ["type-style.texto-p"]
+    "background": [
+      "semantic.fundo-secundario",
+      "semantic.fundo-erro-forte",
+      "semantic.fundo-sucesso-forte",
+      "semantic.fundo-info-forte",
+      "semantic.borda-aviso",
+      "semantic.acao-primaria",
+      "semantic.acao-inativa"
+    ],
+    "border": [
+      "semantic.borda-base",
+      "semantic.borda-campo"
+    ],
+    "text": [
+      "semantic.texto-secundario",
+      "semantic.texto-invertido",
+      "semantic.texto-escuro-fixo",
+      "semantic.texto-primario",
+      "semantic.acao-primaria-texto",
+      "semantic.acao-inativa-texto"
+    ],
+    "radius": [
+      "structural.raio-circular"
+    ],
+    "spacing": [
+      "structural.espaco-xp",
+      "structural.espaco-pp"
+    ],
+    "iconSize": [
+      "structural.icone-pequeno"
+    ],
+    "typography": [
+      "type-style.texto-p"
+    ]
   },
   "variantTokenMap": {
     "note": "Mesma fórmula do Badge: sufixo em português concorda com Sinalização; warning→aviso é o único par não-cognato. neutral não segue a fórmula (usa fundo-secundario/texto-secundario, não um '-neutro' da Sinalização).",
-    "info": "info", "success": "sucesso", "warning": "aviso", "error": "erro"
+    "info": "info",
+    "success": "sucesso",
+    "warning": "aviso",
+    "error": "erro"
   },
   "a11y": {
     "role": "Nenhuma role própria no wrapper — <span> genérico. O label vira <button aria-pressed={selected}> quando selecionável (papel 'toggle button' nativo via aria-pressed); botão de remover é <button aria-label=\"Remover {label}\">.",
-    "requiredAria": ["aria-pressed no botão de label quando selected é usado", "aria-label ('Remover {label}') no botão de remover", "aria-disabled + disabled nativo nos dois botões quando disabled=true"],
-    "keyboard": ["Tab move entre o botão de label e o botão de remover (dois alvos de foco independentes, nunca um dentro do outro)", "Enter/Espaço ativa qualquer um dos dois botões nativos, sem reimplementação"],
+    "requiredAria": [
+      "aria-pressed no botão de label quando selected é usado",
+      "aria-label ('Remover {label}') no botão de remover",
+      "aria-disabled + disabled nativo nos dois botões quando disabled=true"
+    ],
+    "keyboard": [
+      "Tab move entre o botão de label e o botão de remover (dois alvos de foco independentes, nunca um dentro do outro)",
+      "Enter/Espaço ativa qualquer um dos dois botões nativos, sem reimplementação"
+    ],
     "contrastMin": "AA como meta (mesma régua dos tons sólidos do Badge/Toast): variantes de status herdam os números já validados em badge.contract.json (success 5.56, error 5.18, warning exceção — semantic.borda-aviso + texto-primario, fundo claro com texto preto, contraste alto por natureza); selected (acao-primaria + acao-primaria-texto) é o mesmo par já usado no Button primary, contraste já implicitamente validado ali.",
     "notes": "Altura visual do chip fica em ~32px, abaixo do piso de 44×44 já seguido em Checkbox/Radio/Switch/Button — desvio deliberado (ver decisions): chips aparecem tipicamente em grupo/linha, e inflar cada um pra 44px prejudicaria mais a leitura do conjunto do que ajudaria o toque. Compensado com espaçamento generoso entre chips (espaco-pp) pra reduzir erro de toque adjacente."
   },
-  "events": { "status": "não definido no contrato original" },
+  "events": {
+    "status": "não definido no contrato original"
+  },
   "composition": {
-    "canContain": ["Icon (só dentro do botão de remover, ícone 'x')"],
-    "canBeContainedBy": ["grupos de filtro", "campos de multi-select (mostrando valores escolhidos)", "listas de tags"],
-    "doNotCombine": ["Chip dentro de Chip", "botão de remover aninhado dentro do botão de label (inválido em HTML — ver decisions, são sempre irmãos)"]
+    "canContain": [
+      "Icon (só dentro do botão de remover, ícone 'x')"
+    ],
+    "canBeContainedBy": [
+      "grupos de filtro",
+      "campos de multi-select (mostrando valores escolhidos)",
+      "listas de tags"
+    ],
+    "doNotCombine": [
+      "Chip dentro de Chip",
+      "botão de remover aninhado dentro do botão de label (inválido em HTML — ver decisions, são sempre irmãos)"
+    ]
   },
   "forbidden": [
     "selected sem onToggle, ou onToggle sem selected — mutuamente dependentes",
@@ -65,7 +169,13 @@
     "Altura ~32px, abaixo do piso de 44×44 já exigido em outros controles interativos do harness — desvio deliberado por causa do padrão de uso em grupo/linha de Chips; compensado com espaçamento generoso entre eles. Documentado explicitamente em vez de simplesmente ignorar a régua de toque do resto do harness.",
     "AJUSTADO a pedido do usuário — success/warning/error clareados um degrau, mesma mudança e mesmos tokens novos (fundo-erro-forte/fundo-sucesso-forte/fundo-aviso-forte) já aplicados no Badge (ver contratos/badge.contract.json, decisions, pro racional completo de contraste). warning é a exceção: usa semantic.texto-primario (preto) em vez de texto-invertido, tanto no label quanto no ícone 'x' do botão de remover — o mesmo fundo mais claro que falha contraste AA com texto branco (3.10:1).",
     "AJUSTADO a pedido do usuário — warning clareado MAIS um degrau (mesma mudança do Badge, ver contratos/badge.contract.json, decisions): de fundo-aviso-forte (Amarelo-600) pra semantic.borda-aviso (Amarelo-500, já existente). Texto/ícone 'x' continuam semantic.texto-primario (preto), sem mudança. success/error e demais variantes não mudaram nesta rodada.",
-    "BUG REAL corrigido em teste no navegador (modo escuro) — mesmo bug do Badge (ver badge.contract.json, decisions, pro racional completo): variant='info' usava semantic.texto-info como fundo (vira azul claro no escuro, ilegível com texto branco por cima) — trocado pra semantic.fundo-info-forte. variant='warning' usava semantic.texto-primario como texto (vira claro no escuro, ilegível sobre o fundo amarelo que continua vivo em qualquer tema) — trocado pra semantic.texto-escuro-fixo (token novo, não muda de valor entre temas)."
+    "BUG REAL corrigido em teste no navegador (modo escuro) — mesmo bug do Badge (ver badge.contract.json, decisions, pro racional completo): variant='info' usava semantic.texto-info como fundo (vira azul claro no escuro, ilegível com texto branco por cima) — trocado pra semantic.fundo-info-forte. variant='warning' usava semantic.texto-primario como texto (vira claro no escuro, ilegível sobre o fundo amarelo que continua vivo em qualquer tema) — trocado pra semantic.texto-escuro-fixo (token novo, não muda de valor entre temas).",
+    "CORRIGIDO — auditoria de acessibilidade (2026-11-10, perfil padrão, WCAG 1.4.11): a borda do controle usava borda-base, com 1,47:1 no claro e 1,88:1 no escuro contra a superfície (mínimo 3:1 pra identificar um componente de interface). Passou a borda-campo, token novo (#6b7280 no claro = 4,83:1; #85847c no escuro = 4,82:1). borda-base continua valendo pra divisórias e superfícies decorativas, que a WCAG não exige em 3:1.",
+    "CORRIGIDO — auditoria de acessibilidade (2026-11-10, perfil padrão): no modo ESCURO os fundos 'forte' de erro/sucesso/info/apoio-2 ficavam com 3,3–3,8:1 contra o texto-invertido branco (mínimo 4,5:1). Valores escuros escurecidos (erro #db2828, sucesso #27814c, info #226ce5, apoio-2 #b9531a — todos ≥ 4,62:1). O claro não mudou. O tom warning não é afetado: usa texto-escuro-fixo.",
+    "CORRIGIDO — auditoria de acessibilidade (2026-11-10, perfil padrão, WCAG 2.5.8 — alvo mínimo de 24×24 px): o botão do chip ocupava só a linha de texto (20px de altura); agora estica na altura do chip (≥ 24px).",
+    "CORRIGIDO — auditoria de acessibilidade (2026-11-10, perfil padrão) (WCAG 2.5.8): o botão de remover tinha 20×20; agora 24×24 (o chip tem 32px de altura, não cresce)."
   ],
-  "references": { "tokensFile": "tokens/tokens.json — Cores Semânticas (Ações/Primárias, Fundos, Textos, Sinalização), Estrutural (raio-circular, espaco-xp/pp, icone-pequeno), Tipografia Estilo (texto-p)" }
+  "references": {
+    "tokensFile": "tokens/tokens.json — Cores Semânticas (Ações/Primárias, Fundos, Textos, Sinalização), Estrutural (raio-circular, espaco-xp/pp, icone-pequeno), Tipografia Estilo (texto-p)"
+  }
 }

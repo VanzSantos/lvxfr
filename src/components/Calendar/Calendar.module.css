@@ -109,8 +109,7 @@
 }
 
 .dayAdjacent {
-  color: var(--texto-inativo);
-  opacity: 0.5;
+  color: var(--texto-secundario);
 }
 
 .dayDisabled {
@@ -118,7 +117,7 @@
 }
 
 .dayToday:not(.daySelected) {
-  color: var(--acao-primaria);
+  color: var(--acao-link-texto);
   font-weight: 700;
 }
 

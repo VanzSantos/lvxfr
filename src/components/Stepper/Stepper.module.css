@@ -83,15 +83,15 @@ button.step {
   border-radius: var(--raio-circular);
   border: 2px solid var(--borda-base);
   background: var(--fundo-superficie);
-  color: var(--texto-inativo);
+  color: var(--texto-secundario);
   font-family: var(--texto-rotulo-botao-family);
   font-size: var(--texto-rotulo-botao-size);
   font-weight: var(--texto-rotulo-botao-weight);
 }
 
 .marker.current {
-  border-color: var(--acao-primaria);
-  color: var(--acao-primaria);
+  border-color: var(--acao-link-texto);
+  color: var(--acao-link-texto);
 }
 
 .marker.completed {
@@ -126,4 +126,17 @@ button.step {
   font-weight: var(--texto-micro-weight);
   line-height: var(--texto-micro-line-height);
   color: var(--texto-secundario);
+}
+
+/* Texto só pra leitor de tela (estado da etapa, anexado ao nome acessível do botão). */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
 }

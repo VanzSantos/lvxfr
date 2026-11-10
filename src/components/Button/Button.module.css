@@ -87,6 +87,9 @@
   --btn-text: var(--acao-link-texto);
   --btn-text-hover: var(--acao-link-texto-sobreposto);
   height: auto;
+  /* alvo mínimo de 24x24 (WCAG 2.5.8) — o botão-link sem padding ficava com 22x22 (só ícone) */
+  min-width: 24px;
+  min-height: 24px;
   padding: 0;
   border-radius: 2px;
 }
@@ -115,8 +118,19 @@
   /* -sobreposta dava 3.25:1 (falha AA de texto) — -pressionada é o tom mais escuro
      que a família secundária tem, sobe pra 5.23:1 (AA; não alcança AAA por ser um
      verde-amarelado, hue com luminância naturalmente alta mesmo escurecido). */
-  --btn-text: var(--acao-secundaria-pressionada);
-  border-color: var(--acao-secundaria-pressionada);
+  --btn-text: var(--texto-apoio-3);
+  border-color: var(--texto-apoio-3);
+}
+
+:root[data-theme="dark"] .outlined.primary {
+  /* acao-primaria-sobreposta (#12693b) sobre o fundo escuro dava 2,68:1 de texto */
+  --btn-text: var(--acao-link-texto);
+  border-color: var(--acao-link-texto);
+}
+
+:root[data-theme="dark"] .outlined.destructive {
+  --btn-text: var(--texto-erro);
+  border-color: var(--texto-erro);
 }
 
 .outlined.neutral {
@@ -151,4 +165,18 @@
 .loading {
   cursor: progress;
   background: var(--acao-carregando);
+}
+
+/* Texto só pra leitor de tela — usado pra manter o nome do botão em state=loading,
+   quando o rótulo visível dá lugar ao Spinner. */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
 }

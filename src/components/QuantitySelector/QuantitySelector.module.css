@@ -1,7 +1,7 @@
 .group {
   display: inline-flex;
   align-items: center;
-  border: 1px solid var(--borda-base);
+  border: 1px solid var(--borda-campo);
   border-radius: var(--raio-pp);
   overflow: hidden;
   background: var(--fundo-campo);

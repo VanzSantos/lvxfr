@@ -50,7 +50,7 @@ export function UserCardDemo() {
             </div>
           }
         >
-          <UserCard name="Ana Souza" secondaryText="ana.souza@lvxfr.com" accessibleLabel="Menu da conta de Ana Souza" />
+          <UserCard name="Ana Souza" secondaryText="ana.souza@selenesdk.com" accessibleLabel="Menu da conta" />
         </Popover>
       </div>
     </div>

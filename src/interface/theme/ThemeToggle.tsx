@@ -1,24 +1,22 @@
-import { Icon } from "../../components/Icon/Icon";
-import type { Theme } from "./useTheme";
-import styles from "./ThemeToggle.module.css";
+import { Select } from "../../components/Select/Select";
+import type { ThemePreference } from "./useTheme";
+
+const OPTIONS = [
+  { value: "light", label: "Modo claro" },
+  { value: "dark", label: "Modo escuro" },
+  { value: "system", label: "Padrão do sistema" },
+];
 
 interface ThemeToggleProps {
-  theme: Theme;
-  onToggle: () => void;
+  preference: ThemePreference;
+  onChange: (preference: ThemePreference) => void;
 }
 
-export function ThemeToggle({ theme, onToggle }: ThemeToggleProps) {
-  const isDark = theme === "dark";
+/** Seletor de modo de cor — "Padrão do sistema" herda o prefers-color-scheme do SO. */
+export function ThemeToggle({ preference, onChange }: ThemeToggleProps) {
   return (
-    <button
-      type="button"
-      className={styles.toggle}
-      onClick={onToggle}
-      aria-pressed={isDark}
-      aria-label={isDark ? "Mudar para modo claro" : "Mudar para modo escuro"}
-    >
-      <Icon name={isDark ? "moon" : "sun"} size="small" color="var(--texto-secundario)" decorative />
-      {isDark ? "Escuro" : "Claro"}
-    </button>
+    <div role="group" aria-label="Modo de cor">
+      <Select options={OPTIONS} value={preference} onChange={(value) => onChange(value as ThemePreference)} />
+    </div>
   );
 }

@@ -19,28 +19,9 @@
   color: var(--texto-primario);
 }
 
-.status {
-  font-family: var(--texto-p-family);
-  font-size: 12px;
-  font-weight: 600;
-  padding: 2px var(--espaco-pp);
-  border-radius: var(--raio-pp);
-}
 
-.draft {
-  background: var(--fundo-secundario);
-  color: var(--texto-secundario);
-}
 
-.stable {
-  background: var(--acao-primaria-transparente);
-  color: var(--acao-primaria);
-}
 
-.deprecated {
-  background: var(--acao-destrutiva-transparente);
-  color: var(--acao-destrutiva);
-}
 
 .description {
   font-family: var(--texto-p-family);
@@ -53,36 +34,13 @@
 .canvasToolbar {
   display: flex;
   justify-content: flex-end;
-  gap: var(--espaco-pp);
+  align-items: center;
+  gap: var(--espaco-m);
   margin-bottom: var(--espaco-pp);
 }
 
-.toolbarButton {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--espaco-xp);
-  height: 32px;
-  padding: 0 var(--espaco-p);
-  border: 1px solid var(--borda-base);
-  border-radius: var(--raio-xp);
-  background: var(--fundo-superficie);
-  color: var(--texto-secundario);
-  font-family: var(--texto-p-family);
-  font-size: 12px;
-  font-weight: 600;
-  text-decoration: none;
-  cursor: pointer;
-}
 
-.toolbarButton:hover {
-  background: var(--fundo-secundario);
-  color: var(--texto-primario);
-}
 
-.toolbarButton:focus-visible {
-  outline: var(--foco-espessura) solid var(--borda-foco);
-  outline-offset: 1px;
-}
 
 /* "Device frame" simulando um smartphone — largura fixa dentro de um iframe
    (viewport própria, então @media reage de verdade), altura de referência de
@@ -139,7 +97,9 @@
 .code {
   margin: 0;
   padding: var(--espaco-m);
-  background: var(--fundo-secundario);
+  /* a página ao redor é fundo-secundario no claro (ver App.module.css), então o
+     bloco sobe pra superfície; no escuro a página é a superfície e o bloco desce. */
+  background: var(--fundo-superficie);
   border: 1px solid var(--borda-base);
   border-radius: var(--raio-pp);
   overflow-x: auto;
@@ -167,33 +127,11 @@
   color: var(--texto-primario);
 }
 
-.contractFileRow {
-  display: flex;
-  align-items: center;
-  gap: var(--espaco-pp);
-}
 
-.contractFileRow code {
-  font-family: "SF Mono", Menlo, Consolas, monospace;
-  font-size: 0.9em;
-}
 
-.viewContractButton {
-  background: none;
-  border: 1px solid var(--borda-base);
-  border-radius: var(--raio-xp);
-  padding: 2px var(--espaco-pp);
-  font-family: var(--texto-p-family);
-  font-size: 12px;
-  color: var(--acao-primaria);
-  cursor: pointer;
-}
 
-.viewContractButton:hover {
+
+
+:root[data-theme="dark"] .code {
   background: var(--fundo-secundario);
-}
-
-.viewContractButton:focus-visible {
-  outline: var(--foco-espessura) solid var(--borda-foco);
-  outline-offset: 1px;
 }

@@ -7,6 +7,8 @@ export type TextareaState = "default" | "focus" | "error" | "disabled" | "readOn
 
 export interface TextareaProps {
   label?: string;
+  /** Nome acessível quando não há `label` visível (placeholder não é rótulo). */
+  accessibleLabel?: string;
   required?: boolean;
   withInfo?: boolean;
   infoText?: string;
@@ -25,6 +27,7 @@ export interface TextareaProps {
 
 export function Textarea({
   label,
+  accessibleLabel,
   required = false,
   withInfo = false,
   infoText,
@@ -70,6 +73,7 @@ export function Textarea({
           readOnly={readOnly}
           required={required}
           maxLength={enforceMaxLength ? maxLength : undefined}
+          aria-label={label ? undefined : accessibleLabel}
           aria-required={required || undefined}
           aria-invalid={error || undefined}
           aria-describedby={helperText ? `${fieldId}-message` : undefined}

@@ -1,4 +1,4 @@
-# LVXFR
+# SeleneSDK
 
 Design system baseado em **contratos executáveis**, otimizado para criação de protótipos
 interativos com IA (Claude Code, Codex e ferramentas equivalentes) — evolução direta do
@@ -11,7 +11,7 @@ improvisar — é o que mantém gerações sucessivas consistentes entre sessõe
 diferentes. Detalhes completos de como as peças se encaixam em `ARCHITECTURE.md`; regras
 de geração para IA em `SKILL.md`; histórico de decisões consolidado em `CHANGELOG.md`.
 
-Você está recebendo acesso a este repositório pra testar o LVXFR, fazer protótipos
+Você está recebendo acesso a este repositório pra testar o SeleneSDK, fazer protótipos
 navegáveis e (se quiser) mandar de volta ajustes/correções — ver "Contribuindo" abaixo.
 
 ## Pré-requisitos
@@ -23,7 +23,7 @@ navegáveis e (se quiser) mandar de volta ajustes/correções — ver "Contribui
 
 ```bash
 git clone <url-do-seu-fork>
-cd lvxfr
+cd selenesdk
 npm install
 npm run dev
 ```
@@ -46,7 +46,7 @@ que aparece em cada story (rota `/?standalone=<key>`) — então dá pra ter vá
 protótipos diferentes convivendo no mesmo clone, cada um navegável isoladamente, sem
 precisar reinstalar nada.
 
-Por que essa é a opção recomendada: o valor real do LVXFR está na base compartilhada —
+Por que essa é a opção recomendada: o valor real do SeleneSDK está na base compartilhada —
 contratos, tokens e componentes. Se cada protótipo virasse um clone/instalação separada,
 ou essa base seria duplicada a cada protótipo novo (ela diverge com o tempo, quebrando
 exatamente o problema que os contratos existem pra resolver), ou você precisaria de

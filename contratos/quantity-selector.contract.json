@@ -43,7 +43,7 @@
       "name": "accessibleLabel",
       "type": "string",
       "required": true,
-      "description": "Nome acessível do controle inteiro (ex.: 'Quantidade de Fone LVXFR'). Cada botão deriva seu próprio aria-label a partir deste (ex.: 'Diminuir Quantidade de Fone LVXFR')."
+      "description": "Nome acessível do controle inteiro (ex.: 'Quantidade de Fone SeleneSDK'). Cada botão deriva seu próprio aria-label a partir deste (ex.: 'Diminuir Quantidade de Fone SeleneSDK')."
     },
     {
       "name": "state",
@@ -78,7 +78,8 @@
     "border": [
       "semantic.borda-base",
       "semantic.borda-foco",
-      "semantic.borda-inativo"
+      "semantic.borda-inativo",
+      "semantic.borda-campo"
     ],
     "text": [
       "semantic.texto-primario",
@@ -149,7 +150,8 @@
     "Valor central usa aria-live='polite' em vez de mover o foco pro texto a cada clique — o foco permanece no botão que o usuário acabou de clicar (importante pra cliques repetidos em sequência), e leitor de tela ainda anuncia o novo valor.",
     "step é sempre um número fixo (default 1) — não suporta múltiplos passos de tamanhos diferentes; caso real disso é decisão nova.",
     "Value/min/max controlados de fora — mesmo padrão do resto do harness de data-entry (TextField, Select), nenhuma lógica de clamping vive fora do componente: o QuantitySelector decide sozinho quando desabilitar os botões, mas quem decide o valor real é o consumidor via onChange.",
-    "AJUSTADO a pedido do usuário — fundo do campo trocado de semantic.fundo-superficie pra semantic.fundo-campo (token novo): 'o fundo dos inputs de forma geral, devem ser levemente mais escuros que a cor de fundo da página onde estão, para destacar melhor'. No modo claro fundo-campo é idêntico a fundo-superficie (sem mudança visual, branco com borda já bastava) — só no modo escuro os dois valores divergem (fundo-campo um degrau mais escuro que a página), porque era só ali que o campo ficava indistinguível da própria página por trás."
+    "AJUSTADO a pedido do usuário — fundo do campo trocado de semantic.fundo-superficie pra semantic.fundo-campo (token novo): 'o fundo dos inputs de forma geral, devem ser levemente mais escuros que a cor de fundo da página onde estão, para destacar melhor'. No modo claro fundo-campo é idêntico a fundo-superficie (sem mudança visual, branco com borda já bastava) — só no modo escuro os dois valores divergem (fundo-campo um degrau mais escuro que a página), porque era só ali que o campo ficava indistinguível da própria página por trás.",
+    "CORRIGIDO — auditoria de acessibilidade (2026-11-10, perfil padrão, WCAG 1.4.11): a borda do controle usava borda-base, com 1,47:1 no claro e 1,88:1 no escuro contra a superfície (mínimo 3:1 pra identificar um componente de interface). Passou a borda-campo, token novo (#6b7280 no claro = 4,83:1; #85847c no escuro = 4,82:1). borda-base continua valendo pra divisórias e superfícies decorativas, que a WCAG não exige em 3:1."
   ],
   "references": {
     "tokensFile": "tokens/tokens.json — Cores Semânticas (Fundos, Bordas, Textos, Ícones), Estrutural (raio-pp, foco-espessura, espaco-xp/pp, icone-pequeno), Tipografia Estilo (texto-p)"

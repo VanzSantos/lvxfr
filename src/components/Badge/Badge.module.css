@@ -123,6 +123,11 @@
   color: var(--acao-destrutiva-pressionada);
 }
 
+:root[data-theme="dark"] .inverted.critical {
+  /* acao-destrutiva-pressionada (#8a2c2c) sobre o fundo-erro escuro dava 1,77:1 */
+  color: var(--texto-erro);
+}
+
 .inverted.accent1 {
   background: var(--fundo-apoio-3);
   border-color: var(--fundo-apoio-3);

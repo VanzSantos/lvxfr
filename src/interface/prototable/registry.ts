@@ -69,8 +69,8 @@ export interface ScreenEntry {
 
 export const PROJECTS: ProjectEntry[] = [
   {
-    key: "lvxfr-referencia",
-    title: "LVXFR — telas de referência",
+    key: "selenesdk-referencia",
+    title: "SeleneSDK — telas de referência",
     description: "Telas de exemplo que já vêm com o harness, semente inicial do ProtoTable.",
   },
   {
@@ -83,7 +83,7 @@ export const PROJECTS: ProjectEntry[] = [
 export const MODULES: ModuleEntry[] = [
   {
     key: "referencia",
-    projectKey: "lvxfr-referencia",
+    projectKey: "selenesdk-referencia",
     title: "Referência",
   },
   {

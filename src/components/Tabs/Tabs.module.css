@@ -27,8 +27,8 @@
 }
 
 .tab.selected {
-  color: var(--acao-primaria);
-  border-bottom-color: var(--acao-primaria);
+  color: var(--acao-link-texto);
+  border-bottom-color: var(--acao-link-texto);
 }
 
 .tab:focus-visible {

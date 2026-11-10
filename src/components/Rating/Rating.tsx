@@ -43,7 +43,7 @@ const COLOR_VAR: Record<RatingColor, string> = {
 // texto-aviso (amarelo-700, mais escuro) enquanto a estrela continua com a
 // cor normal de COLOR_VAR. Ver contratos/rating.contract.json, decisions.
 const COMPACT_TEXT_COLOR_VAR: Record<RatingColor, string> = {
-  green: "var(--acao-primaria)",
+  green: "var(--acao-link-texto)",
   yellow: "var(--texto-aviso)",
 };
 

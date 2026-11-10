@@ -51,6 +51,11 @@
 
 .body {
   flex: 1;
+  /* BUG REAL — sem min-height:0 o .body nunca encolhia abaixo do conteúdo, então
+     numa árvore longa o scroll subia pro .nav inteiro e o footer (que deveria
+     ficar fixo no rodapé do painel) saía da tela junto. */
+  min-height: 0;
+  overflow-y: auto;
   padding: var(--espaco-m);
   box-sizing: border-box;
   font-family: var(--texto-p-family);

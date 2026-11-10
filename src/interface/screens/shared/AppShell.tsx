@@ -52,7 +52,7 @@ function Logo() {
   return (
     <span style={{ display: "flex", alignItems: "center", gap: "var(--espaco-pp)" }}>
       <LogoIcon />
-      <strong style={{ fontSize: 16, color: "var(--texto-primario)" }}>LVXFR</strong>
+      <strong style={{ fontSize: 16, color: "var(--texto-primario)" }}>SeleneSDK</strong>
     </span>
   );
 }
@@ -85,8 +85,8 @@ function ProfileFooter() {
     >
       <UserCard
         name="Nome do Operador"
-        secondaryText="operador@lvxfr.com"
-        accessibleLabel="Menu da conta de Nome do Operador"
+        secondaryText="operador@selenesdk.com"
+        accessibleLabel="Menu da conta"
       />
     </Popover>
   );
@@ -103,8 +103,8 @@ function ProfileFooterMobile() {
     <div>
       <UserCard
         name="Nome do Operador"
-        secondaryText="operador@lvxfr.com"
-        accessibleLabel="Menu da conta de Nome do Operador"
+        secondaryText="operador@selenesdk.com"
+        accessibleLabel="Menu da conta"
         caretDirection={open ? "up" : "down"}
         aria-expanded={open}
         onClick={() => setOpen((prev) => !prev)}

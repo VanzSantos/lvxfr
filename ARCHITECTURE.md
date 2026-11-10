@@ -1,4 +1,4 @@
-# Arquitetura — LVXFR
+# Arquitetura — SeleneSDK
 
 Visão de alto nível pra quem chega no projeto agora. Regras de geração detalhadas vivem em
 `SKILL.md`; status corrente (feito/próximo/dívida técnica) vive em `ROADMAP.md`; decisões
@@ -6,7 +6,7 @@ individuais de cada componente vivem no próprio contrato (`contratos/*.contract
 array `decisions`) e são consolidadas automaticamente em `CHANGELOG.md` (`npm run
 changelog`). Este arquivo não repete nada disso — só explica como as peças se encaixam.
 
-## O que é o LVXFR
+## O que é o SeleneSDK
 
 Um design system baseado em **contratos executáveis**: cada componente tem um arquivo
 JSON (`contratos/<nome>.contract.json`) que documenta props, anatomia, tokens permitidos,

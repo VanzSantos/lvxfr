@@ -1,6 +1,7 @@
 .rating {
   display: inline-flex;
   align-items: center;
+  min-height: 24px;
   gap: var(--espaco-xp);
 }
 
@@ -33,4 +34,5 @@
   font-size: var(--texto-m-forte-size);
   font-weight: var(--texto-m-forte-weight);
   line-height: var(--texto-m-forte-line-height);
+  color: var(--texto-primario);
 }

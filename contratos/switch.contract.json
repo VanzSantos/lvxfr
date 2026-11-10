@@ -14,36 +14,128 @@
   ],
   "dependencies": [],
   "props": [
-    { "name": "checked", "type": "boolean", "required": true, "description": "Campo controlado, mesmo padrão de checked em Checkbox/Radio." },
-    { "name": "label", "type": "string", "required": false, "description": "Texto visível ao lado do trilho. Quando omitido, accessibleLabel passa a ser obrigatório (ver forbidden) — caso de uso: linha de uma lista de configurações onde o rótulo já existe fora do componente." },
-    { "name": "accessibleLabel", "type": "string", "required": false, "requiredWhen": "label não é fornecido", "description": "Vira aria-label do input. Nunca usado quando label já existe (label visível já é o nome acessível — duplicar seria redundante)." },
-    { "name": "state", "type": "enum", "enum": ["default", "disabled"], "default": "default", "required": false, "description": "Sem state=error neste contrato — ver decisions." },
-    { "name": "size", "type": "enum", "enum": ["medium", "small"], "default": "medium", "required": false, "description": "small = trilho/thumb reduzidos, pra contextos densos (ex.: coluna de ações de uma Datatable). A área clicável mínima de 44×44px é preservada nos dois tamanhos via padding invisível no <label> — só o desenho visual do trilho encolhe, não o alvo de toque real (ver decisions)." },
-    { "name": "onChange", "type": "function", "required": false, "description": "Assinatura (checked: boolean) => void, mesmo padrão de Checkbox." },
-    { "name": "name", "type": "string", "required": false }
+    {
+      "name": "checked",
+      "type": "boolean",
+      "required": true,
+      "description": "Campo controlado, mesmo padrão de checked em Checkbox/Radio."
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "required": false,
+      "description": "Texto visível ao lado do trilho. Quando omitido, accessibleLabel passa a ser obrigatório (ver forbidden) — caso de uso: linha de uma lista de configurações onde o rótulo já existe fora do componente."
+    },
+    {
+      "name": "accessibleLabel",
+      "type": "string",
+      "required": false,
+      "requiredWhen": "label não é fornecido",
+      "description": "Vira aria-label do input. Nunca usado quando label já existe (label visível já é o nome acessível — duplicar seria redundante)."
+    },
+    {
+      "name": "state",
+      "type": "enum",
+      "enum": [
+        "default",
+        "disabled"
+      ],
+      "default": "default",
+      "required": false,
+      "description": "Sem state=error neste contrato — ver decisions."
+    },
+    {
+      "name": "size",
+      "type": "enum",
+      "enum": [
+        "medium",
+        "small"
+      ],
+      "default": "medium",
+      "required": false,
+      "description": "small = trilho/thumb reduzidos, pra contextos densos (ex.: coluna de ações de uma Datatable). A área clicável mínima de 44×44px é preservada nos dois tamanhos via padding invisível no <label> — só o desenho visual do trilho encolhe, não o alvo de toque real (ver decisions)."
+    },
+    {
+      "name": "onChange",
+      "type": "function",
+      "required": false,
+      "description": "Assinatura (checked: boolean) => void, mesmo padrão de Checkbox."
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "required": false
+    }
   ],
   "variants": [],
-  "states": ["default", "disabled"],
+  "states": [
+    "default",
+    "disabled"
+  ],
   "tokensAllowed": {
-    "trackBackground": ["semantic.acao-primaria", "semantic.fundo-secundario", "semantic.acao-inativa"],
-    "trackBorder": ["semantic.borda-base", "semantic.borda-foco", "semantic.borda-inativo"],
-    "thumbBackground": ["semantic.fundo-superficie"],
-    "text": ["semantic.texto-primario", "semantic.texto-inativo"],
-    "radius": ["structural.raio-circular"],
-    "focusRing": ["structural.foco-espessura"],
-    "spacing": ["structural.espaco-pp", "structural.espaco-xp"],
-    "thumbSize": ["structural.icone-medio", "structural.icone-pequeno"],
-    "typography": ["type-style.texto-m"]
+    "trackBackground": [
+      "semantic.acao-primaria",
+      "semantic.fundo-secundario",
+      "semantic.acao-inativa"
+    ],
+    "trackBorder": [
+      "semantic.borda-base",
+      "semantic.borda-foco",
+      "semantic.borda-inativo"
+    ],
+    "thumbBackground": [
+      "semantic.fundo-superficie"
+    ],
+    "text": [
+      "semantic.texto-primario",
+      "semantic.texto-inativo"
+    ],
+    "radius": [
+      "structural.raio-circular"
+    ],
+    "focusRing": [
+      "structural.foco-espessura"
+    ],
+    "spacing": [
+      "structural.espaco-pp",
+      "structural.espaco-xp"
+    ],
+    "thumbSize": [
+      "structural.icone-medio",
+      "structural.icone-pequeno"
+    ],
+    "typography": [
+      "type-style.texto-m"
+    ],
+    "border": [
+      "semantic.borda-campo"
+    ]
   },
   "a11y": {
     "role": "switch — <input type=\"checkbox\" role=\"switch\">, mesmo padrão de checkbox nativo estilizado usado pela ARIA Authoring Practices como alternativa a role=switch num elemento não-nativo",
-    "requiredAria": ["aria-label quando label não é fornecido (obrigatório via accessibleLabel)"],
-    "keyboard": ["Espaço alterna o estado (comportamento nativo de checkbox, herdado por role=switch)", "Tab move o foco", "disabled sai da ordem de tabulação"],
+    "requiredAria": [
+      "aria-label quando label não é fornecido (obrigatório via accessibleLabel)"
+    ],
+    "keyboard": [
+      "Espaço alterna o estado (comportamento nativo de checkbox, herdado por role=switch)",
+      "Tab move o foco",
+      "disabled sai da ordem de tabulação"
+    ],
     "contrastMin": "AAA (7:1) como meta pro público 60+, mesma régua do Checkbox/Radio/Button.",
     "notes": "Alvo de toque mínimo 44×44px (igual Checkbox/Radio) mesmo com o trilho visual menor — a área clicável real é o <label> inteiro quando label existe; quando não existe (uso 'nu' com accessibleLabel), o próprio trilho precisa ter no mínimo 44×44px de área clicável via padding invisível, não só o tamanho visual do trilho. Foco nunca só cor — anel visível combinando cor + espessura, no trilho (não no thumb)."
   },
-  "events": { "status": "não definido no contrato original" },
-  "composition": { "canContain": [], "canBeContainedBy": ["formulários", "listas de configurações", "linhas de settings"], "doNotCombine": [] },
+  "events": {
+    "status": "não definido no contrato original"
+  },
+  "composition": {
+    "canContain": [],
+    "canBeContainedBy": [
+      "formulários",
+      "listas de configurações",
+      "linhas de settings"
+    ],
+    "doNotCombine": []
+  },
   "forbidden": [
     "Switch sem label E sem accessibleLabel — precisa de pelo menos um dos dois, senão o controle não tem nome acessível",
     "usar Switch para um valor que só aplica depois de um submit — isso é Checkbox, não Switch (ver whenNotToUse)",
@@ -62,7 +154,10 @@
     "Cor do trilho desligado (habilitado) usa semantic.fundo-secundario + borda semantic.borda-base — deliberadamente diferente de semantic.acao-inativa (reservada para o estado disabled, mesmo padrão do Checkbox/Radio) pra não confundir visualmente 'desligado, mas ainda usável' com 'desabilitado'.",
     "Thumb é sempre semantic.fundo-superficie (branco), em todos os estados (ligado/desligado/disabled) — a posição do thumb (esquerda/direita) já comunica o estado por si só, diferente do Checkbox que precisa trocar a cor do glifo porque o ícone de check é a única pista visual.",
     "Borda do trilho fixa em 2px — não é token, mesma constante não-tokenizada já usada na caixa do Checkbox/círculo do Radio.",
-    "REVISADO — size='small' adicionado a pedido do usuário pra caber na coluna de ações de datatable.contract.json (trilho medium ficava desproporcional numa célula de tabela densa). Dimensões seguem a mesma fórmula do medium, só trocando o token do thumb: thumb=structural.icone-pequeno (16px em vez de 20px), trilho altura=thumb+2×espaco-xp (24px), largura=2×altura (48px) — nenhum valor cru novo, mesma disciplina de derivação do medium. O alvo de toque de 44×44px continua garantido via padding invisível no <label>, não relaxado — só o desenho visual muda de tamanho."
+    "REVISADO — size='small' adicionado a pedido do usuário pra caber na coluna de ações de datatable.contract.json (trilho medium ficava desproporcional numa célula de tabela densa). Dimensões seguem a mesma fórmula do medium, só trocando o token do thumb: thumb=structural.icone-pequeno (16px em vez de 20px), trilho altura=thumb+2×espaco-xp (24px), largura=2×altura (48px) — nenhum valor cru novo, mesma disciplina de derivação do medium. O alvo de toque de 44×44px continua garantido via padding invisível no <label>, não relaxado — só o desenho visual muda de tamanho.",
+    "CORRIGIDO — auditoria de acessibilidade (2026-11-10, perfil padrão, WCAG 1.4.11): a borda do controle usava borda-base, com 1,47:1 no claro e 1,88:1 no escuro contra a superfície (mínimo 3:1 pra identificar um componente de interface). Passou a borda-campo, token novo (#6b7280 no claro = 4,83:1; #85847c no escuro = 4,82:1). borda-base continua valendo pra divisórias e superfícies decorativas, que a WCAG não exige em 3:1."
   ],
-  "references": { "tokensFile": "tokens/tokens.json — Cores Semânticas (Ações/Primárias, Bordas, Fundos), Estrutural (raio-circular, foco-espessura, espaco-pp, espaco-xp, icone-medio), Tipografia Estilo (texto-m)" }
+  "references": {
+    "tokensFile": "tokens/tokens.json — Cores Semânticas (Ações/Primárias, Bordas, Fundos), Estrutural (raio-circular, foco-espessura, espaco-pp, espaco-xp, icone-medio), Tipografia Estilo (texto-m)"
+  }
 }

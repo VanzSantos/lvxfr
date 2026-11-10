@@ -65,6 +65,10 @@ export function Stepper({ items, currentStep, accessibleLabel, onStepClick, vari
                 <span className={styles.label}>{item.label}</span>
                 {item.description && <span className={styles.description}>{item.description}</span>}
               </span>
+              {/* Estado como texto só pra leitor de tela: o nome acessível do botão continua
+                  CONTENDO o texto visível (marcador + rótulo + descrição), como pede WCAG 2.5.3 —
+                  um aria-label próprio ("Endereço, etapa atual") descartava número e descrição. */}
+              {status !== "pending" && <span className={styles.srOnly}>{status === "completed" ? ", concluída" : ", etapa atual"}</span>}
             </>
           );
 
@@ -81,7 +85,6 @@ export function Stepper({ items, currentStep, accessibleLabel, onStepClick, vari
                   className={stepClassName}
                   onClick={() => onStepClick?.(index)}
                   aria-current={status === "current" ? "step" : undefined}
-                  aria-label={`${item.label}, ${status === "completed" ? "concluída" : "etapa atual"}`}
                 >
                   {content}
                 </button>

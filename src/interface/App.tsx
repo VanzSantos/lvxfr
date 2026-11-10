@@ -30,11 +30,30 @@ function readInitialMode(): AppMode {
   return params.has("pt_project") || params.has("pt_module") || params.has("pt_flow") ? "prototable" : "playground";
 }
 
+/** Tela selecionada vem da hash da URL ("#/<id>") — é o que o SideNav (que só
+    navega por href) altera ao clicar; sem hash, abre o primeiro story. */
+function readSelectedId(): string {
+  if (typeof window === "undefined") return STORIES[0].id;
+  const hash = window.location.hash.replace(/^#\/?/, "");
+  if (!hash) return STORIES[0].id;
+  try {
+    return decodeURIComponent(hash);
+  } catch {
+    return STORIES[0].id;
+  }
+}
+
 export function App() {
-  const [selectedId, setSelectedId] = useState<string>(STORIES[0].id);
+  const [selectedId, setSelectedId] = useState<string>(readSelectedId);
   const [mode, setMode] = useState<AppMode>(readInitialMode);
   const { theme, preference, setPreference } = useTheme();
   const [standaloneId] = useState<string | null>(readStandaloneId);
+
+  useEffect(() => {
+    const onHashChange = () => setSelectedId(readSelectedId());
+    window.addEventListener("hashchange", onHashChange);
+    return () => window.removeEventListener("hashchange", onHashChange);
+  }, []);
 
   const standaloneStory = standaloneId ? STORIES.find((item) => item.id === standaloneId) : undefined;
   /* Protótipos ProtoTable-only (sem entrada em stories/registry.ts — pedido
@@ -94,7 +113,6 @@ export function App() {
         <>
           <Sidebar
             selectedId={selectedId}
-            onSelect={setSelectedId}
             themePreference={preference}
             onThemePreferenceChange={setPreference}
             onNavigateToPrototable={() => setMode("prototable")}

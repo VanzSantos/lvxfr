@@ -3,7 +3,10 @@ import type { StoryMeta } from "./types";
 import type { Theme } from "../theme/useTheme";
 import { ContractDialog } from "./ContractDialog";
 import { getContractSource } from "./contractSource";
-import { Icon } from "../../components/Icon/Icon";
+import { Badge, type BadgeVariant } from "../../components/Badge/Badge";
+import { Button } from "../../components/Button/Button";
+import { Link } from "../../components/Link/Link";
+import { SegmentedControl } from "../../components/SegmentedControl/SegmentedControl";
 import styles from "./StoryDetail.module.css";
 
 const STATUS_LABEL: Record<StoryMeta["status"], string> = {
@@ -19,6 +22,12 @@ const STATUS_LABEL: Record<StoryMeta["status"], string> = {
     encolher uma div. Ver ROADMAP.md (LoginScreen) pro raciocínio completo. */
 const RESPONSIVE_GROUPS: StoryMeta["group"][] = ["Templates", "Páginas"];
 
+const STATUS_VARIANT: Record<StoryMeta["status"], BadgeVariant> = {
+  draft: "neutral",
+  stable: "success",
+  deprecated: "error",
+};
+
 type DeviceView = "desktop" | "mobile";
 
 export function StoryDetail({ story, theme }: { story: StoryMeta; theme: Theme }) {
@@ -33,41 +42,26 @@ export function StoryDetail({ story, theme }: { story: StoryMeta; theme: Theme }
     <div className={styles.wrapper}>
       <header className={styles.header}>
         <h1 className={styles.title}>{story.title}</h1>
-        <span className={`${styles.status} ${styles[story.status]}`}>
-          {STATUS_LABEL[story.status]}
-        </span>
+        <Badge variant={STATUS_VARIANT[story.status]} label={STATUS_LABEL[story.status]} />
       </header>
       {story.description && <p className={styles.description}>{story.description}</p>}
 
       {isResponsive && (
         <div className={styles.canvasToolbar}>
-          {/* <a target="_blank"> em vez de window.open: é o jeito nativo/garantido
-              do navegador abrir uma aba nova de verdade — window.open com uma
-              windowFeatures string (ex.: "noopener,noreferrer") pode ser tratado
-              como popup/navegação no lugar em vez de aba pelo navegador,
-              dependendo do contexto. BUG REAL relatado pelo usuário. */}
-          <a
-            href={standaloneUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.toolbarButton}
-          >
-            <Icon name="arrow-square-out" size="small" color="var(--texto-secundario)" decorative />
-            Abrir em nova página
-          </a>
-          <button
-            type="button"
-            className={styles.toolbarButton}
-            onClick={() => setDeviceView((current) => (current === "desktop" ? "mobile" : "desktop"))}
-          >
-            <Icon
-              name={deviceView === "desktop" ? "device-mobile" : "desktop"}
-              size="small"
-              color="var(--texto-secundario)"
-              decorative
-            />
-            {deviceView === "desktop" ? "Ver como smartphone" : "Ver como desktop"}
-          </button>
+          {/* Link external (<a target="_blank"> de verdade) em vez de window.open: é o
+              jeito nativo/garantido do navegador abrir uma aba nova — window.open
+              pode ser tratado como popup/navegação no lugar. BUG REAL relatado
+              pelo usuário. */}
+          <Link href={standaloneUrl} label="Abrir em nova página" external leftIcon="arrow-square-out" />
+          <SegmentedControl
+            accessibleLabel="Visualização"
+            value={deviceView}
+            onChange={(value) => setDeviceView(value as DeviceView)}
+            items={[
+              { value: "desktop", label: "Desktop", icon: "desktop" },
+              { value: "mobile", label: "Smartphone", icon: "device-mobile" },
+            ]}
+          />
         </div>
       )}
 
@@ -116,13 +110,7 @@ export function StoryDetail({ story, theme }: { story: StoryMeta; theme: Theme }
           <dd className={styles.contractFileRow}>
             <code>{story.contractFile ?? "—"}</code>
             {contractSource && (
-              <button
-                type="button"
-                className={styles.viewContractButton}
-                onClick={() => setContractOpen(true)}
-              >
-                Ver contrato
-              </button>
+              <Button variant="link" label="Ver contrato" onPress={() => setContractOpen(true)} />
             )}
           </dd>
         </dl>

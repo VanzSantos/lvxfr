@@ -13,6 +13,7 @@ export function TabsDemo() {
         <span className={styles.sectionLabel}>Básico (com aba desabilitada)</span>
         <div style={{ width: "100%" }}>
           <Tabs
+            accessibleLabel="Detalhes do registro"
             items={[
               { value: "detalhes", label: "Detalhes" },
               { value: "historico", label: "Histórico" },
@@ -37,6 +38,7 @@ export function TabsDemo() {
         <span className={styles.sectionLabel}>Com contador (count) — quantidade de registros por aba</span>
         <div style={{ width: "100%" }}>
           <Tabs
+            accessibleLabel="Registros por situação"
             items={[
               { value: "abertos", label: "Abertos", count: 12 },
               { value: "resolvidos", label: "Resolvidos", count: 84 },

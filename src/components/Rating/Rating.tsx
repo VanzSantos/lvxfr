@@ -33,7 +33,7 @@ interface RatingReadOnlyProps {
 export type RatingProps = RatingInteractiveProps | RatingReadOnlyProps;
 
 const COLOR_VAR: Record<RatingColor, string> = {
-  green: "var(--acao-primaria)",
+  green: "var(--acao-link-texto)",
   yellow: "var(--borda-aviso)",
 };
 

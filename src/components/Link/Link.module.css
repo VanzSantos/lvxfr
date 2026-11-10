@@ -2,6 +2,10 @@
   display: inline-flex;
   align-items: center;
   gap: var(--espaco-xp);
+  /* alvo mínimo de 24px (WCAG 2.5.8). A margem negativa devolve o que o min-height
+     soma na linha, então um link no meio de parágrafo não muda o espaçamento. */
+  min-height: 24px;
+  margin-block: min(0px, calc((1lh - 24px) / 2));
   /* sem tipografia própria — herda font-family/size do contexto onde o
      link vive (parágrafo, item de navegação, rodapé); só a cor é fixa */
   font: inherit;

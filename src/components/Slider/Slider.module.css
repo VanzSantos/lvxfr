@@ -14,7 +14,7 @@
 
 .trackWrapper {
   position: relative;
-  height: 20px;
+  height: 24px;
   display: flex;
   align-items: center;
 }
@@ -62,8 +62,8 @@
   appearance: none;
   -webkit-appearance: none;
   pointer-events: auto;
-  width: 18px;
-  height: 18px;
+  width: 24px;
+  height: 24px;
   border-radius: var(--raio-circular);
   background: var(--acao-primaria);
   border: 2px solid var(--fundo-superficie);
@@ -74,8 +74,8 @@
 
 .rangeInput::-moz-range-thumb {
   pointer-events: auto;
-  width: 18px;
-  height: 18px;
+  width: 24px;
+  height: 24px;
   border-radius: var(--raio-circular);
   background: var(--acao-primaria);
   border: 2px solid var(--fundo-superficie);

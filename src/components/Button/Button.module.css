@@ -118,8 +118,19 @@
   /* -sobreposta dava 3.25:1 (falha AA de texto) — -pressionada é o tom mais escuro
      que a família secundária tem, sobe pra 5.23:1 (AA; não alcança AAA por ser um
      verde-amarelado, hue com luminância naturalmente alta mesmo escurecido). */
-  --btn-text: var(--acao-secundaria-pressionada);
-  border-color: var(--acao-secundaria-pressionada);
+  --btn-text: var(--texto-apoio-3);
+  border-color: var(--texto-apoio-3);
+}
+
+:root[data-theme="dark"] .outlined.primary {
+  /* acao-primaria-sobreposta (#12693b) sobre o fundo escuro dava 2,68:1 de texto */
+  --btn-text: var(--acao-link-texto);
+  border-color: var(--acao-link-texto);
+}
+
+:root[data-theme="dark"] .outlined.destructive {
+  --btn-text: var(--texto-erro);
+  border-color: var(--texto-erro);
 }
 
 .outlined.neutral {

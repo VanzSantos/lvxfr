@@ -69,7 +69,8 @@
   border: 2px solid var(--fundo-superficie);
   box-shadow: 0 0 0 1px var(--acao-primaria);
   cursor: pointer;
-  margin-top: 0;
+  /* centraliza o polegar de 24px no trilho de 4px: (4 − 24) / 2 */
+  margin-top: -10px;
 }
 
 .rangeInput::-moz-range-thumb {

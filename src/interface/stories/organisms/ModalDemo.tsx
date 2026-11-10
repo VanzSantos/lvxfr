@@ -10,6 +10,7 @@ export function ModalDemo() {
   const [semCabecalho, setSemCabecalho] = useState(false);
   const [pequeno, setPequeno] = useState(false);
   const [grande, setGrande] = useState(false);
+  const [telaInteira, setTelaInteira] = useState(false);
   const [paddingSmall, setPaddingSmall] = useState(false);
   const [paddingMedium, setPaddingMedium] = useState(false);
   const [naoDismissible, setNaoDismissible] = useState(false);
@@ -75,12 +76,18 @@ export function ModalDemo() {
           <button type="button" className={styles.trigger} onClick={() => setGrande(true)}>
             large
           </button>
+          <button type="button" className={styles.trigger} onClick={() => setTelaInteira(true)}>
+            full
+          </button>
         </div>
         <Modal open={pequeno} onClose={() => setPequeno(false)} title="Modal pequeno" size="small">
           <p style={{ margin: 0 }}>400px de largura máxima.</p>
         </Modal>
         <Modal open={grande} onClose={() => setGrande(false)} title="Modal grande" size="large">
           <p style={{ margin: 0 }}>720px de largura máxima.</p>
+        </Modal>
+        <Modal open={telaInteira} onClose={() => setTelaInteira(false)} title="Modal em tela inteira" size="full">
+          <p style={{ margin: 0 }}>100vw × 100vh, sem borda nem raio.</p>
         </Modal>
       </div>
 

@@ -51,6 +51,19 @@
   width: min(720px, calc(100vw - var(--espaco-g) * 2));
 }
 
+/* EXTENSÃO — tela inteira (ver modal.contract.json, decisions). Sem o teto de
+   calc(100vw - espaco-g×2) nem o max-height de .dialog: ocupa a viewport toda,
+   sem borda/raio, porque não sobra backdrop pra enquadrar. max-width/height
+   explícitos porque <dialog> nativo traz max-width/max-height próprios. */
+.full {
+  width: 100vw;
+  height: 100vh;
+  max-width: 100vw;
+  max-height: 100vh;
+  border: none;
+  border-radius: 0;
+}
+
 /* Padding — mesma escala e mesmos tokens do Card (contratos/card.contract.json),
    aplicada como UMA padding só ao redor do cabeçalho+corpo juntos, não duas
    paddings independentes. */

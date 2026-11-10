@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from "react";
-import { Icon } from "../../components/Icon/Icon";
+import { useEffect, useState } from "react";
+import { Modal } from "../../components/Modal/Modal";
+import { Button } from "../../components/Button/Button";
 import styles from "./ContractDialog.module.css";
 
 interface ContractDialogProps {
@@ -9,19 +10,10 @@ interface ContractDialogProps {
   content: string;
 }
 
+/** Diálogo "Ver contrato" — Modal do SeleneSDK; alterna entre 'large' e 'full'
+    (tela inteira) pelo botão da barra acima do código. */
 export function ContractDialog({ open, onClose, fileName, content }: ContractDialogProps) {
-  const dialogRef = useRef<HTMLDialogElement>(null);
   const [expanded, setExpanded] = useState(false);
-
-  useEffect(() => {
-    const dialog = dialogRef.current;
-    if (!dialog) return;
-    if (open && !dialog.open) {
-      dialog.showModal();
-    } else if (!open && dialog.open) {
-      dialog.close();
-    }
-  }, [open]);
 
   // Sempre reabre no tamanho normal.
   useEffect(() => {
@@ -29,35 +21,21 @@ export function ContractDialog({ open, onClose, fileName, content }: ContractDia
   }, [open]);
 
   return (
-    <dialog
-      ref={dialogRef}
-      className={`${styles.dialog} ${expanded ? styles.dialogExpanded : ""}`}
-      onClose={onClose}
-      onClick={(event) => {
-        // clique no ::backdrop nativo dispara com target = o próprio <dialog>
-        if (event.target === dialogRef.current) onClose();
-      }}
-    >
-      <div className={styles.header}>
-        <code className={styles.fileName}>{fileName}</code>
-        <div className={styles.headerActions}>
-          <button
-            type="button"
-            className={styles.closeButton}
-            onClick={() => setExpanded((value) => !value)}
-            aria-label={expanded ? "Restaurar tamanho" : "Expandir para tela inteira"}
-            aria-pressed={expanded}
-          >
-            <Icon name={expanded ? "corners-in" : "corners-out"} size="small" color="var(--texto-secundario)" decorative />
-          </button>
-          <button type="button" className={styles.closeButton} onClick={onClose} aria-label="Fechar">
-            <span aria-hidden="true">×</span>
-          </button>
+    <Modal open={open} onClose={onClose} title={fileName} size={expanded ? "full" : "large"}>
+      <div className={styles.content}>
+        <div className={styles.toolbar}>
+          <Button
+            variant="neutral"
+            iconOnly
+            leftIcon={expanded ? "corners-in" : "corners-out"}
+            accessibleLabel={expanded ? "Restaurar tamanho" : "Expandir para tela inteira"}
+            onPress={() => setExpanded((value) => !value)}
+          />
         </div>
+        <pre className={styles.code}>
+          <code>{content}</code>
+        </pre>
       </div>
-      <pre className={styles.code}>
-        <code>{content}</code>
-      </pre>
-    </dialog>
+    </Modal>
   );
 }

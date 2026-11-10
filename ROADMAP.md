@@ -3516,6 +3516,64 @@ debounce, e gerou um commit `auto: sync (contratos) — <timestamp>` enviado soz
 `origin/main`, confirmado comparando `git log` local com `git fetch origin main`. Entrada
 de teste revertida antes de finalizar, não ficou no contrato. Build limpo.
 
+### Mensagem de commit do autosync passou a resumir o que mudou (2026-09-02)
+
+Pedido do usuário: o histórico gerado pelo autosync precisa deixar fácil entender o que
+foi feito, não só quais pastas mudaram.
+
+`buildCommitBody()` novo em `scripts/autosync.mjs`: lista os arquivos alterados (até 30,
+depois resume em "+N arquivo(s) a mais") e, pra cada `contratos/*.contract.json` tocado,
+extrai as entradas NOVAS do array `decisions` — reaproveitando a MESMA lógica já existente
+em `scripts/pr-decisions-diff.mjs` (o comentário automático de PR), só que rodando
+localmente a cada commit em vez de uma vez por PR. O corpo vira parte da mensagem de
+commit (`git commit -m <assunto> -m <corpo>`), o assunto continua o resumo curto de
+grupos de path que já existia.
+
+**BUG REAL pego testando de verdade** (não só lendo o código): a primeira versão lia o
+conteúdo staged via `readJsonAtRef(":", path)`, um helper genérico que monta `` `${ref}:${path}` ``
+— com `ref=":"` isso vira `::contratos/...json` (dois-pontos duplicado), sintaxe inválida
+de `git show`, que sempre falhava silenciosamente (capturado pelo try/catch) e retornava
+`null`. Resultado: a seção "Decisões novas" da mensagem de commit vinha sempre vazia,
+mesmo quando havia uma decision nova de verdade — só descoberto rodando o autosync ao
+vivo (`npm run dev`) e inspecionando `git log -1` do commit gerado, não pela leitura do
+código. Corrigido com uma função dedicada `readStagedJson(path)` usando a sintaxe certa
+(`:path`, um só dois-pontos, sem ref antes). Revalidado com um teste de ponta a ponta:
+uma decision nova adicionada a `contratos/tooltip.contract.json` apareceu corretamente na
+mensagem do commit gerado (`auto: sync (contratos/tooltip.contract.json) — ...` +
+"Decisões novas:" + o texto exato da decision). Entradas de teste todas revertidas —
+`tooltip.contract.json` confirmado byte-idêntico ao estado anterior via `git diff`
+contra o commit-base. Build limpo.
+
+### Primeira integração real de trabalho de outra sessão via autosync (2026-09-02)
+
+Enquanto o autosync ampliado (entrada anterior) estava sendo testado nesta sessão, um
+`git push` deu `[rejected] non-fast-forward` — o `origin/main` tinha 7 commits que não
+existiam localmente. Investigado (não descartado nem forçado, ver Git Safety Protocol):
+eram commits `auto: sync (src/interface)` reais, com timestamps de ~15h-15h30, contendo
+um protótipo novo genuíno — `AutorizacaoOCRScreen` — provavelmente da outra sessão de
+teste do usuário (clone separado, `lvxfr-pre-alpha-teste`, mesmo remoto `origin`).
+Exatamente o cenário que o autosync foi construído pra resolver: trabalho de outra
+pessoa/sessão chegando sozinho no repositório principal, sem precisar de lembrete.
+
+Resolvido com `git merge` normal (nunca `--force`, nunca reescrita de histórico).
+`App.tsx` e `prototable/registry.ts` mesclaram automaticamente sem conflito (mudanças
+complementares — a outra sessão estendeu `ScreenEntry` com um campo `Demo?` opcional
+pra protótipos ProtoTable-only sem entrada em `stories/registry.ts`/sem contrato,
+resolvido em `App.tsx` como fallback quando o id não está em `STORIES`, extensão
+coerente com a arquitetura já documentada). Único conflito real foi em
+`src/interface/prototable/manifest.json` — arquivo GERADO, resolvido regenerando via
+`scripts/prototable-manifest.mjs` em vez de merge manual de JSON.
+
+Verificado no navegador (depois de descobrir que a porta relatada pela ferramenta de
+preview não batia com a porta real escolhida pelo Vite — problema da ferramenta, não do
+código; a porta certa aparece no log do próprio `vite`): ProtoTable agora lista 2
+Projetos ("LVXFR — telas de referência" e "Portal do Cliente (Web)"), navegação até
+`AutorizacaoOCRScreen` funcionando (auto-colapso Módulo→Fluxo→Tela, breadcrumb, metadados
+git reais de autor/data do outro clone), tela renderizando via `?standalone=` com a fonte
+correta (confirma de novo o fix de `base.css`/font-family, agora num consumidor real
+diferente de tudo que existia antes). Build limpo. `git push` normal (sem force) depois
+do merge.
+
 ### Rebrand LVXFR → SeleneSDK (2026-11-10)
 
 O projeto deixou de se chamar LVXFR e passou a se chamar **SeleneSDK** (nome mais

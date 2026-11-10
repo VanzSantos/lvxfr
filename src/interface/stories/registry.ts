@@ -64,7 +64,6 @@ import { DashboardTemplateDemo } from "./pages/DashboardTemplateDemo";
 import { KanbanTemplateDemo } from "./pages/KanbanTemplateDemo";
 import { BackofficeTemplateDemo } from "./pages/BackofficeTemplateDemo";
 import { CrudTemplateDemo } from "./pages/CrudTemplateDemo";
-import { AutorizacaoOCRScreenDemo } from "./pages/AutorizacaoOCRScreenDemo";
 import { LoginScreenDemo } from "./pages/LoginScreenDemo";
 import { ForgotPasswordScreenDemo } from "./pages/ForgotPasswordScreenDemo";
 import { ResetPasswordScreenDemo } from "./pages/ResetPasswordScreenDemo";
@@ -1211,21 +1210,6 @@ toast({ intent: "error", message: "Falha ao salvar.", actionLabel: "Tentar de no
 
 <CrudTemplate />`,
     Demo: CrudTemplateDemo,
-  },
-  {
-    id: "autorizacao-ocr-screen",
-    title: "AutorizacaoOCRScreen",
-    group: "Páginas",
-    status: "draft",
-    category: "page",
-    contractFile: "sem contrato — página, não componente",
-    dependencies: ["NavBar", "Avatar", "Alert", "FileUpload", "Select", "TextField", "ComboBox", "QuantitySelector", "Button", "Badge", "Divider", "Spinner", "ConfirmDialog", "EmptyState", "DataField"],
-    tokensSummary: ["semantic.fundo-secundario/superficie", "structural.espaco-g/m/p"],
-    description: "Protótipo da US 'Extração OCR e Validação de Dados na Solicitação de Autorização pelo App' (Portal do Cliente > Autorizações). Fluxo: upload de pedidos médicos → OCR simulado (seletor de cenário escolhe o resultado mockado, já que não há OCR real) → tela de conferência agrupada por médico (edição de Nome/CRM/UF, busca preditiva por descrição autocompletando o Código TUSS, exclusão/inclusão de procedimentos) → confirmação de envio com alerta se algum campo obrigatório estiver vazio → bypass direto pro protocolo quando o total consolidado passa de 5 procedimentos (sem exibir a tela de conferência). Cobre os 5 cenários BDD da US.",
-    code: `import { AutorizacaoOCRScreen } from "./interface/screens/AutorizacaoOCRScreen/AutorizacaoOCRScreen";
-
-<AutorizacaoOCRScreen />`,
-    Demo: AutorizacaoOCRScreenDemo,
   },
   {
     id: "login-screen",

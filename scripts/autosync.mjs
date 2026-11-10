@@ -65,14 +65,8 @@ function log(message) {
 
 /** Resume os arquivos staged num rótulo curto pro commit — ex.: "contratos,
     src/components" — em vez de listar cada arquivo (podem ser dezenas numa
-    sessão de edição real). */
-function summarizeStagedPaths() {
-  let names;
-  try {
-    names = git(["diff", "--cached", "--name-only"]).split("\n").filter(Boolean);
-  } catch {
-    return "alterações";
-  }
+    sessão de edição real). Vira a primeira linha (assunto) do commit. */
+function summarizeStagedPaths(names) {
   const groups = new Set(
     names.map((name) => {
       const parts = name.split("/");
@@ -80,6 +74,67 @@ function summarizeStagedPaths() {
     })
   );
   return [...groups].sort().join(", ") || "alterações";
+}
+
+function readJsonAtRef(ref, path) {
+  try {
+    return JSON.parse(git(["show", `${ref}:${path}`]));
+  } catch {
+    return null;
+  }
+}
+
+/** Conteúdo STAGED (índice) de um arquivo — sintaxe própria do git, não é
+    "ref:path" com ref="" (isso gera "::path", inválido). BUG REAL pego
+    testando de verdade: a primeira versão deste script usava readJsonAtRef
+    genérico pros dois lados da comparação, e o lado "staged" sempre
+    resultava em null (decisões novas nunca apareciam na mensagem de
+    commit, mesmo havendo uma de verdade). */
+function readStagedJson(path) {
+  try {
+    return JSON.parse(git(["show", `:${path}`]));
+  } catch {
+    return null;
+  }
+}
+
+/** Monta o CORPO do commit (além do assunto curto) — lista os arquivos
+    alterados e, pra cada contrato tocado, as entradas NOVAS de `decisions`
+    (comparando o HEAD anterior com o que está staged agora) — mesma lógica
+    já usada em scripts/pr-decisions-diff.mjs pro comentário automático de
+    PR, só que rodando localmente a cada commit em vez de uma vez por PR.
+    É o que faz o histórico do autosync dar pra entender sem precisar abrir
+    cada arquivo depois — pedido explícito do usuário. */
+function buildCommitBody(names) {
+  const lines = [];
+
+  const MAX_FILES_LISTED = 30;
+  lines.push("Arquivos alterados:");
+  for (const name of names.slice(0, MAX_FILES_LISTED)) lines.push(`- ${name}`);
+  if (names.length > MAX_FILES_LISTED) lines.push(`- (+${names.length - MAX_FILES_LISTED} arquivo(s) a mais)`);
+
+  const changedContracts = names.filter((name) => name.startsWith("contratos/") && name.endsWith(".contract.json"));
+  if (changedContracts.length > 0) {
+    lines.push("");
+    lines.push("Decisões novas:");
+    for (const path of changedContracts) {
+      const before = readJsonAtRef("HEAD", path);
+      const after = readStagedJson(path);
+      if (!before) {
+        lines.push(`${path}: contrato novo.`);
+        continue;
+      }
+      if (!after) continue; // removido — nada a resumir
+      const beforeDecisions = new Set(Array.isArray(before.decisions) ? before.decisions : []);
+      const afterDecisions = Array.isArray(after.decisions) ? after.decisions : [];
+      const newDecisions = afterDecisions.filter((d) => !beforeDecisions.has(d));
+      if (newDecisions.length === 0) continue;
+      lines.push(`${path}:`);
+      for (const decision of newDecisions) lines.push(`- ${decision}`);
+    }
+  }
+
+  return lines.join("\n");
 }
 
 function sync() {
@@ -92,10 +147,13 @@ function sync() {
 
   if (!hasStagedChanges()) return;
 
-  const summary = summarizeStagedPaths();
+  const names = git(["diff", "--cached", "--name-only"]).split("\n").filter(Boolean);
+  const summary = summarizeStagedPaths(names);
   const timestamp = new Date().toISOString();
+  const subject = `auto: sync (${summary}) — ${timestamp}`;
+  const body = buildCommitBody(names);
   try {
-    git(["commit", "-m", `auto: sync (${summary}) — ${timestamp}`]);
+    git(["commit", "-m", subject, "-m", body]);
   } catch (err) {
     log(`falha ao commitar: ${err.message}`);
     return;

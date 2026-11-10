@@ -4,7 +4,6 @@
   gap: var(--espaco-xp);
   width: 100%;
   padding: var(--espaco-xp) var(--espaco-pp);
-  margin-bottom: var(--espaco-m);
   border: 1px solid var(--borda-base);
   border-radius: var(--raio-pp);
   background: var(--fundo-superficie);

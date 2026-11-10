@@ -2,11 +2,31 @@
   width: 240px;
   flex-shrink: 0;
   height: 100vh;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
   background: var(--fundo-secundario);
   border-right: 1px solid var(--borda-base);
   padding: var(--espaco-m);
   box-sizing: border-box;
+}
+
+/* Só a lista de grupos rola — marca no topo e rodapé ficam fixos. */
+.scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  margin: 0 calc(var(--espaco-xp) * -1);
+  padding: 0 var(--espaco-xp);
+}
+
+.footer {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-pp);
+  padding-top: var(--espaco-m);
+  margin-top: var(--espaco-pp);
+  border-top: 1px solid var(--borda-base);
 }
 
 .brand {
@@ -17,33 +37,82 @@
   margin-bottom: var(--espaco-pp);
 }
 
-.moduleSwitch {
-  display: block;
+.moduleCard {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-pp);
   width: 100%;
   text-align: left;
-  background: none;
-  border: none;
+  padding: var(--espaco-pp);
+  background: var(--fundo-superficie);
+  border: 1px solid var(--borda-base);
   border-radius: var(--raio-pp);
-  padding: var(--espaco-xp) 0;
-  margin-bottom: var(--espaco-m);
   font-family: var(--texto-p-family);
-  font-size: var(--texto-p-size);
-  font-weight: 600;
-  color: var(--acao-primaria);
+  color: var(--texto-primario);
   cursor: pointer;
 }
 
-.moduleSwitch:hover {
-  text-decoration: underline;
+.moduleCard:hover {
+  border-color: var(--acao-primaria);
 }
 
-.moduleSwitch:focus-visible {
+.moduleCard:focus-visible {
   outline: var(--foco-espessura) solid var(--borda-foco);
   outline-offset: 2px;
 }
 
+.moduleIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: var(--raio-pp);
+  background: var(--fundo-secundario);
+}
+
+.moduleText {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.moduleTitle {
+  font-size: var(--texto-p-size);
+  font-weight: 600;
+}
+
+.moduleDescription {
+  font-size: 12px;
+  color: var(--texto-secundario);
+}
+
 .group {
   margin-bottom: var(--espaco-m);
+}
+
+.groupHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: none;
+  border: none;
+  border-radius: var(--raio-pp);
+  padding: var(--espaco-xp) var(--espaco-pp);
+  margin-bottom: var(--espaco-xp);
+  cursor: pointer;
+}
+
+.groupHeader:hover {
+  background: var(--fundo-superficie);
+}
+
+.groupHeader:focus-visible {
+  outline: var(--foco-espessura) solid var(--borda-foco);
+  outline-offset: -2px;
 }
 
 .groupTitle {
@@ -54,7 +123,7 @@
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--texto-secundario);
-  margin-bottom: var(--espaco-xp);
+  text-align: left;
 }
 
 .empty {

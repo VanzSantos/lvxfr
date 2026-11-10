@@ -320,7 +320,7 @@ export function ProtoTablePage({ onNavigateToPlayground }: ProtoTablePageProps) 
       <nav className={sidebarStyles.sidebar} aria-label="Navegação de protótipos">
         <div className={sidebarStyles.brand}>ProtoTable</div>
         <button type="button" className={sidebarStyles.moduleSwitch} onClick={onNavigateToPlayground}>
-          ← Voltar pro DS Playground
+          ← Voltar pro SeleneSDK
         </button>
         <div className={sidebarStyles.group}>
           <span className={sidebarStyles.groupTitle}>Projetos</span>

@@ -78,7 +78,7 @@ export function PopoverDemo() {
             <button
               type="button"
               aria-label="Mais ações"
-              style={{ padding: 8, borderRadius: "var(--raio-circular)", border: "none", background: "var(--fundo-secundario)", color: "var(--texto-invertido)", cursor: "pointer" }}
+              style={{ padding: 8, borderRadius: "var(--raio-circular)", border: "none", background: "color-mix(in srgb, var(--texto-invertido) 15%, transparent)", color: "var(--texto-invertido)", cursor: "pointer" }}
             >
               ⋯
             </button>

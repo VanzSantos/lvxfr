@@ -30,8 +30,11 @@
 }
 
 .brand {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-pp);
   font-family: var(--texto-m-family);
-  font-size: var(--texto-p-size);
+  font-size: 20px;
   font-weight: 600;
   color: var(--texto-primario);
   margin-bottom: var(--espaco-pp);
@@ -118,11 +121,11 @@
 .groupTitle {
   display: block;
   font-family: var(--texto-p-family);
-  font-size: 11px;
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--texto-secundario);
+  color: var(--acao-primaria);
   text-align: left;
 }
 
@@ -157,7 +160,7 @@
 }
 
 .item:hover {
-  background: var(--fundo-superficie);
+  background: var(--borda-base);
 }
 
 .item:focus-visible {
@@ -165,12 +168,9 @@
   outline-offset: -2px;
 }
 
-.itemActive {
-  background: var(--acao-primaria);
-  color: var(--acao-primaria-texto);
-  font-weight: 600;
-}
-
+.itemActive,
 .itemActive:hover {
-  background: var(--acao-primaria);
+  background: var(--borda-base);
+  color: var(--texto-primario);
+  font-weight: 600;
 }

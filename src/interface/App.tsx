@@ -32,7 +32,7 @@ function readInitialMode(): AppMode {
 export function App() {
   const [selectedId, setSelectedId] = useState<string>(STORIES[0].id);
   const [mode, setMode] = useState<AppMode>(readInitialMode);
-  const { theme, toggleTheme } = useTheme();
+  const { theme, preference, setPreference } = useTheme();
   const [standaloneId] = useState<string | null>(readStandaloneId);
 
   const standaloneStory = standaloneId ? STORIES.find((item) => item.id === standaloneId) : undefined;
@@ -86,8 +86,8 @@ export function App() {
           <Sidebar
             selectedId={selectedId}
             onSelect={setSelectedId}
-            theme={theme}
-            onToggleTheme={toggleTheme}
+            themePreference={preference}
+            onThemePreferenceChange={setPreference}
             onNavigateToPrototable={() => setMode("prototable")}
           />
           <main className={styles.main}>

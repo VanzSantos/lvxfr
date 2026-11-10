@@ -26,6 +26,7 @@ export function ContractPanel({ fileName, source }: ContractPanelProps) {
   return (
     <section className={styles.panel} aria-label="Especificações e contrato">
       <Tabs
+        accessibleLabel="Seções do componente"
         items={[
           { value: "specs", label: "Especificações" },
           { value: "contract", label: "Contrato" },

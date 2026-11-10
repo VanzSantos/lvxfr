@@ -14,9 +14,11 @@ export interface TabsProps {
   items: TabItem[];
   value: string;
   onChange: (value: string) => void;
+  /** Nome acessível do grupo de abas (aria-label do tablist). */
+  accessibleLabel?: string;
 }
 
-export function Tabs({ items, value, onChange }: TabsProps) {
+export function Tabs({ items, value, onChange, accessibleLabel }: TabsProps) {
   const refs = useRef<Record<string, HTMLButtonElement | null>>({});
   const enabledItems = items.filter((item) => !item.disabled);
 
@@ -45,7 +47,7 @@ export function Tabs({ items, value, onChange }: TabsProps) {
   };
 
   return (
-    <div className={styles.tablist} role="tablist">
+    <div className={styles.tablist} role="tablist" aria-label={accessibleLabel}>
       {items.map((item) => {
         const selected = item.value === value;
         return (

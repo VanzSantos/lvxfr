@@ -10,6 +10,8 @@ export interface CommentComposerProps {
   onChange: (value: string) => void;
   onSubmit: (value: string) => void;
   placeholder?: string;
+  /** Nome acessível do campo (o placeholder não é rótulo). */
+  accessibleLabel?: string;
   submitLabel?: string;
   onAttachImage?: () => void;
   onMarkImportant?: () => void;
@@ -24,6 +26,7 @@ export function CommentComposer({
   onChange,
   onSubmit,
   placeholder = "Insira sua nota aqui...",
+  accessibleLabel = "Comentário",
   submitLabel = "Publicar",
   onAttachImage,
   onMarkImportant,
@@ -40,6 +43,7 @@ export function CommentComposer({
       <Textarea
         value={value}
         onChange={onChange}
+        accessibleLabel={accessibleLabel}
         placeholder={placeholder}
         rows={3}
         resizable={false}

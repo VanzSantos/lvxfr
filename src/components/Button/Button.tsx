@@ -75,7 +75,12 @@ export function Button({
       {loading ? (
         // decorative=true: o <button> já expõe aria-busy, então o Spinner não
         // precisa de role="status" próprio (evitaria anunciar duas vezes).
-        <Spinner size="medium" color="var(--acao-carregando-texto)" />
+        <>
+          <Spinner size="medium" color="var(--acao-carregando-texto)" />
+          {/* Sem isto o botão perde o nome acessível enquanto carrega (só aria-busy).
+              iconOnly já tem aria-label, então só o caso com rótulo precisa. */}
+          {!iconOnly && label && <span className={styles.srOnly}>{label}</span>}
+        </>
       ) : (
         <>
           {leftIcon && <Icon name={leftIcon} size="medium" color={textColorVar} />}

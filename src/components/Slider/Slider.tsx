@@ -42,6 +42,12 @@ export function Slider(props: SliderProps) {
   const disabled = state === "disabled";
   const showValue = props.showValue ?? true;
 
+  if (!props.label && !props.accessibleLabel) {
+    throw new Error("Slider: label ou accessibleLabel é obrigatório (contratos/slider.contract.json, forbidden).");
+  }
+  // Modo range tem dois inputs — cada um precisa do próprio nome, mesmo quando há `label` visível.
+  const rangeName = props.accessibleLabel ?? props.label;
+
   if (props.range) {
     const [lo, hi] = props.value;
     const loPercent = percentage(lo, min, max);
@@ -74,7 +80,7 @@ export function Slider(props: SliderProps) {
             step={step}
             value={lo}
             disabled={disabled}
-            aria-label={props.accessibleLabel ? `${props.accessibleLabel} (mínimo)` : undefined}
+            aria-label={`${rangeName} (mínimo)`}
             onChange={(event) => handleLoChange(Number(event.target.value))}
           />
           <input
@@ -85,7 +91,7 @@ export function Slider(props: SliderProps) {
             step={step}
             value={hi}
             disabled={disabled}
-            aria-label={props.accessibleLabel ? `${props.accessibleLabel} (máximo)` : undefined}
+            aria-label={`${rangeName} (máximo)`}
             onChange={(event) => handleHiChange(Number(event.target.value))}
           />
         </div>

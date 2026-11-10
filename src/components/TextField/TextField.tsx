@@ -10,6 +10,8 @@ export type TextFieldState = "default" | "focus" | "error" | "disabled" | "readO
 
 export interface TextFieldProps {
   label?: string;
+  /** Nome acessível quando não há `label` visível (placeholder não é rótulo). */
+  accessibleLabel?: string;
   required?: boolean;
   withInfo?: boolean;
   infoText?: string;
@@ -32,6 +34,7 @@ export interface TextFieldProps {
 
 export function TextField({
   label,
+  accessibleLabel,
   required = false,
   withInfo = false,
   infoText,
@@ -110,6 +113,7 @@ export function TextField({
           disabled={disabled}
           readOnly={readOnly}
           required={required}
+          aria-label={label ? undefined : accessibleLabel}
           aria-required={required || undefined}
           aria-invalid={error || undefined}
           aria-describedby={helperText ? `${fieldId}-message` : undefined}

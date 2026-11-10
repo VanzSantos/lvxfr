@@ -52,12 +52,11 @@
       "enum": [
         "small",
         "medium",
-        "large",
-        "full"
+        "large"
       ],
       "default": "medium",
       "required": false,
-      "description": "small=400px, medium=560px, large=720px de largura máxima (sempre limitada a 100vw - 2×espaco-g, responsivo); full=100vw × 100vh, sem borda nem raio (ocupa a tela inteira)."
+      "description": "small=400px, medium=560px, large=720px de largura máxima (sempre limitada a 100vw - 2×espaco-g, responsivo)."
     },
     {
       "name": "padding",
@@ -93,8 +92,7 @@
   "variants": [
     "small",
     "medium",
-    "large",
-    "full"
+    "large"
   ],
   "states": [
     "static"
@@ -186,8 +184,7 @@
     "Tamanhos (small=400/medium=560/large=720px) sempre com teto de calc(100vw - espaco-g×2) — mesmo padrão responsivo já usado no ContractDialog interno, garante que o Modal nunca estoura a viewport em telas pequenas mesmo no tamanho 'large'.",
     "Sem prop 'initialFocusRef' ou similar pra customizar o elemento que recebe foco ao abrir — o comportamento nativo do showModal() (foca o primeiro elemento focável, ou o próprio <dialog> se não houver nenhum) já é adequado pra maioria dos casos; se um caso real pedir foco customizado, é decisão nova.",
     "Foco retorna pro elemento que abriu o Modal ao fechar — comportamento nativo do close() em navegadores modernos, não precisou de nenhuma lógica adicional pra implementar.",
-    "BUG REAL corrigido em teste no navegador (modo escuro) — .dialog nunca declarava background/color próprios; o <dialog> nativo tem um fundo branco (ou 'Canvas', dependendo do navegador) no user-agent stylesheet por padrão, então o Modal continuava com o card claro mesmo no tema escuro, mesmo com o resto da página já correto. Adicionado `background: var(--fundo-superficie); color: var(--texto-primario)` explícitos em .dialog — os dois já eram tokens corretos, só faltava declará-los (o :root[data-theme] já cuidava do valor certo por tema, o componente só não estava lendo).",
-    "EXTENSÃO — size='full' (2026-11-10), sob demanda do consumidor real: o diálogo 'Ver contrato' do SeleneSDK Playground precisa alternar entre leitura normal e tela inteira (JSON longo). Ocupa 100vw × 100vh sem borda/raio (não sobra backdrop pra enquadrar). Quem consome controla a troca (ex.: size={expandido ? 'full' : 'large'}) — Modal não ganha prop 'fullscreen' separada nem botão próprio de expandir, pra não inflar a API com algo que cada consumidor posiciona onde fizer sentido (children é livre)."
+    "BUG REAL corrigido em teste no navegador (modo escuro) — .dialog nunca declarava background/color próprios; o <dialog> nativo tem um fundo branco (ou 'Canvas', dependendo do navegador) no user-agent stylesheet por padrão, então o Modal continuava com o card claro mesmo no tema escuro, mesmo com o resto da página já correto. Adicionado `background: var(--fundo-superficie); color: var(--texto-primario)` explícitos em .dialog — os dois já eram tokens corretos, só faltava declará-los (o :root[data-theme] já cuidava do valor certo por tema, o componente só não estava lendo)."
   ],
   "references": {
     "tokensFile": "tokens/tokens.json — Cores Semânticas (fundo-superficie, fundo-secundario, fundo-sobreposicao, borda-base, textos), Estrutural (raio-pp, espaco-pp/m/g, icone-pequeno)"

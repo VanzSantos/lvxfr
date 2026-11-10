@@ -2,7 +2,7 @@ import { useEffect, useId, useRef, type ReactNode } from "react";
 import { Icon } from "../Icon/Icon";
 import styles from "./Modal.module.css";
 
-export type ModalSize = "small" | "medium" | "large" | "full";
+export type ModalSize = "small" | "medium" | "large";
 export type ModalPadding = "small" | "medium" | "large";
 export type ModalRole = "dialog" | "alertdialog";
 

@@ -68,7 +68,7 @@ export function Sidebar({ selectedId, onSelect, themePreference, onThemePreferen
   return (
     <nav className={styles.sidebar} aria-label="Navegação de componentes">
       <div className={styles.brand}>
-        <Icon name="moon" size="medium" color="var(--acao-primaria)" weight="fill" decorative />
+        <Icon name="moon" size="medium" color="var(--texto-primario)" weight="fill" decorative />
         SeleneSDK
       </div>
 

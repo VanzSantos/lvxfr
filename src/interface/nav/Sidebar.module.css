@@ -37,6 +37,7 @@
   font-size: 20px;
   font-weight: 600;
   color: var(--texto-primario);
+  padding: var(--espaco-m) 0;
   margin-bottom: var(--espaco-pp);
 }
 

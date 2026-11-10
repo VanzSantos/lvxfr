@@ -1,10 +1,9 @@
 import { useState } from "react";
 import type { StoryMeta } from "./types";
 import type { Theme } from "../theme/useTheme";
-import { ContractDialog } from "./ContractDialog";
+import { ContractPanel } from "./specs/ContractPanel";
 import { getContractSource } from "./contractSource";
 import { Badge, type BadgeVariant } from "../../components/Badge/Badge";
-import { Button } from "../../components/Button/Button";
 import { Link } from "../../components/Link/Link";
 import { SegmentedControl } from "../../components/SegmentedControl/SegmentedControl";
 import styles from "./StoryDetail.module.css";
@@ -32,7 +31,6 @@ type DeviceView = "desktop" | "mobile";
 
 export function StoryDetail({ story, theme }: { story: StoryMeta; theme: Theme }) {
   const Demo = story.Demo;
-  const [contractOpen, setContractOpen] = useState(false);
   const [deviceView, setDeviceView] = useState<DeviceView>("desktop");
   const contractSource = getContractSource(story.contractFile);
   const isResponsive = RESPONSIVE_GROUPS.includes(story.group);
@@ -94,35 +92,23 @@ export function StoryDetail({ story, theme }: { story: StoryMeta; theme: Theme }
         </pre>
       </section>
 
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Detalhes do contrato</h2>
-        <dl className={styles.meta}>
-          <dt>Categoria</dt>
-          <dd>{story.category ?? "—"}</dd>
+      {contractSource ? (
+        <ContractPanel fileName={story.contractFile ?? ""} source={contractSource} />
+      ) : (
+        // Sem contrato (ex.: Templates/Páginas): só os metadados do registro.
+        <section className={styles.section}>
+          <h2 className={styles.sectionTitle}>Detalhes</h2>
+          <dl className={styles.meta}>
+            <dt>Categoria</dt>
+            <dd>{story.category ?? "—"}</dd>
 
-          <dt>Dependências</dt>
-          <dd>{story.dependencies && story.dependencies.length > 0 ? story.dependencies.join(", ") : "nenhuma"}</dd>
+            <dt>Dependências</dt>
+            <dd>{story.dependencies && story.dependencies.length > 0 ? story.dependencies.join(", ") : "nenhuma"}</dd>
 
-          <dt>Tokens principais</dt>
-          <dd>{story.tokensSummary && story.tokensSummary.length > 0 ? story.tokensSummary.join(", ") : "—"}</dd>
-
-          <dt>Arquivo do contrato</dt>
-          <dd className={styles.contractFileRow}>
-            <code>{story.contractFile ?? "—"}</code>
-            {contractSource && (
-              <Button variant="link" label="Ver contrato" onPress={() => setContractOpen(true)} />
-            )}
-          </dd>
-        </dl>
-      </section>
-
-      {contractSource && (
-        <ContractDialog
-          open={contractOpen}
-          onClose={() => setContractOpen(false)}
-          fileName={story.contractFile ?? ""}
-          content={contractSource}
-        />
+            <dt>Tokens principais</dt>
+            <dd>{story.tokensSummary && story.tokensSummary.length > 0 ? story.tokensSummary.join(", ") : "—"}</dd>
+          </dl>
+        </section>
       )}
     </div>
   );

@@ -127,16 +127,7 @@
   color: var(--texto-primario);
 }
 
-.contractFileRow {
-  display: flex;
-  align-items: center;
-  gap: var(--espaco-pp);
-}
 
-.contractFileRow code {
-  font-family: "SF Mono", Menlo, Consolas, monospace;
-  font-size: 0.9em;
-}
 
 
 

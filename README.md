@@ -11,8 +11,9 @@ improvisar — é o que mantém gerações sucessivas consistentes entre sessõe
 diferentes. Detalhes completos de como as peças se encaixam em `ARCHITECTURE.md`; regras
 de geração para IA em `SKILL.md`; histórico de decisões consolidado em `CHANGELOG.md`.
 
-Você está recebendo acesso a este repositório pra testar o SeleneSDK, fazer protótipos
-navegáveis e (se quiser) mandar de volta ajustes/correções — ver "Contribuindo" abaixo.
+Este repositório é trabalhado por uma equipe ao mesmo tempo: cada pessoa usa o SeleneSDK
+pra fazer protótipos navegáveis e melhorar a base (componentes, contratos, tokens) na
+própria branch, e as mudanças entram na `main` por Pull Request — ver "Contribuindo".
 
 ## Pré-requisitos
 
@@ -22,11 +23,14 @@ navegáveis e (se quiser) mandar de volta ajustes/correções — ver "Contribui
 ## Instalação
 
 ```bash
-git clone <url-do-seu-fork>
-cd selenesdk
+git clone https://github.com/VanzSantos/SeleneSDK.git
+cd SeleneSDK
 npm install
 npm run dev
 ```
+
+(Você precisa ter sido adicionado(a) como colaborador(a) pra enviar mudanças. Só pra
+olhar o projeto, o clone público basta.)
 
 Abre em `http://localhost:5173` — é o **DS Playground**: navegue pela lateral pra ver
 cada componente com todas as variantes/estados, o código de exemplo e os detalhes do
@@ -40,7 +44,7 @@ fazer isso, escolha a que fizer mais sentido pro seu caso:
 ### Opção recomendada: vários protótipos no mesmo projeto clonado
 
 Cada protótipo novo é uma pasta em `src/interface/screens/<NomeDoProtótipo>/`, registrada
-em `src/interface/stories/registry.ts` (grupo `"Páginas"`). Toda tela registrada abre
+em um arquivo novo `src/interface/stories/entries/<id>.ts` (grupo `"Páginas"`). Toda tela registrada abre
 isolada, sem o chrome do Playground ao redor, através do link **"Abrir em nova página"**
 que aparece em cada story (rota `/?standalone=<key>`) — então dá pra ter vários
 protótipos diferentes convivendo no mesmo clone, cada um navegável isoladamente, sem
@@ -69,21 +73,20 @@ pros outros — você precisaria reaplicar manualmente ou reclonar.
 
 Comece pela primeira opção; migre pra clones separados só quando um caso real pedir.
 
-## Tudo que você mexer é commitado e enviado sozinho
+## Seu trabalho é salvo sozinho — na sua branch
 
 Enquanto `npm run dev` está de pé, um processo em segundo plano
-(`scripts/autosync.mjs`) observa `contratos/`, `tokens/` e `src/` inteiros — ou seja,
-**qualquer** contrato de componente novo/ajustado, token novo/ajustado, componente
-novo/ajustado, ou protótipo novo/ajustado — e, ~20 segundos depois da última mudança,
-**commita e dá push automaticamente**, sem você precisar lembrar de rodar `git add`/
-`git commit`/`git push`. É assim que quem administra o repositório principal consegue
-ver o progresso de qualquer Product Designer sem depender de lembrete manual — a
-curadoria de o que entra de fato no projeto principal acontece depois, na revisão do
-seu PR (ver "Contribuindo" abaixo), não aqui.
+(`scripts/autosync.mjs`) observa `contratos/`, `tokens/` e `src/` — qualquer contrato,
+token, componente ou protótipo novo/ajustado — e, ~20 segundos depois da última mudança,
+**commita e dá push** sem você lembrar de `git add`/`commit`/`push`.
 
-Ele nunca usa `--force`; se o push falhar (histórico divergente), só avisa no
-terminal, sem tentar resolver sozinho — nesse caso, dê um `git pull` manual. Pra
-desligar essa automação numa sessão específica: `AUTOSYNC=0 npm run dev`.
+**Ele nunca escreve na `main`**, que só recebe mudança por Pull Request. Se você estiver
+nela ao subir o `npm run dev`, ele troca sozinho pra uma branch pessoal `wip/<seu-nome>`
+(ou use a sua: `git switch -c ajuste/minha-tarefa` antes). Quando o trabalho estiver pronto,
+você abre um PR dessa branch — ver "Contribuindo".
+
+Nunca usa `--force`; se o push falhar (histórico divergente), só avisa — dê um `git pull`.
+Pra olhar o projeto sem nenhum commit: `npm run dev:vite-only` (ou `AUTOSYNC=0 npm run dev`).
 
 ## ProtoTable — quem criou/atualizou o quê
 
@@ -92,21 +95,22 @@ deliberadamente uma tela separada, não misturada com a vitrine de componentes: 
 índice dos protótipos reais (não dos componentes), mostrando quem criou cada um, quem
 atualizou por último, quando, e o histórico completo de commits. Nada disso é digitado
 à mão — vem direto do histórico git de cada pasta em `src/interface/screens/`
-registrada em `src/interface/prototable/registry.ts` (a mesma automação acima é quem
-garante que esse histórico existe de verdade no repositório remoto).
+registrada em `src/interface/prototable/registry.ts` (o histórico vem do git, então só
+existe pro que já foi commitado e enviado).
 
 ## Contribuindo
 
-Se você ajustar um componente, um token, ou corrigir algo no contrato/tokens durante os
-testes e quiser mandar isso de volta, veja **`CONTRIBUTING.md`** — resume o fluxo (fork →
-branch → PR contra o repositório original) e a regra mais importante: toda mudança de
-contrato precisa de uma entrada no array `decisions` daquele contrato, que é de onde o
-changelog do projeto é gerado automaticamente.
+Veja **`CONTRIBUTING.md`** — resume o fluxo da equipe (branch própria → Pull Request pra
+`main` → revisão) e a regra mais importante: toda mudança de contrato precisa de uma
+entrada no array `decisions` daquele contrato, que é de onde o changelog do projeto é
+gerado automaticamente.
 
 ## Scripts disponíveis
 
 ```bash
-npm run dev         # servidor de desenvolvimento (Playground)
+npm run dev         # servidor de desenvolvimento (Playground) + autosync na sua branch
+npm run dev:vite-only  # só o servidor, sem autosync nem commits
+npm run manifest    # regera o manifesto do ProtoTable (já roda sozinho no install/dev/build)
 npm run build       # typecheck + build de produção
 npm run preview     # serve o build de produção localmente
 npm run changelog   # regenera CHANGELOG.md a partir das decisions[] de todos os contratos

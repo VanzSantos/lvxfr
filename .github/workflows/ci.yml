@@ -2,6 +2,14 @@ name: CI
 
 on:
   pull_request:
+  # build também na main depois de um merge — pega quebra que o PR sozinho não mostrou
+  push:
+    branches: [main]
+
+# um build novo da mesma branch/PR cancela o anterior (equipe empurrando várias vezes seguidas)
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -24,6 +32,7 @@ jobs:
       - run: npm run build
 
       - name: Resumir contratos alterados
+        if: github.event_name == 'pull_request'
         id: decisions
         run: |
           node scripts/pr-decisions-diff.mjs "origin/${{ github.base_ref }}" "${{ github.sha }}" > /tmp/summary.md
@@ -32,6 +41,7 @@ jobs:
           echo "EOF" >> "$GITHUB_OUTPUT"
 
       - name: Comentar resumo no PR
+        if: github.event_name == 'pull_request'
         uses: actions/github-script@v7
         env:
           # Via variável de ambiente, NUNCA interpolado no script: o resumo vem de

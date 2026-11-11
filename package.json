@@ -4,9 +4,13 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
+    "manifest": "node scripts/prototable-manifest.mjs --out src/interface/prototable/manifest.json",
+    "postinstall": "npm run manifest",
+    "predev": "npm run manifest",
     "dev": "node scripts/dev-with-autosync.mjs",
+    "predev:vite-only": "npm run manifest",
     "dev:vite-only": "vite",
-    "prebuild": "node scripts/prototable-manifest.mjs --out src/interface/prototable/manifest.json",
+    "prebuild": "npm run manifest",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "changelog": "node scripts/changelog.mjs > CHANGELOG.md"

@@ -95,7 +95,7 @@ originais (ex.: Button trata prop fora do enum como erro a resolver, não a adiv
                                        phoneMask.ts, dateTimeMask.ts) — nunca um componente em si
     interface/                     <- DS Playground: telas que compõem/exercitam os componentes
       App.tsx                      <- shell do Playground (sidebar + área de conteúdo)
-      stories/                     <- uma entrada por componente/página em registry.ts, com demo + código +
+      stories/                     <- uma entrada por componente/página (1 arquivo em entries/), com demo + código +
                                        metadados do contrato; GROUP_ORDER define os grupos do Sidebar
                                        (Átomos/Moléculas/Organismos/Templates/Páginas)
       screens/                     <- telas completas construídas sobre os componentes — Templates (telas
@@ -116,7 +116,7 @@ ls contratos/*.contract.json
 ```
 
 Sempre que um contrato for criado ou atualizado, a implementação correspondente e a
-entrada dela no DS Playground (`src/interface/stories/registry.ts`) devem ser
+entrada dela no DS Playground (`src/interface/stories/entries/<id>.ts`) devem ser
 criadas/atualizadas juntas — não fica pendente pra depois.
 
 Ao criar um novo componente: contrato novo em `contratos/`, implementação nova em

@@ -1,0 +1,4 @@
+# Quem revisa por padrão (o GitHub pede revisão automaticamente em todo PR).
+# Pra tornar a aprovação OBRIGATÓRIA: Settings > Branches > regra da main >
+# "Require review from Code Owners". Ver CONTRIBUTING.md, "Para quem administra".
+*       @VanzSantos

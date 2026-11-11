@@ -4,6 +4,8 @@ export type StoryGroup = "Tokens" | "Átomos" | "Moléculas" | "Organismos" | "T
 
 export interface StoryMeta {
   id: string;
+  /** Posição no menu (menor primeiro). Sem `order`, a tela vai pro fim, em ordem alfabética de id. */
+  order?: number;
   title: string;
   group: StoryGroup;
   status: "draft" | "stable" | "deprecated";

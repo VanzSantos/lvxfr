@@ -4,3 +4,4 @@ dist
 .DS_Store
 *.local
 .claude/settings.local.json
+src/interface/prototable/manifest.json

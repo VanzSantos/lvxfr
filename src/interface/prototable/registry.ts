@@ -1,5 +1,5 @@
 /** Registro de PROTÓTIPOS, separado de propósito do registro do DS Playground
-    (src/interface/stories/registry.ts). O Playground é a vitrine dos
+    (src/interface/stories/entries/). O Playground é a vitrine dos
     componentes; ProtoTable é o índice de telas/produtos reais construídos em
     cima deles — as duas coisas não devem se misturar (pedido explícito do
     usuário), mesmo que hoje algumas entradas apontem pras mesmas pastas em
@@ -14,7 +14,7 @@
     mão e de agregar em scripts/prototable-manifest.mjs do que aninhado.
 
     Registrar um protótipo aqui é um passo A MAIS, separado de registrá-lo em
-    stories/registry.ts (que só controla se ele aparece navegável dentro do
+    stories/entries/<id>.ts (que só controla se ele aparece navegável dentro do
     Playground) — ver README.md/CONTRIBUTING.md "Criando protótipos". Um
     nível com exatamente 1 filho (ex.: um Módulo com um Fluxo só) não precisa
     virar uma tabela de "1 item" na UI — ProtoTablePage pula direto pro
@@ -51,14 +51,14 @@ export interface ScreenEntry {
       pra rodar `git log` — precisa ser a pasta real em src/interface/screens/. */
   screenPath: string;
   /** id usado pra montar o link "Abrir" via ?standalone=<id>. Pra telas que
-      TAMBÉM existem no Playground (stories/registry.ts) — telas de
+      TAMBÉM existem no Playground (stories/entries/) — telas de
       referência do harness, ver ARCHITECTURE.md — use o id do STORY de lá.
       Pra protótipos de produto reais (US de negócio, sem contrato, que NÃO
       devem aparecer no Playground — pedido explícito do usuário), use
       qualquer id único aqui e informe `Demo` abaixo; App.tsx resolve o
       standalone por Demo quando o id não é encontrado em STORIES. */
   standaloneStoryId: string;
-  /** Só necessário quando a tela NÃO está registrada em stories/registry.ts
+  /** Só necessário quando a tela NÃO está registrada em stories/entries/
       (protótipo ProtoTable-only). Componente sem props obrigatórias — a
       própria tela de src/interface/screens/<Nome> serve direto aqui, já que
       seu `embedded` é opcional e o padrão (false) já ocupa a viewport

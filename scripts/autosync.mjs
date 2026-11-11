@@ -10,6 +10,14 @@
 // única empresa, sem preocupação de privacidade entre produtos (decisão
 // explícita do usuário) — por isso está ligado por padrão em `npm run dev`.
 //
+// TRABALHO EM EQUIPE: este script NUNCA commita nem dá push na `main` (nem na
+// `master`). A `main` é protegida e só recebe mudança por Pull Request. Ao
+// iniciar, se você estiver nela, o script troca sozinho pra uma branch
+// pessoal `wip/<seu-nome>` (nome do `git config user.name`, ou AUTOSYNC_BRANCH
+// pra escolher outro) e é nela que commita e envia. Quando o trabalho estiver
+// pronto, abra um PR dessa branch pra `main` (ver CONTRIBUTING.md). Se você
+// trocar manualmente pra `main` com o autosync rodando, ele só avisa e pausa.
+//
 // NUNCA força push. Se o push normal falhar (histórico divergente), só avisa
 // no terminal — resolver isso é manual, sempre.
 //
@@ -34,11 +42,60 @@ const DEBOUNCE_MS = Number(process.env.AUTOSYNC_DEBOUNCE_MS) || 20_000;
 const WATCHED_DIRS = ["contratos", "tokens", "src"];
 
 function git(args) {
-  return execFileSync("git", args, { cwd: repoRoot, encoding: "utf8" }).trim();
+  // stderr capturado (não vaza "fatal: ..." de sondagens esperadas, como "essa branch existe?");
+  // quando um comando falha de verdade, errLine() mostra a mensagem do git.
+  return execFileSync("git", args, { cwd: repoRoot, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }).trim();
+}
+
+function errLine(err) {
+  return (err.stderr?.toString().trim() || err.message).split("\n")[0];
 }
 
 function currentBranch() {
   return git(["rev-parse", "--abbrev-ref", "HEAD"]);
+}
+
+// Branches onde o autosync nunca escreve: a main é compartilhada e protegida (só PR).
+const PROTECTED_BRANCHES = ["main", "master"];
+
+function slugify(text) {
+  return (
+    text
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "") || "dev"
+  );
+}
+
+/** Nome da branch pessoal: AUTOSYNC_BRANCH, senão wip/<user.name do git ou $USER>. */
+function personalBranchName() {
+  if (process.env.AUTOSYNC_BRANCH) return process.env.AUTOSYNC_BRANCH;
+  let who = "";
+  try {
+    who = git(["config", "user.name"]);
+  } catch {
+    // sem user.name configurado — cai no usuário do sistema
+  }
+  return `wip/${slugify(who || process.env.USER || process.env.USERNAME || "dev")}`;
+}
+
+/** Se estiver numa branch protegida, troca pra branch pessoal (alterações não commitadas vão junto). */
+function ensureNotOnProtectedBranch() {
+  const branch = currentBranch();
+  if (!PROTECTED_BRANCHES.includes(branch)) return;
+  const target = personalBranchName();
+  try {
+    try {
+      git(["switch", target]); // já existe (local ou no origin)
+    } catch {
+      git(["switch", "-c", target]);
+    }
+    log(`você estava na ${branch} (protegida, só recebe PR) — troquei pra a branch pessoal "${target}".`);
+  } catch (err) {
+    log(`⚠️  não consegui sair da ${branch}: ${errLine(err)} — autosync pausado até você trocar de branch.`);
+  }
 }
 
 function hasStagedChanges() {
@@ -138,10 +195,20 @@ function buildCommitBody(names) {
 }
 
 function sync() {
+  const branch = currentBranch();
+  if (branch === "HEAD" || PROTECTED_BRANCHES.includes(branch)) {
+    log(
+      branch === "HEAD"
+        ? "HEAD solto (detached) — autosync pausado, nada commitado."
+        : `você está na ${branch} (protegida, só recebe PR) — autosync pausado, nada commitado. Troque pra uma branch (ex.: git switch -c minha-tarefa).`
+    );
+    return;
+  }
+
   try {
     git(["add", "--", ...WATCHED_DIRS]);
   } catch (err) {
-    log(`falha ao "git add": ${err.message}`);
+    log(`falha ao "git add": ${errLine(err)}`);
     return;
   }
 
@@ -155,12 +222,11 @@ function sync() {
   try {
     git(["commit", "-m", subject, "-m", body]);
   } catch (err) {
-    log(`falha ao commitar: ${err.message}`);
+    log(`falha ao commitar: ${errLine(err)}`);
     return;
   }
   log(`commit criado (${summary}).`);
 
-  const branch = currentBranch();
   try {
     if (hasUpstream(branch)) {
       git(["push"]);
@@ -171,12 +237,13 @@ function sync() {
   } catch (err) {
     log(
       `⚠️  push falhou (branch ${branch}) — provavelmente histórico divergente. ` +
-        `Resolva manualmente com "git pull" antes do próximo autosync. Detalhe: ${err.message.split("\n")[0]}`
+        `Resolva manualmente com "git pull" antes do próximo autosync. Detalhe: ${errLine(err)}`
     );
   }
 }
 
 function main() {
+  ensureNotOnProtectedBranch();
   log(`observando ${WATCHED_DIRS.join(", ")} (debounce ${DEBOUNCE_MS}ms). Ctrl+C pra parar.`);
 
   let timer = null;

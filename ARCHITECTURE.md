@@ -71,7 +71,7 @@ assim pode deixar parte do conteúdo (a toolbar) fora de qualquer superfície de
 ## Criando um novo protótipo
 
 Um protótipo novo não precisa de um projeto/clone separado — é uma pasta nova em
-`src/interface/screens/`, registrada em `src/interface/stories/registry.ts` (grupo
+`src/interface/screens/`, registrada em um arquivo novo `src/interface/stories/entries/<id>.ts` (grupo
 `"Páginas"`), reaproveitando `AppShell` quando fizer sentido. Toda tela registrada abre
 isolada via `/?standalone=<key>` (ver `Abrir em nova página` em qualquer story do
 Playground) — então múltiplos protótipos convivem no mesmo projeto sem se atrapalharem,
